@@ -127,89 +127,13 @@ async def generate_diagram(request: DiagramGenerationRequest):
             return result if result else text  # Fallback to original if nothing left
         
         if request.diagram_type == 'graphviz':
-            # Advanced workflow parser for complex diagrams
-            def parse_workflow_advanced(text):
-                """Parse complex workflows with branching, errors, and parallel paths"""
-                
-                nodes_list = []
-                edges_list = []
-                
-                # Pattern detection
-                patterns = {
-                    'routing': re.compile(r'(?:routed?\s+to|choose|select)\s+(?:either\s+)?(?:a\s+)?(\w+[\w\s-]*)\s+(?:or|\/)\s+(?:a\s+)?(\w+[\w\s-]*)', re.IGNORECASE),
-                    'conditional': re.compile(r'if\s+(.*?)\s+(?:then\s+)?(?:do\s+)?([^,\.]+)(?:\s+(?:else|otherwise)\s+([^,\.]+))?', re.IGNORECASE),
-                    'parallel': re.compile(r'(?:parallel|concurrent|simultaneously|multiple)\s+(\w+)', re.IGNORECASE),
-                    'error_handling': re.compile(r'(?:on|if)\s+(?:transient\s+)?(?:errors?|failures?|timeout)\s*[,:]?\s*([^,\.]+)', re.IGNORECASE),
-                    'fatal_error': re.compile(r'(?:fatal\s+errors?|critical\s+failures?)\s*[,:]?\s*([^,\.]+)', re.IGNORECASE),
-                    'retry': re.compile(r'retry\s+(?:on\s+)?([^,\.]+)', re.IGNORECASE),
-                    'success': re.compile(r'(?:on\s+)?success\s*[,:]?\s*([^,\.]+)', re.IGNORECASE),
-                }
-                
-                # Extract routing paths (fast-path/slow-path, either/or)
-                routing_matches = patterns['routing'].findall(text)
-                
-                # Extract conditionals (if/else)
-                conditional_matches = patterns['conditional'].findall(text)
-                
-                # Extract error handling
-                error_matches = patterns['error_handling'].findall(text)
-                fatal_matches = patterns['fatal_error'].findall(text)
-                
-                # Extract retry logic
-                retry_matches = patterns['retry'].findall(text)
-                
-                # Extract success paths
-                success_matches = patterns['success'].findall(text)
-                
-                # Split into sentences/clauses
-                sentences = re.split(r'[.!]', text)
-                
-                all_steps = []
-                for sentence in sentences:
-                    # Split by commas and conjunctions
-                    parts = re.split(r',|;|\band\s+then\b|\bthen\b', sentence, flags=re.IGNORECASE)
-                    for part in parts:
-                        part = part.strip()
-                        if len(part) > 8:  # Only meaningful steps
-                            # Clean filler words
-                            cleaned = clean_step(part)
-                            if cleaned and len(cleaned) > 3:
-                                all_steps.append(cleaned)
-                
-                return {
-                    'steps': all_steps,
-                    'routing': routing_matches,
-                    'conditionals': conditional_matches,
-                    'errors': error_matches,
-                    'fatal_errors': fatal_matches,
-                    'retries': retry_matches,
-                    'success_paths': success_matches
-                }
-            
-            workflow_data = parse_workflow_advanced(description)
-            
-            # Check if this is a complex workflow (multiple branches, errors, etc.)
-            is_complex = any([
-                len(workflow_data['routing']) > 0,
-                len(workflow_data['errors']) > 0,
-                len(workflow_data['fatal_errors']) > 0,
-                'parallel' in description.lower() or 'worker' in description.lower(),
-                'retry' in description.lower(),
-                'dead-letter' in description.lower() or 'dlq' in description.lower()
-            ])
-            
-            # Use advanced generator for complex workflows
-            code = None
-            if is_complex:
-                try:
-                    code = generate_graphviz_advanced(description)
-                    logger.info("Advanced generator succeeded")
-                except Exception as e:
-                    logger.error(f"Advanced generator failed: {e}", exc_info=True)
-                    is_complex = False
-            
-            if not is_complex or code is None:
-                # Original simple parsing for backwards compatibility
+            # Use advanced generator for all GraphViz diagrams
+            try:
+                code = generate_graphviz_advanced(description)
+                logger.info("Advanced GraphViz generator used successfully")
+            except Exception as e:
+                logger.error(f"Advanced generator failed: {e}, using simple fallback", exc_info=True)
+                # Fallback to simple version
                 desc_lower = description.lower()
             
             # Detect layout preference
