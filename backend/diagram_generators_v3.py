@@ -427,9 +427,10 @@ def generate_excalidraw_v3(description):
     
     # Start node - centered
     start_width, start_height = 220, 90
+    start_x = center_x - start_width // 2
     last_id, last_x, last_y = make_element(
         "ellipse", 
-        center_x - start_width // 2, 
+        start_x, 
         current_y, 
         start_width, 
         start_height, 
@@ -437,6 +438,9 @@ def generate_excalidraw_v3(description):
         "#dcfce7", 
         "#16a34a"
     )
+    # Set last position to center bottom of START for next arrow
+    last_x = center_x
+    last_y = current_y + start_height
     current_y += start_height + vertical_spacing
     
     # Steps - all centered vertically
