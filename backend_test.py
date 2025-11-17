@@ -71,12 +71,8 @@ def test_api_endpoint(description: str, diagram_type: str, test_name: str, expec
                 generated_code = json_response.get("code", "")
                 result["generated_code"] = generated_code
                 
-                # Check length expectations from test scenario
-                expected_min = expected_features.get('expected_length_min', 600) if isinstance(expected_features, dict) else 600
-                expected_max = expected_features.get('expected_length_max', 10000) if isinstance(expected_features, dict) else 10000
-                result["expected_length_min"] = expected_min
-                result["expected_length_max"] = expected_max
-                result["is_sophisticated"] = expected_min <= len(generated_code) <= expected_max
+                result["generated_code"] = generated_code
+                result["is_sophisticated"] = expected_length_min <= len(generated_code) <= expected_length_max
                 
                 # Feature analysis for final 4 diagram types
                 feature_checks = {}
