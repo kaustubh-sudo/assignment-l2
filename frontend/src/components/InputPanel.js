@@ -12,12 +12,6 @@ const DIAGRAM_TYPES = [
   { value: 'mermaid', label: '🧜 Mermaid', description: 'Flowcharts, sequences, and state diagrams' },
   { value: 'plantuml', label: '🌱 PlantUML', description: 'UML diagrams, sequences, and use cases' },
   { value: 'excalidraw', label: '✨ Excalidraw', description: 'Hand-drawn style diagrams and sketches' },
-  { value: 'blockdiag', label: '📦 BlockDiag', description: 'Simple block and network diagrams' },
-  { value: 'd2', label: '🎨 D2', description: 'Modern declarative diagram scripting language' },
-  { value: 'ditaa', label: '✏️ Ditaa', description: 'ASCII art to diagram converter' },
-  { value: 'structurizr', label: '🏗️ Structurizr', description: 'Software architecture diagrams (C4 model)' },
-  { value: 'svgbob', label: '🎭 Svgbob', description: 'ASCII diagrams to SVG converter' },
-  { value: 'symbolator', label: '🔣 Symbolator', description: 'Hardware timing diagrams from VHDL/Verilog' },
 ];
 
 const InputPanel = ({
