@@ -197,43 +197,52 @@ def generate_pikchr_v3(description):
     """Generate clean Pikchr diagram with proper labels and flow"""
     steps, decision = parse_description_to_steps(description)
     
-    code = "// Pikchr diagram - Clean flowchart\n"
-    code += "linewid = 0.5\n"
-    code += "lineht = 0.5\n\n"
+    # Pikchr uses simple, clean syntax
+    code = "// Pikchr flowchart\n"
+    code += "scale = 1.0\n"
+    code += "lineht = 0.4\n\n"
     
     # Start node
-    code += "Start: oval \"START\" fill lightgreen\n"
-    code += "arrow\n"
+    code += "START: oval \"START\" fit fill lightgreen\n"
+    code += "arrow down\n"
     
     # Steps
     for i, step in enumerate(steps):
-        step_id = f"Step{i}"
+        step_id = f"S{i}"
         if any(word in step.lower() for word in ['error', 'fail']):
-            fill_color = "lightred"
+            fill_color = "pink"
         else:
             fill_color = "lightblue"
         
-        code += f'{step_id}: box "{step[:50]}" fill {fill_color}\n'
-        code += "arrow\n"
+        # Escape quotes in text
+        safe_text = step[:45].replace('"', "'")
+        code += f'{step_id}: box "{safe_text}" fit fill {fill_color}\n'
+        code += "arrow down\n"
     
     # Decision point
     if decision:
-        code += f'Decision: diamond "{decision["condition"][:40]}?" fill lightyellow\n'
-        code += "arrow \"YES\" above\n"
-        code += f'YesBranch: box "{decision["yes"][:50]}" fill lightgreen\n'
-        code += "arrow\n"
+        safe_condition = decision["condition"][:35].replace('"', "'")
+        code += f'DEC: diamond "{safe_condition}?" fit fill lightyellow\n'
         
-        code += "move to Decision.e\n"
-        code += "arrow \"NO\" above right\n"
-        code += f'NoBranch: box "{decision["no"][:50]}" fill lightred\n'
-        code += "arrow\n"
+        # YES branch (left)
+        safe_yes = decision["yes"][:40].replace('"', "'")
+        code += "arrow left \"YES\" above\n"
+        code += f'YES: box "{safe_yes}" fit fill lightgreen\n'
         
-        # Both converge to end
-        code += "End: oval \"END\" fill lightgreen at (Decision.x, YesBranch.y - 1.0)\n"
-        code += "arrow from YesBranch.s to End.n\n"
-        code += "arrow from NoBranch.s to End.n\n"
+        # Move back to decision for NO branch
+        code += "move to DEC.s\n"
+        code += "arrow down\n"
+        
+        # NO branch (straight down)
+        safe_no = decision["no"][:40].replace('"', "'")
+        code += f'NO: box "{safe_no}" fit fill pink\n'
+        
+        # Both converge to END
+        code += "arrow down from NO.s\n"
+        code += "END: oval \"END\" fit fill lightgreen\n"
+        code += "arrow from YES.s down then right until even with END.w then to END.w\n"
     else:
-        code += "End: oval \"END\" fill lightgreen\n"
+        code += "END: oval \"END\" fit fill lightgreen\n"
     
     return code
 
