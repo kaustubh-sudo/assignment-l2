@@ -295,3 +295,5 @@ agent_communication:
     message: "Starting comprehensive testing of Kroki Diagram Renderer application. Will test all UI elements, functionality, and integration with Kroki API using Playwright automation."
   - agent: "main"
     message: "Fixed critical backend bug: 1) Added return statement after successful advanced GraphViz generation to prevent fall-through to simple generator code. 2) Moved logger initialization to top of file before first use. Need to test backend /api/generate-diagram endpoint with complex GraphViz descriptions."
+  - agent: "testing"
+    message: "✅ BACKEND BUG FIX VERIFIED: Tested /api/generate-diagram endpoint with all 4 scenarios from review request. Complex GraphViz workflow (main bug fix target) now returns 200 OK with 1004 chars of valid GraphViz code instead of 500 error. Advanced generator working correctly with proper conditional logic, styling, and error handling. Simple GraphViz, Mermaid, and PlantUML also working. Backend logs confirm successful API processing. Bug fix is complete and functional."
