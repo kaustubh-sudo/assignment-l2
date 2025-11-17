@@ -144,7 +144,7 @@ async def generate_diagram(request: DiagramGenerationRequest):
   {chr(10).join(f"  {edge}" for edge in edges)}
 }}'''
         
-        elif request.diagram_type == 'sequence':
+        elif request.diagram_type == 'mermaid':
             # Extract participants and interactions
             participants = []
             interactions = []
