@@ -402,7 +402,7 @@ def generate_mermaid_diagram(description):
         elif step['type'] == 'end':
             code += f"    {node_id}([{text}]):::{step['type']}Style\n"
         elif step['type'] == 'decision':
-            code += f"    {node_id}{{{{{text}?}}}}}:::{step['type']}Style\n"
+            code += f"    {node_id}{{{text}?}}:::{step['type']}Style\n"
         elif step['type'] == 'database':
             code += f"    {node_id}[({text})]:::{step['type']}Style\n"
         elif step['type'] == 'error':
