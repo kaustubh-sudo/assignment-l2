@@ -365,7 +365,14 @@ async def generate_diagram(request: DiagramGenerationRequest):
         elif request.diagram_type == 'ditaa':
             # Generate Ditaa ASCII art
             parts = re.split(r'[,;.\n]|then|next', description, flags=re.IGNORECASE)
-            steps = [p.strip()[:15] for p in parts if p.strip() and len(p.strip()) > 2][:5]
+            steps = []
+            for p in parts:
+                p = p.strip()
+                if p and len(p) > 2:
+                    cleaned = clean_step(p)
+                    if cleaned:
+                        steps.append(cleaned[:15])
+            steps = steps[:5]
             
             code = '+' + '-' * 20 + '+\n'
             for step in steps:
