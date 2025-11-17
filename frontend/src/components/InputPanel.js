@@ -39,21 +39,21 @@ const InputPanel = ({
         </p>
       </CardHeader>
       
-      <CardContent className="flex-1 flex flex-col gap-4 pt-4 overflow-hidden">
-        <div className="space-y-2">
-          <Label htmlFor="diagram-type" className="text-sm font-medium">
+      <CardContent className="flex-1 flex flex-col gap-5 pt-5 overflow-hidden">
+        <div className="space-y-3">
+          <Label htmlFor="diagram-type" className="text-base font-medium">
             What type of diagram?
           </Label>
           <Select value={diagramType} onValueChange={setDiagramType}>
-            <SelectTrigger id="diagram-type" className="h-11">
+            <SelectTrigger id="diagram-type" className="h-12">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {DIAGRAM_TYPES.map((type) => (
                 <SelectItem key={type.value} value={type.value}>
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium">{type.label}</span>
-                    <span className="text-xs text-muted-foreground">{type.description}</span>
+                  <div className="flex flex-col items-start gap-1">
+                    <span className="font-medium text-sm">{type.label}</span>
+                    <span className="text-sm text-muted-foreground">{type.description}</span>
                   </div>
                 </SelectItem>
               ))}
@@ -61,8 +61,8 @@ const InputPanel = ({
           </Select>
         </div>
 
-        <div className="flex-1 flex flex-col gap-2 min-h-0">
-          <Label htmlFor="user-input" className="text-sm font-medium">
+        <div className="flex-1 flex flex-col gap-3 min-h-0">
+          <Label htmlFor="user-input" className="text-base font-medium">
             Describe what you want to create
           </Label>
           <Textarea
