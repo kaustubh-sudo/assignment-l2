@@ -88,10 +88,46 @@ async def generate_diagram(request: DiagramGenerationRequest):
         kroki_type = request.diagram_type
         description = request.description
         
+        # Common filler words to filter out
+        FILLER_WORDS = {
+            'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+            'of', 'with', 'by', 'from', 'up', 'about', 'into', 'through', 'during',
+            'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+            'do', 'does', 'did', 'will', 'would', 'should', 'could', 'may', 'might',
+            'can', 'must', 'shall', 'it', 'this', 'that', 'these', 'those',
+            'i', 'you', 'he', 'she', 'we', 'they', 'what', 'which', 'who',
+            'when', 'where', 'why', 'how', 'all', 'each', 'every', 'both', 'few',
+            'more', 'most', 'some', 'such', 'no', 'nor', 'not', 'only', 'own',
+            'same', 'so', 'than', 'too', 'very', 's', 't', 'just', 'now'
+        }
+        
+        def clean_step(text):
+            """Clean and extract meaningful content from a step"""
+            # Remove common prefixes
+            text = re.sub(r'^(step\s+\d+:?\s*|•\s*|-\s*|\d+\.\s*)', '', text, flags=re.IGNORECASE)
+            
+            # Split into words
+            words = text.split()
+            
+            # Filter out filler words but keep meaningful phrases
+            if len(words) <= 3:
+                # For short phrases, only remove pure filler words
+                cleaned_words = [w for w in words if w.lower() not in FILLER_WORDS or len(w) > 4]
+            else:
+                # For longer phrases, be more aggressive
+                cleaned_words = []
+                for w in words:
+                    word_lower = w.lower()
+                    # Keep capitalized words (likely proper nouns/important terms)
+                    if w[0].isupper() or word_lower not in FILLER_WORDS:
+                        cleaned_words.append(w)
+            
+            result = ' '.join(cleaned_words).strip()
+            return result if result else text  # Fallback to original if nothing left
+        
         if request.diagram_type == 'graphviz':
             # Generate GraphViz diagram - flowchart/network style
             # Extract steps from description
-            # Look for patterns like: "Step 1, Step 2" or "A -> B -> C" or "First X, then Y, finally Z"
             steps = []
             
             # Split by common delimiters
@@ -100,10 +136,9 @@ async def generate_diagram(request: DiagramGenerationRequest):
             for part in parts:
                 part = part.strip()
                 if part and len(part) > 2:
-                    # Clean up common prefixes
-                    part = re.sub(r'^(step\s+\d+:?\s*|•\s*|-\s*|\d+\.\s*)', '', part, flags=re.IGNORECASE)
-                    if part:
-                        steps.append(part.strip())
+                    cleaned = clean_step(part)
+                    if cleaned and len(cleaned) > 1:
+                        steps.append(cleaned)
             
             # Generate flowchart
             rankdir = 'TB'
