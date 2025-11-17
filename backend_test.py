@@ -104,7 +104,8 @@ def test_api_endpoint(description: str, diagram_type: str, test_name: str, expec
                 print(f"✅ SUCCESS: Status {response.status_code}")
                 print(f"   Response time: {result['response_time']:.2f}s")
                 print(f"   Code length: {result['code_length']} characters")
-                print(f"   Sophisticated: {'✅' if result['is_sophisticated'] else '❌'} (>= 600 chars)")
+                print(f"   Expected range: {expected_length_min}-{expected_length_max} chars")
+                print(f"   Sophisticated: {'✅' if result['is_sophisticated'] else '❌'} (within expected range)")
                 print(f"   Kroki type: {json_response.get('kroki_type', 'N/A')}")
                 print(f"   Features: {result['features_passed']}/{result['total_features']} passed")
                 
