@@ -369,9 +369,15 @@ async def generate_diagram(request: DiagramGenerationRequest):
 }}'''
         
         elif request.diagram_type == 'mermaid':
-            # Generate Mermaid flowchart (not sequence diagram)
-            # Detect if it's better as flowchart or sequence
-            desc_lower = description.lower()
+            # Use enhanced Mermaid generator with styling and conditionals
+            try:
+                logger.info(f"Using enhanced Mermaid generator for description length: {len(description)}")
+                code = generate_mermaid_diagram(description)
+                logger.info(f"Enhanced Mermaid generator succeeded, code length: {len(code)}")
+            except Exception as e:
+                logger.error(f"Enhanced Mermaid generator failed: {str(e)}, using fallback")
+                # Fallback to old logic
+                desc_lower = description.lower()
             
             # Check for sequence diagram indicators
             is_sequence = any(word in desc_lower for word in ['participant', 'actor', 'request', 'response', 'message', 'call', 'reply'])
