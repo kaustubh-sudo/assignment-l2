@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Alert, AlertDescription } from './ui/alert';
 import { Skeleton } from './ui/skeleton';
-import { Eye, AlertCircle, Image as ImageIcon, Download } from 'lucide-react';
+import { Eye, AlertCircle, Image as ImageIcon, Download, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,19 @@ import {
 } from './ui/dropdown-menu';
 
 const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
+  const [zoom, setZoom] = useState(100);
+  
+  const handleZoomIn = () => {
+    setZoom(prev => Math.min(prev + 10, 200));
+  };
+  
+  const handleZoomOut = () => {
+    setZoom(prev => Math.max(prev - 10, 30));
+  };
+  
+  const handleResetZoom = () => {
+    setZoom(100);
+  };
   return (
     <Card className="h-full flex flex-col shadow-lg border-border/50 bg-card/95 backdrop-blur-sm">
       <CardHeader className="pb-3 border-b border-border/50">
