@@ -194,19 +194,18 @@ def generate_mermaid_v3(description):
     return code
 
 def generate_pikchr_v3(description):
-    """Generate clean Pikchr diagram with proper labels and flow"""
+    """Generate clean Pikchr diagram with proper YES/NO branching"""
     steps, decision = parse_description_to_steps(description)
     
-    # Pikchr uses simple, clean syntax
     code = "// Pikchr flowchart\n"
-    code += "scale = 1.0\n"
-    code += "lineht = 0.4\n\n"
+    code += "scale = 1.2\n"
+    code += "lineht = 0.5\n\n"
     
     # Start node
-    code += "START: oval \"START\" fit fill lightgreen\n"
-    code += "arrow down\n"
+    code += "START: oval \"START\" fit bold fill lightgreen\n"
+    code += "arrow down 150%\n"
     
-    # Steps
+    # Steps before decision
     for i, step in enumerate(steps):
         step_id = f"S{i}"
         if any(word in step.lower() for word in ['error', 'fail']):
@@ -214,35 +213,37 @@ def generate_pikchr_v3(description):
         else:
             fill_color = "lightblue"
         
-        # Escape quotes in text
         safe_text = step[:45].replace('"', "'")
         code += f'{step_id}: box "{safe_text}" fit fill {fill_color}\n'
-        code += "arrow down\n"
+        code += "arrow down 150%\n"
     
-    # Decision point
+    # Decision point with proper branching
     if decision:
         safe_condition = decision["condition"][:35].replace('"', "'")
-        code += f'DEC: diamond "{safe_condition}?" fit fill lightyellow\n'
+        code += f'DEC: diamond "{safe_condition}?" fit fill lightyellow width 150%\n\n'
         
-        # YES branch (left)
+        # YES branch - go left then down
         safe_yes = decision["yes"][:40].replace('"', "'")
-        code += "arrow left \"YES\" above\n"
-        code += f'YES: box "{safe_yes}" fit fill lightgreen\n'
+        code += "arrow from DEC.w left 50% \"YES\" above\n"
+        code += "arrow down 50%\n"
+        code += f'YES: box "{safe_yes}" fit fill lightgreen width 150%\n'
+        code += "arrow down 150%\n"
         
-        # Move back to decision for NO branch
-        code += "move to DEC.s\n"
-        code += "arrow down\n"
-        
-        # NO branch (straight down)
+        # NO branch - go right then down  
         safe_no = decision["no"][:40].replace('"', "'")
-        code += f'NO: box "{safe_no}" fit fill pink\n'
+        code += "arrow from DEC.e right 50% \"NO\" above\n"
+        code += "arrow down 50%\n"
+        code += f'NO: box "{safe_no}" fit fill pink width 150%\n'
+        code += "arrow down 150%\n"
         
-        # Both converge to END
-        code += "arrow down from NO.s\n"
-        code += "END: oval \"END\" fit fill lightgreen\n"
-        code += "arrow from YES.s down then right until even with END.w then to END.w\n"
+        # END node positioned below both branches
+        code += "END: oval \"END\" fit bold fill lightgreen with .n at 0.5<YES.s,NO.s> + (0,-50%)\n"
+        
+        # Connect both branches to END
+        code += "arrow from YES.s to END.nw\n"
+        code += "arrow from NO.s to END.ne\n"
     else:
-        code += "END: oval \"END\" fit fill lightgreen\n"
+        code += "END: oval \"END\" fit bold fill lightgreen\n"
     
     return code
 
