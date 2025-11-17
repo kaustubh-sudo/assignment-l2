@@ -232,8 +232,10 @@ def generate_excalidraw_v3(description):
     def make_element(elem_type, x, y, width, height, text, bg_color, stroke_color):
         nonlocal element_id
         elem_id = f"element-{element_id}"
-        element_id += 1
+        text_id = f"text-{element_id + 1}"
+        element_id += 2
         
+        # Create shape element with bound text element reference
         elem = {
             "id": elem_id,
             "type": elem_type,
@@ -253,7 +255,7 @@ def generate_excalidraw_v3(description):
             "version": 1,
             "versionNonce": 1,
             "isDeleted": False,
-            "boundElements": [],
+            "boundElements": [{"type": "text", "id": text_id}],
             "updated": 1,
             "link": None,
             "locked": False
@@ -266,22 +268,19 @@ def generate_excalidraw_v3(description):
         
         elements.append(elem)
         
-        # Add text
-        text_id = f"text-{element_id}"
-        element_id += 1
-        
+        # Add text element bound to container
         text_elem = {
             "id": text_id,
             "type": "text",
-            "x": x + 10,
-            "y": y + (height - 25) // 2,
+            "x": x + width // 2,
+            "y": y + height // 2,
             "width": width - 20,
             "height": 25,
             "angle": 0,
             "strokeColor": stroke_color,
             "backgroundColor": "transparent",
             "fillStyle": "solid",
-            "strokeWidth": 2,
+            "strokeWidth": 1,
             "strokeStyle": "solid",
             "roughness": 0,
             "opacity": 100,
@@ -289,7 +288,7 @@ def generate_excalidraw_v3(description):
             "version": 1,
             "versionNonce": 1,
             "isDeleted": False,
-            "boundElements": [],
+            "boundElements": None,
             "updated": 1,
             "link": None,
             "locked": False,
