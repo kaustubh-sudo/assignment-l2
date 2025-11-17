@@ -29,8 +29,8 @@ if not BACKEND_URL:
 API_BASE = f"{BACKEND_URL}/api"
 print(f"Testing backend at: {API_BASE}")
 
-def test_api_endpoint(description: str, diagram_type: str, test_name: str) -> Dict[str, Any]:
-    """Test a single API endpoint call"""
+def test_api_endpoint(description: str, diagram_type: str, test_name: str, expected_features: list = None) -> Dict[str, Any]:
+    """Test a single API endpoint call and verify advanced features"""
     url = f"{API_BASE}/generate-diagram"
     payload = {
         "description": description,
@@ -52,7 +52,8 @@ def test_api_endpoint(description: str, diagram_type: str, test_name: str) -> Di
             "success": response.status_code == 200,
             "response_time": response.elapsed.total_seconds(),
             "content_type": response.headers.get('content-type', ''),
-            "response_size": len(response.content)
+            "response_size": len(response.content),
+            "expected_features": expected_features or []
         }
         
         if response.status_code == 200:
@@ -62,12 +63,49 @@ def test_api_endpoint(description: str, diagram_type: str, test_name: str) -> Di
                 result["has_code"] = "code" in json_response and len(json_response.get("code", "")) > 0
                 result["has_kroki_type"] = "kroki_type" in json_response
                 result["code_length"] = len(json_response.get("code", ""))
+                
+                # Check for advanced features
+                generated_code = json_response.get("code", "")
+                result["generated_code"] = generated_code
+                result["is_sophisticated"] = len(generated_code) >= 600  # Critical check
+                
+                # Feature analysis
+                feature_checks = {}
+                if diagram_type == "d2":
+                    feature_checks["has_classes"] = "classes:" in generated_code
+                    feature_checks["has_shapes"] = any(shape in generated_code for shape in ["oval", "diamond", "rectangle", "cylinder"])
+                    feature_checks["has_styling"] = "style:" in generated_code and "fill:" in generated_code
+                    feature_checks["has_conditionals"] = "Yes" in generated_code and "No" in generated_code
+                elif diagram_type == "blockdiag":
+                    feature_checks["has_colors"] = "color =" in generated_code
+                    feature_checks["has_node_attributes"] = "textcolor" in generated_code
+                    feature_checks["has_shapes"] = "roundedbox" in generated_code or "diamond" in generated_code
+                    feature_checks["has_conditionals"] = "Yes" in generated_code and "No" in generated_code
+                elif diagram_type == "graphviz":
+                    feature_checks["has_typed_nodes"] = any(shape in generated_code for shape in ["ellipse", "diamond", "box", "cylinder"])
+                    feature_checks["has_colors"] = "fillcolor=" in generated_code and "color=" in generated_code
+                    feature_checks["has_conditionals"] = "Yes" in generated_code and "No" in generated_code
+                    feature_checks["has_styling"] = "style=" in generated_code
+                
+                result["feature_checks"] = feature_checks
+                result["features_passed"] = sum(feature_checks.values())
+                result["total_features"] = len(feature_checks)
+                
                 print(f"✅ SUCCESS: Status {response.status_code}")
                 print(f"   Response time: {result['response_time']:.2f}s")
                 print(f"   Code length: {result['code_length']} characters")
+                print(f"   Sophisticated: {'✅' if result['is_sophisticated'] else '❌'} (>= 600 chars)")
                 print(f"   Kroki type: {json_response.get('kroki_type', 'N/A')}")
-                if result['code_length'] < 500:  # Show short responses
-                    print(f"   Generated code preview:\n{json_response.get('code', '')[:200]}...")
+                print(f"   Features: {result['features_passed']}/{result['total_features']} passed")
+                
+                # Show feature details
+                for feature, passed in feature_checks.items():
+                    status = "✅" if passed else "❌"
+                    print(f"     {status} {feature}")
+                
+                # Show code preview for analysis
+                print(f"   Generated code preview:\n{generated_code[:300]}...")
+                
             except json.JSONDecodeError as e:
                 result["json_error"] = str(e)
                 result["raw_response"] = response.text[:500]
