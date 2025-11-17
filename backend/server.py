@@ -638,34 +638,36 @@ async def generate_diagram(request: DiagramGenerationRequest):
             code += '}'
         
         elif request.diagram_type == 'd2':
-            # Generate D2 diagram with proper styling and padding
-            parts = re.split(r'[,;.\n]|then|next', description, flags=re.IGNORECASE)
-            steps = []
-            for p in parts:
-                p = p.strip()
-                if p and len(p) > 2:
-                    cleaned = clean_step(p).replace('"', '')
-                    if cleaned:
-                        steps.append(cleaned[:30])
-            steps = steps[:8]
-            
-            # Add direction and layout configuration with padding
-            code = 'direction: down\n'
-            code += 'pad: 50\n\n'  # Add padding to prevent cutoff
-            
-            # Generate nodes and connections
-            for i, step in enumerate(steps):
-                safe_id = f"step{i}"
-                # Add shape styling to make boxes more visible
-                code += f'{safe_id}: {step} {{\n'
-                code += f'  style: {{\n'
-                code += f'    fill: "#e0f2fe"\n'
-                code += f'    stroke: "#0284c7"\n'
-                code += f'    stroke-width: 2\n'
-                code += f'  }}\n'
-                code += f'}}\n'
-                if i > 0:
-                    code += f'step{i-1} -> {safe_id}\n'
+            # Use enhanced D2 generator with classes, shapes, and conditionals
+            try:
+                logger.info(f"Using enhanced D2 generator for description length: {len(description)}")
+                code = generate_d2_diagram(description)
+                logger.info(f"Enhanced D2 generator succeeded, code length: {len(code)}")
+            except Exception as e:
+                logger.error(f"Enhanced D2 generator failed: {str(e)}, using simple fallback")
+                # Simple fallback
+                parts = re.split(r'[,;.\n]|then|next', description, flags=re.IGNORECASE)
+                steps = []
+                for p in parts:
+                    p = p.strip()
+                    if p and len(p) > 2:
+                        cleaned = clean_step(p).replace('"', '')
+                        if cleaned:
+                            steps.append(cleaned[:30])
+                steps = steps[:8]
+                
+                code = 'direction: down\n\n'
+                for i, step in enumerate(steps):
+                    safe_id = f"step{i}"
+                    code += f'{safe_id}: {step} {{\n'
+                    code += f'  style: {{\n'
+                    code += f'    fill: "#e0f2fe"\n'
+                    code += f'    stroke: "#0284c7"\n'
+                    code += f'    stroke-width: 2\n'
+                    code += f'  }}\n'
+                    code += f'}}\n'
+                    if i > 0:
+                        code += f'step{i-1} -> {safe_id}\n'
         
         elif request.diagram_type == 'ditaa':
             # Generate Ditaa ASCII art
