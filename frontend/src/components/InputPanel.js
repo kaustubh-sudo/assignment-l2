@@ -25,8 +25,6 @@ const InputPanel = ({
   isGenerating,
   isRendering,
 }) => {
-  const selectedType = DIAGRAM_TYPES.find(t => t.value === diagramType);
-
   return (
     <Card className="h-full flex flex-col shadow-xl border-border/50 bg-card/95 backdrop-blur-sm rounded-2xl">
       <CardHeader className="pb-4 border-b border-border/50">
