@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 const DiagramRenderer = () => {
   const [userInput, setUserInput] = useState(
-    "Create a workflow: User logs in, System validates credentials, If valid show dashboard else show error, User can logout"
+    "A user presses a button. The system checks if the user is logged in. If the user is logged in, it shows the dashboard. If the user is not logged in, it shows the login page."
   );
   const [diagramType, setDiagramType] = useState('graphviz');
   const [generatedCode, setGeneratedCode] = useState('');
