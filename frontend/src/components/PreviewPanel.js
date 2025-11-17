@@ -27,10 +27,9 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
   };
   return (
     <Card className="h-full flex flex-col shadow-lg border-border/50 bg-card/95 backdrop-blur-sm">
-      <CardHeader className="flex-none pb-2 md:pb-3">
+      <CardHeader className="flex-none pb-2.5">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
-            <Eye className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+          <CardTitle className="text-base font-semibold">
             Preview
           </CardTitle>
           
