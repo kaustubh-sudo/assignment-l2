@@ -3,10 +3,10 @@ import { Moon, Sun } from 'lucide-react';
 import { Button } from './ui/button';
 
 const ThemeToggle = () => {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     setTheme(savedTheme);
     document.documentElement.classList.toggle('dark', savedTheme === 'dark');
   }, []);
@@ -23,12 +23,12 @@ const ThemeToggle = () => {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      className="h-6 w-6 rounded transition-all duration-300 hover:bg-accent/20"
+      className="h-8 w-8 rounded-lg transition-all duration-300 hover:bg-accent/20"
     >
       {theme === 'light' ? (
-        <Moon className="w-3.5 h-3.5" />
+        <Moon className="w-4 h-4" />
       ) : (
-        <Sun className="w-3.5 h-3.5" />
+        <Sun className="w-4 h-4" />
       )}
     </Button>
   );
