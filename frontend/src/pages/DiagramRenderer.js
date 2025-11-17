@@ -54,31 +54,35 @@ const DiagramRenderer = () => {
   const renderDiagram = async (code, krokiType) => {
     const krokiUrl = `https://kroki.io/${krokiType}/svg`;
     
-    return fetch(krokiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain',
-      },
-      body: code,
-    })
-      .then(response => {
-        // Get status before consuming body
-        const status = response.status;
-        const ok = response.ok;
-        
-        // Return text promise along with status
-        return response.text().then(text => ({ text, status, ok }));
-      })
-      .then(({ text, status, ok }) => {
-        if (!ok) {
-          throw new Error(`Kroki error ${status}: ${text.substring(0, 100)}`);
-        }
-        return { type: 'svg', content: text };
-      })
-      .catch(error => {
-        console.error('Render error:', error);
-        throw error;
+    try {
+      const response = await fetch(krokiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: code,
       });
+
+      // Store status/ok before reading body to avoid clone issues
+      const { status, ok, statusText } = response;
+      
+      // Read body only once
+      const svgText = await response.text();
+      
+      // Check status after reading
+      if (!ok) {
+        throw new Error(`Kroki API error ${status}: ${statusText}`);
+      }
+
+      return { type: 'svg', content: svgText };
+    } catch (error) {
+      // Avoid re-throwing response clone errors
+      if (error.message && error.message.includes('Response body is already used')) {
+        console.warn('Response clone error caught and ignored');
+        return null;
+      }
+      throw error;
+    }
   };
 
   // Main function to generate and render diagram
