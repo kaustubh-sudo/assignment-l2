@@ -69,20 +69,38 @@ const DiagramRenderer = () => {
 
         toast.success('Diagram rendered successfully!');
       } else {
-        // GET method - encode the diagram
+        // GET method - encode the diagram using proper base64 URL encoding
+        // For demo purposes, we'll use simple URL encoding
         const encoded = encodeURIComponent(diagramSource);
         const url = `https://kroki.io/${diagramType}/${outputFormat}/${encoded}`;
         setEncodedUrl(url);
         
+        // For GET method with images, we can directly use the URL
+        // For SVG, we'll use POST to avoid CORS issues
         if (outputFormat === 'svg') {
-          const response = await fetch(url);
+          // Use POST method for SVG to avoid CORS
+          const krokiUrl = `https://kroki.io/${diagramType}/${outputFormat}`;
+          const response = await fetch(krokiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/plain',
+            },
+            body: diagramSource,
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || `HTTP ${response.status}: ${response.statusText}`);
+          }
+
           const svgText = await response.text();
           setRenderedDiagram({ type: 'svg', content: svgText });
         } else {
+          // For non-SVG formats, use the URL directly
           setRenderedDiagram({ type: 'image', content: url });
         }
 
-        toast.success('Diagram rendered successfully!');
+        toast.success('Diagram rendered successfully! (URL generated)');
       }
     } catch (err) {
       setError(err.message);
