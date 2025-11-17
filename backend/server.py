@@ -153,10 +153,10 @@ async def generate_diagram(request: DiagramGenerationRequest):
             logger.info("Using simple GraphViz fallback")
             desc_lower = description.lower()
             
-                # Detect layout preference
-                rankdir = 'LR' if 'left to right' in desc_lower or 'horizontal' in desc_lower else 'TB'
-                if 'top to bottom' in desc_lower or 'vertical' in desc_lower:
-                    rankdir = 'TB'
+            # Detect layout preference
+            rankdir = 'LR' if 'left to right' in desc_lower or 'horizontal' in desc_lower else 'TB'
+            if 'top to bottom' in desc_lower or 'vertical' in desc_lower:
+                rankdir = 'TB'
             
             # Initialize structures
             nodes = []
