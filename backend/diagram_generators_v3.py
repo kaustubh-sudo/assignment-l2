@@ -366,25 +366,28 @@ def generate_excalidraw_v3(description):
             text_id = f"label-{element_id}"
             element_id += 1
             
-            mid_x = from_x + (to_x - from_x) // 2
-            mid_y = from_y + (to_y - from_y) // 2
+            # Position label closer to the source for better readability
+            label_offset = 30  # Distance from decision node
+            mid_x = from_x + (to_x - from_x) // 4
+            mid_y = from_y + (to_y - from_y) // 4
             
             label_elem = {
                 "id": text_id,
                 "type": "text",
-                "x": mid_x - 20,
-                "y": mid_y - 10,
-                "width": 40,
-                "height": 20,
+                "x": mid_x - 25,
+                "y": mid_y - 12,
+                "width": 50,
+                "height": 24,
                 "text": label,
-                "fontSize": 14,
+                "fontSize": 16,
                 "fontFamily": 1,
                 "textAlign": "center",
                 "verticalAlign": "middle",
                 "strokeColor": color,
-                "backgroundColor": "#ffffff",
+                "backgroundColor": "transparent",
                 "fillStyle": "solid",
                 "strokeWidth": 0,
+                "strokeStyle": "solid",
                 "roughness": 0,
                 "opacity": 100,
                 "angle": 0,
@@ -392,8 +395,12 @@ def generate_excalidraw_v3(description):
                 "version": 1,
                 "versionNonce": 1,
                 "isDeleted": False,
+                "boundElements": None,
+                "updated": 1,
+                "link": None,
+                "locked": False,
                 "lineHeight": 1.25,
-                "baseline": 14
+                "baseline": 16
             }
             
             elements.append(label_elem)
