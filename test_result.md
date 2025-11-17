@@ -282,14 +282,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Initial Load & UI Elements"
-    - "Theme Toggle Functionality"
-    - "POST Method Rendering"
-    - "GET Method Toggle"
-    - "Options Panel - Add/Remove Options"
-    - "Error Handling"
+    - "Fix 500 Error - Control Flow Bug"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
