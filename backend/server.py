@@ -407,7 +407,14 @@ async def generate_diagram(request: DiagramGenerationRequest):
         elif request.diagram_type == 'svgbob':
             # Generate Svgbob ASCII diagram
             parts = re.split(r'[,;.\n]|then|next', description, flags=re.IGNORECASE)
-            steps = [p.strip()[:12] for p in parts if p.strip() and len(p.strip()) > 2][:4]
+            steps = []
+            for p in parts:
+                p = p.strip()
+                if p and len(p) > 2:
+                    cleaned = clean_step(p)
+                    if cleaned:
+                        steps.append(cleaned[:12])
+            steps = steps[:4]
             
             code = ''
             for i, step in enumerate(steps):
