@@ -201,9 +201,9 @@ const DiagramRenderer = () => {
     <div className="flex flex-col h-screen bg-gradient-to-br from-background to-muted">
       <Header />
       
-      <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row gap-3 md:gap-4 p-2 md:p-4 overflow-hidden">
         {/* Left Side - Input */}
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 lg:max-w-[50%]">
           <InputPanel
             userInput={userInput}
             setUserInput={setUserInput}
@@ -220,7 +220,7 @@ const DiagramRenderer = () => {
         </div>
 
         {/* Right Side - Preview */}
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 lg:max-w-[50%]">
           <PreviewPanel
             renderedDiagram={renderedDiagram}
             isLoading={isGenerating || isRendering}
