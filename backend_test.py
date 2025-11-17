@@ -140,13 +140,10 @@ def test_api_endpoint(description: str, diagram_type: str, test_name: str, expec
 def test_kroki_rendering(code: str, diagram_type: str) -> Dict[str, Any]:
     """Test if generated code renders successfully with Kroki API"""
     try:
-        # Encode the diagram code
-        encoded = base64.urlsafe_b64encode(code.encode('utf-8')).decode('ascii')
+        # Test with Kroki API using POST method
+        kroki_url = f"https://kroki.io/{diagram_type}/svg"
         
-        # Test with Kroki API
-        kroki_url = f"https://kroki.io/{diagram_type}/svg/{encoded}"
-        
-        response = requests.get(kroki_url, timeout=10)
+        response = requests.post(kroki_url, data=code, headers={'Content-Type': 'text/plain'}, timeout=10)
         
         return {
             "kroki_success": response.status_code == 200,
