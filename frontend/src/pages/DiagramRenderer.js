@@ -28,13 +28,11 @@ const DiagramRenderer = () => {
     return mapping[type] || 'graphviz';
   };
 
-  // Generate diagram code from natural language using backend AI
+  // Generate diagram code from natural language using backend
   const generateDiagramCode = async (description, type) => {
-    // Use local backend URL to avoid CORS issues
-    const BACKEND_URL = window.location.hostname === 'localhost' ? 'http://localhost:8001' : process.env.REACT_APP_BACKEND_URL;
-    
+    // Use relative URL - Kubernetes ingress routes /api to backend automatically
     try {
-      const response = await fetch(`${BACKEND_URL}/api/generate-diagram`, {
+      const response = await fetch('/api/generate-diagram', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,7 +44,7 @@ const DiagramRenderer = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.detail || `Failed to generate diagram code: ${response.status}`);
       }
 
