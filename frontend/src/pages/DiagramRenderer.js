@@ -62,12 +62,13 @@ const DiagramRenderer = () => {
         body: code,
       });
 
+      // Read response text only once
+      const svgText = await response.text();
+      
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || `Failed to render diagram`);
+        throw new Error(svgText || `Failed to render diagram: ${response.status}`);
       }
 
-      const svgText = await response.text();
       return { type: 'svg', content: svgText };
     } catch (error) {
       console.error('Error rendering diagram:', error);
