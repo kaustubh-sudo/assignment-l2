@@ -193,6 +193,50 @@ def generate_mermaid_v3(description):
     
     return code
 
+def generate_pikchr_v3(description):
+    """Generate clean Pikchr diagram with proper labels and flow"""
+    steps, decision = parse_description_to_steps(description)
+    
+    code = "// Pikchr diagram - Clean flowchart\n"
+    code += "linewid = 0.5\n"
+    code += "lineht = 0.5\n\n"
+    
+    # Start node
+    code += "Start: oval \"START\" fill lightgreen\n"
+    code += "arrow\n"
+    
+    # Steps
+    for i, step in enumerate(steps):
+        step_id = f"Step{i}"
+        if any(word in step.lower() for word in ['error', 'fail']):
+            fill_color = "lightred"
+        else:
+            fill_color = "lightblue"
+        
+        code += f'{step_id}: box "{step[:50]}" fill {fill_color}\n'
+        code += "arrow\n"
+    
+    # Decision point
+    if decision:
+        code += f'Decision: diamond "{decision["condition"][:40]}?" fill lightyellow\n'
+        code += "arrow \"YES\" above\n"
+        code += f'YesBranch: box "{decision["yes"][:50]}" fill lightgreen\n'
+        code += "arrow\n"
+        
+        code += "move to Decision.e\n"
+        code += "arrow \"NO\" above right\n"
+        code += f'NoBranch: box "{decision["no"][:50]}" fill lightred\n'
+        code += "arrow\n"
+        
+        # Both converge to end
+        code += "End: oval \"END\" fill lightgreen at (Decision.x, YesBranch.y - 1.0)\n"
+        code += "arrow from YesBranch.s to End.n\n"
+        code += "arrow from NoBranch.s to End.n\n"
+    else:
+        code += "End: oval \"END\" fill lightgreen\n"
+    
+    return code
+
 def generate_plantuml_v3(description):
     """Generate clean PlantUML with proper labels and flow"""
     steps, decision = parse_description_to_steps(description)
