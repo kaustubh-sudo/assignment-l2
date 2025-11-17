@@ -23,7 +23,7 @@ from diagram_generators_v3 import (
     generate_graphviz_v3,
     generate_mermaid_v3,
     generate_plantuml_v3,
-    generate_excalidraw_v3
+    generate_pikchr_v3
 )
 
 # Configure logging early
