@@ -346,7 +346,14 @@ async def generate_diagram(request: DiagramGenerationRequest):
         elif request.diagram_type == 'd2':
             # Generate D2 diagram
             parts = re.split(r'[,;.\n]|then|next', description, flags=re.IGNORECASE)
-            steps = [p.strip().replace('"', '')[:30] for p in parts if p.strip() and len(p.strip()) > 2][:8]
+            steps = []
+            for p in parts:
+                p = p.strip()
+                if p and len(p) > 2:
+                    cleaned = clean_step(p).replace('"', '')
+                    if cleaned:
+                        steps.append(cleaned[:30])
+            steps = steps[:8]
             
             code = ''
             for i, step in enumerate(steps):
