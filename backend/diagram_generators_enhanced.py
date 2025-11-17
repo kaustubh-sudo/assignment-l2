@@ -494,9 +494,9 @@ def generate_plantuml_diagram(description):
     # Add conditional logic
     for cond in workflow['conditions']:
         code += f"if ({cond['condition']}?) then (yes)\n"
-        code += f"  #{dcfce7}:{cond['yes']};\n"
+        code += f"  #dcfce7:{cond['yes']};\n"
         code += "else (no)\n"
-        code += f"  #{fee2e2}:{cond['no']};\n"
+        code += f"  #fee2e2:{cond['no']};\n"
         code += "endif\n\n"
     
     # Add note if there are complex workflows
