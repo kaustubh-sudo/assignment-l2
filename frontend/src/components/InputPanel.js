@@ -41,26 +41,27 @@ const InputPanel = ({
       
       <CardContent className="flex-1 flex flex-col gap-5 pt-5 overflow-hidden">
         <div className="space-y-3">
-          <Label htmlFor="diagram-type" className="text-base font-medium">
-            What type of diagram?
+          <Label className="text-base font-medium">
+            Choose diagram type
           </Label>
-          <Select value={diagramType} onValueChange={setDiagramType}>
-            <SelectTrigger id="diagram-type" className="h-12 bg-background/50">
-              <SelectValue>
-                {selectedType?.label}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent className="bg-background border-border shadow-xl">
-              {DIAGRAM_TYPES.map((type) => (
-                <SelectItem key={type.value} value={type.value} className="cursor-pointer py-1 px-3 h-auto leading-none">
-                  <div className="flex flex-col items-start py-0.5">
-                    <span className="font-medium text-sm leading-tight mb-0.5">{type.label}</span>
-                    <span className="text-[10px] text-muted-foreground/70 leading-tight">{type.description}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap gap-2">
+            {DIAGRAM_TYPES.map((type) => (
+              <button
+                key={type.value}
+                onClick={() => setDiagramType(type.value)}
+                className={`
+                  flex flex-col items-start px-4 py-2.5 rounded-xl border-2 transition-all duration-200
+                  ${diagramType === type.value 
+                    ? 'border-blue-500 bg-blue-500/10 shadow-md' 
+                    : 'border-border bg-background/50 hover:border-blue-400/50 hover:bg-background/80'
+                  }
+                `}
+              >
+                <span className="font-medium text-sm">{type.label}</span>
+                <span className="text-xs text-muted-foreground">{type.description}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="flex-1 flex flex-col gap-3 min-h-0">
