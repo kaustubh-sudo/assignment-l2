@@ -576,6 +576,7 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 logger.info(f"Using enhanced PlantUML generator for description length: {len(description)}")
                 code = generate_plantuml_diagram(description)
                 logger.info(f"Enhanced PlantUML generator succeeded, code length: {len(code)}")
+                return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
             except Exception as e:
                 logger.error(f"Enhanced PlantUML generator failed: {str(e)}, using fallback")
                 # Fallback to old logic
