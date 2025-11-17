@@ -23,12 +23,12 @@ const ThemeToggle = () => {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      className="rounded-lg transition-all duration-300 hover:bg-accent/20"
+      className="h-6 w-6 rounded transition-all duration-300 hover:bg-accent/20"
     >
       {theme === 'light' ? (
-        <Moon className="w-5 h-5" />
+        <Moon className="w-3.5 h-3.5" />
       ) : (
-        <Sun className="w-5 h-5" />
+        <Sun className="w-3.5 h-3.5" />
       )}
     </Button>
   );
