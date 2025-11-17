@@ -268,7 +268,9 @@ def main():
                 
                 # Flag issues
                 if not is_sophisticated:
-                    critical_issues.append(f"CRITICAL: {result['test_name']} - Generated code too simplistic ({result.get('code_length', 0)} chars < 600)")
+                    expected_min = result.get('expected_length_min', 600)
+                    expected_max = result.get('expected_length_max', 10000)
+                    critical_issues.append(f"CRITICAL: {result['test_name']} - Generated code length {result.get('code_length', 0)} chars not in expected range {expected_min}-{expected_max}")
                 if not kroki_success:
                     critical_issues.append(f"CRITICAL: {result['test_name']} - Kroki rendering failed (HTTP {result.get('kroki_status', 'N/A')})")
                 if features_passed < total_features:
