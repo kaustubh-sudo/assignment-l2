@@ -178,6 +178,83 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 receiver = participants[(i + 1) % len(participants)]
                 code += f'    {sender}->>{receiver}: {interaction}\n'
         
+        elif request.diagram_type == 'excalidraw':
+            # Generate Excalidraw JSON format
+            import json
+            
+            # Extract steps
+            parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
+            steps = [p.strip().replace('"', '')[:30] for p in parts if p.strip() and len(p.strip()) > 2][:6]
+            
+            # Build Excalidraw elements
+            elements = []
+            y_pos = 100
+            
+            for i, step in enumerate(steps):
+                # Add rectangle element
+                element_id = f"element-{i}"
+                elements.append({
+                    "id": element_id,
+                    "type": "rectangle",
+                    "x": 100,
+                    "y": y_pos,
+                    "width": 200,
+                    "height": 60,
+                    "strokeColor": "#0284c7",
+                    "backgroundColor": "#e0f2fe",
+                    "fillStyle": "hachure",
+                    "strokeWidth": 2,
+                    "roughness": 1,
+                    "opacity": 100
+                })
+                
+                # Add text element
+                elements.append({
+                    "id": f"text-{i}",
+                    "type": "text",
+                    "x": 110,
+                    "y": y_pos + 20,
+                    "width": 180,
+                    "height": 20,
+                    "text": step,
+                    "fontSize": 16,
+                    "fontFamily": 1,
+                    "textAlign": "center",
+                    "verticalAlign": "middle"
+                })
+                
+                # Add arrow to next element
+                if i < len(steps) - 1:
+                    elements.append({
+                        "id": f"arrow-{i}",
+                        "type": "arrow",
+                        "x": 200,
+                        "y": y_pos + 60,
+                        "width": 0,
+                        "height": 40,
+                        "points": [[0, 0], [0, 40]],
+                        "strokeColor": "#64748b",
+                        "backgroundColor": "transparent",
+                        "fillStyle": "solid",
+                        "strokeWidth": 2,
+                        "roughness": 1
+                    })
+                
+                y_pos += 120
+            
+            # Create Excalidraw JSON
+            excalidraw_data = {
+                "type": "excalidraw",
+                "version": 2,
+                "source": "diagram-maker",
+                "elements": elements,
+                "appState": {
+                    "viewBackgroundColor": "#ffffff"
+                }
+            }
+            
+            code = json.dumps(excalidraw_data)
+        
         elif request.diagram_type == 'plantuml':
             # Generate PlantUML diagram
             # Extract entities/steps
