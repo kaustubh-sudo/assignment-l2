@@ -188,9 +188,27 @@ async def generate_diagram(request: DiagramGenerationRequest):
             
             workflow_data = parse_workflow_advanced(description)
             
-            # Original simple parsing for backwards compatibility
-            # Generate sophisticated GraphViz diagram with proper branching logic
-            desc_lower = description.lower()
+            # Check if this is a complex workflow (multiple branches, errors, etc.)
+            is_complex = any([
+                len(workflow_data['routing']) > 0,
+                len(workflow_data['errors']) > 0,
+                len(workflow_data['fatal_errors']) > 0,
+                'parallel' in description.lower() or 'worker' in description.lower(),
+                'retry' in description.lower(),
+                'dead-letter' in description.lower() or 'dlq' in description.lower()
+            ])
+            
+            # Use advanced generator for complex workflows
+            if is_complex:
+                try:
+                    code = generate_graphviz_advanced(description)
+                except Exception as e:
+                    logger.error(f"Advanced generator failed: {e}, falling back to simple")
+                    is_complex = False
+            
+            if not is_complex:
+                # Original simple parsing for backwards compatibility
+                desc_lower = description.lower()
             
             # Detect layout preference
             rankdir = 'LR' if 'left to right' in desc_lower or 'horizontal' in desc_lower else 'TB'
