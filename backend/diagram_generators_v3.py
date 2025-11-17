@@ -235,13 +235,17 @@ def generate_plantuml_v3(description):
     return code
 
 def generate_excalidraw_v3(description):
-    """Generate clean Excalidraw with proper labels and flow"""
+    """Generate clean Excalidraw with proper labels, spacing, and layout"""
     steps, decision = parse_description_to_steps(description)
     
     elements = []
     element_id = 1
-    y_pos = 100
-    x_pos = 400
+    
+    # Better layout constants for clean diagram
+    center_x = 600  # Center of canvas
+    start_y = 80
+    vertical_spacing = 140  # Space between vertical elements
+    horizontal_branch_offset = 350  # Distance from center for branches
     
     def make_element(elem_type, x, y, width, height, text, bg_color, stroke_color):
         nonlocal element_id
