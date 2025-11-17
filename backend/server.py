@@ -202,9 +202,11 @@ async def generate_diagram(request: DiagramGenerationRequest):
             if is_complex:
                 try:
                     code = generate_graphviz_advanced(description)
+                    logger.info("Advanced generator succeeded")
                 except Exception as e:
-                    logger.error(f"Advanced generator failed: {e}, falling back to simple")
+                    logger.error(f"Advanced generator failed: {e}", exc_info=True)
                     is_complex = False
+                    code = None
             
             if not is_complex:
                 # Original simple parsing for backwards compatibility
