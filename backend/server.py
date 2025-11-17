@@ -374,6 +374,7 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 logger.info(f"Using enhanced Mermaid generator for description length: {len(description)}")
                 code = generate_mermaid_diagram(description)
                 logger.info(f"Enhanced Mermaid generator succeeded, code length: {len(code)}")
+                return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
             except Exception as e:
                 logger.error(f"Enhanced Mermaid generator failed: {str(e)}, using fallback")
                 # Fallback to old logic
