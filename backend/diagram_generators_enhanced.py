@@ -480,11 +480,11 @@ def generate_plantuml_diagram(description):
             code += f"{indent}  Decision point\n"
             code += f"{indent}end note\n"
         elif step['type'] == 'error':
-            code += f"{indent}#{dc2626}:{text};\n"
+            code += f"{indent}#dc2626:{text};\n"
         elif step['type'] == 'database':
-            code += f"{indent}#{4f46e5}:{text};\n"
+            code += f"{indent}#4f46e5:{text};\n"
         elif step['type'] == 'process':
-            code += f"{indent}#{7c3aed}:{text};\n"
+            code += f"{indent}#7c3aed:{text};\n"
         else:
             code += f"{indent}:{text};\n"
     
