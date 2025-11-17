@@ -15,6 +15,9 @@ const DiagramRenderer = () => {
   const [isRendering, setIsRendering] = useState(false);
   const [error, setError] = useState(null);
   const [showCode, setShowCode] = useState(false);
+  
+  // Use ref to prevent duplicate renders
+  const renderingRef = React.useRef(false);
 
   // Kroki type is now directly the diagram type selected by user
   const getKrokiType = (type) => {
