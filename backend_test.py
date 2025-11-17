@@ -54,7 +54,9 @@ def test_api_endpoint(description: str, diagram_type: str, test_name: str, expec
             "response_time": response.elapsed.total_seconds(),
             "content_type": response.headers.get('content-type', ''),
             "response_size": len(response.content),
-            "expected_features": expected_features or []
+            "expected_features": expected_features or [],
+            "expected_length_min": expected_length_min,
+            "expected_length_max": expected_length_max
         }
         
         if response.status_code == 200:
