@@ -30,7 +30,7 @@ if not BACKEND_URL:
 API_BASE = f"{BACKEND_URL}/api"
 print(f"Testing backend at: {API_BASE}")
 
-def test_api_endpoint(description: str, diagram_type: str, test_name: str, expected_features: list = None) -> Dict[str, Any]:
+def test_api_endpoint(description: str, diagram_type: str, test_name: str, expected_features: list = None, expected_length_min: int = 600, expected_length_max: int = 10000) -> Dict[str, Any]:
     """Test a single API endpoint call and verify advanced features"""
     url = f"{API_BASE}/generate-diagram"
     payload = {
