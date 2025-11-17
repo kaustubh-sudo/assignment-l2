@@ -11,6 +11,7 @@ const DIAGRAM_TYPES = [
   { value: 'graphviz', label: '🔷 GraphViz', description: 'Graphs, flowcharts, and network diagrams' },
   { value: 'mermaid', label: '🧜 Mermaid', description: 'Flowcharts, sequences, and state diagrams' },
   { value: 'plantuml', label: '🌱 PlantUML', description: 'UML diagrams, sequences, and use cases' },
+  { value: 'excalidraw', label: '✨ Excalidraw', description: 'Hand-drawn style diagrams and sketches' },
   { value: 'blockdiag', label: '📦 BlockDiag', description: 'Simple block and network diagrams' },
   { value: 'd2', label: '🎨 D2', description: 'Modern declarative diagram scripting language' },
   { value: 'ditaa', label: '✏️ Ditaa', description: 'ASCII art to diagram converter' },
