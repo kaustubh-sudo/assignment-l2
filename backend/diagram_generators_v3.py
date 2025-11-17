@@ -7,40 +7,56 @@ import json
 
 def parse_description_to_steps(description):
     """Parse natural language into clean, labeled steps with proper flow"""
-    desc_lower = description.lower()
-    
-    # Split into sentences/clauses
-    sentences = re.split(r'[,;]|\band\b|\bthen\b', description, flags=re.IGNORECASE)
+    # Split by periods first to handle multi-sentence input
+    lines = re.split(r'\.|\n', description)
     
     steps = []
     decision_point = None
     
-    for sent in sentences:
-        sent = sent.strip()
-        if not sent or len(sent) < 3:
-            continue
-            
-        # Detect decision points (if/else)
-        if_match = re.search(r'if\s+(.+?)\s+(show|display|go|do|process|execute)\s+(.+?)(?:\s+else\s+(.+))?$', sent, re.IGNORECASE)
-        if if_match:
-            condition = if_match.group(1).strip()
-            yes_action = if_match.group(3).strip()
-            no_action = if_match.group(4).strip() if if_match.group(4) else "handle alternative"
-            
-            decision_point = {
-                'condition': condition.capitalize(),
-                'yes': yes_action.capitalize(),
-                'no': no_action.capitalize()
-            }
+    for line in lines:
+        line = line.strip()
+        if not line or len(line) < 3:
             continue
         
-        # Regular steps
-        # Clean up the text
-        cleaned = sent.strip()
-        if cleaned:
-            # Capitalize first letter
-            cleaned = cleaned[0].upper() + cleaned[1:]
-            steps.append(cleaned)
+        # Check for decision pattern: "If X, then Y. If not X, then Z."
+        # Pattern 1: "If the user is logged in, it shows the dashboard"
+        if_match = re.search(r'if\s+(?:the\s+)?(.+?)\s+is\s+(.+?),\s*(.+)', line, re.IGNORECASE)
+        if if_match:
+            subject = if_match.group(1).strip()
+            state = if_match.group(2).strip()
+            action = if_match.group(3).strip()
+            
+            # Check if we haven't set decision yet
+            if not decision_point:
+                # This is the YES branch
+                decision_point = {
+                    'condition': f"{subject.capitalize()} is {state}",
+                    'yes': action.capitalize(),
+                    'no': None  # Will be filled by next "if not" statement
+                }
+            elif decision_point['no'] is None:
+                # This might be the NO branch
+                # Check if it's a negative condition
+                if 'not' in line.lower() or 'isn\'t' in line.lower():
+                    decision_point['no'] = action.capitalize()
+            continue
+        
+        # Pattern 2: "If X is not Y"
+        if_not_match = re.search(r'if\s+(?:the\s+)?(.+?)\s+is\s+not\s+(.+?),\s*(.+)', line, re.IGNORECASE)
+        if if_not_match:
+            if decision_point and decision_point['no'] is None:
+                action = if_not_match.group(3).strip()
+                decision_point['no'] = action.capitalize()
+            continue
+        
+        # Regular steps - not part of if/then logic
+        if 'if' not in line.lower():
+            cleaned = line.strip()
+            if cleaned:
+                cleaned = cleaned[0].upper() + cleaned[1:] if cleaned else cleaned
+                # Remove trailing commas
+                cleaned = cleaned.rstrip(',')
+                steps.append(cleaned)
     
     return steps, decision_point
 
