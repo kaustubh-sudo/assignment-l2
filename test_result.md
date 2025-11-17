@@ -295,3 +295,5 @@ test_plan:
 agent_communication:
   - agent: "testing"
     message: "Starting comprehensive testing of Kroki Diagram Renderer application. Will test all UI elements, functionality, and integration with Kroki API using Playwright automation."
+  - agent: "main"
+    message: "Fixed critical backend bug: 1) Added return statement after successful advanced GraphViz generation to prevent fall-through to simple generator code. 2) Moved logger initialization to top of file before first use. Need to test backend /api/generate-diagram endpoint with complex GraphViz descriptions."
