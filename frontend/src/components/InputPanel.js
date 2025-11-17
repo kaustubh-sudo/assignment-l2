@@ -99,21 +99,21 @@ const InputPanel = ({
           </Collapsible>
         )}
 
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-3 pt-2">
           <Button
             onClick={onGenerate}
             disabled={isGenerating || isRendering || !userInput.trim()}
-            className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg h-11"
+            className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg h-12 text-base font-medium"
           >
-            <Sparkles className="w-4 h-4 mr-2" />
+            <Sparkles className="w-5 h-5 mr-2" />
             {isGenerating ? 'Thinking...' : isRendering ? 'Creating...' : 'Generate Diagram'}
           </Button>
           <Button
             onClick={onClear}
             variant="outline"
-            className="border-border hover:bg-muted h-11"
+            className="border-border hover:bg-muted h-12 px-4"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-5 h-5" />
           </Button>
         </div>
       </CardContent>
