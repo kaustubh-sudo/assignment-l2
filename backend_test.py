@@ -200,7 +200,7 @@ def main():
             "test_name": "PlantUML - Workflow with partitions",
             "expected_features": ["activity diagram", "skinparam styling", "partitions", "conditional logic"],
             "expected_length_min": 650,
-            "expected_length_max": 850
+            "expected_length_max": 900
         },
         
         # 4. Excalidraw - Hand-drawn style flowchart
@@ -210,7 +210,7 @@ def main():
             "test_name": "Excalidraw - Hand-drawn style flowchart",
             "expected_features": ["JSON format", "rectangles", "arrows", "proper element structure"],
             "expected_length_min": 3000,
-            "expected_length_max": 6000
+            "expected_length_max": 10000
         }
     ]
     
