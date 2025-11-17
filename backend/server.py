@@ -224,7 +224,14 @@ async def generate_diagram(request: DiagramGenerationRequest):
             
             # Extract steps
             parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
-            steps = [p.strip().replace('"', '')[:30] for p in parts if p.strip() and len(p.strip()) > 2][:6]
+            steps = []
+            for p in parts:
+                p = p.strip()
+                if p and len(p) > 2:
+                    cleaned = clean_step(p)
+                    if cleaned:
+                        steps.append(cleaned.replace('"', '')[:30])
+            steps = steps[:6]
             
             # Build Excalidraw elements
             elements = []
