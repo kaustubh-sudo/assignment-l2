@@ -161,13 +161,18 @@ const DiagramRenderer = () => {
           body: generatedCode,
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Kroki PNG error:', errorText);
-          throw new Error(`Failed to export as PNG: ${response.status}`);
+        // Store status BEFORE reading body
+        const { status, ok } = response;
+        
+        // Read body as blob
+        const blob = await response.blob();
+        
+        // Check status AFTER reading body
+        if (!ok) {
+          console.error('Kroki PNG error:', status);
+          throw new Error(`Failed to export as PNG: ${status}`);
         }
 
-        const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
