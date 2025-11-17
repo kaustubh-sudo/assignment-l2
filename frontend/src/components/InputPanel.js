@@ -50,10 +50,10 @@ const InputPanel = ({
             </SelectTrigger>
             <SelectContent className="bg-background border-border shadow-xl">
               {DIAGRAM_TYPES.map((type) => (
-                <SelectItem key={type.value} value={type.value} className="cursor-pointer py-2">
-                  <div className="flex flex-col items-start gap-0.5">
-                    <span className="font-medium text-sm">{type.label}</span>
-                    <span className="text-xs text-muted-foreground">{type.description}</span>
+                <SelectItem key={type.value} value={type.value} className="cursor-pointer py-1.5 px-2">
+                  <div className="flex flex-col items-start gap-0">
+                    <span className="font-medium text-sm leading-tight">{type.label}</span>
+                    <span className="text-xs text-muted-foreground leading-tight">{type.description}</span>
                   </div>
                 </SelectItem>
               ))}
