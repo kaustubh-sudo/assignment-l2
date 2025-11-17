@@ -1,0 +1,421 @@
+"""
+Version 3: Clean, detailed, properly flowing diagram generators
+Focus on clarity, proper labeling, and logical flow
+"""
+import re
+import json
+
+def parse_description_to_steps(description):
+    """Parse natural language into clean, labeled steps with proper flow"""
+    desc_lower = description.lower()
+    
+    # Split into sentences/clauses
+    sentences = re.split(r'[,;]|\band\b|\bthen\b', description, flags=re.IGNORECASE)
+    
+    steps = []
+    decision_point = None
+    
+    for sent in sentences:
+        sent = sent.strip()
+        if not sent or len(sent) < 3:
+            continue
+            
+        # Detect decision points (if/else)
+        if_match = re.search(r'if\s+(.+?)\s+(show|display|go|do|process|execute)\s+(.+?)(?:\s+else\s+(.+))?$', sent, re.IGNORECASE)
+        if if_match:
+            condition = if_match.group(1).strip()
+            yes_action = if_match.group(3).strip()
+            no_action = if_match.group(4).strip() if if_match.group(4) else "handle alternative"
+            
+            decision_point = {
+                'condition': condition.capitalize(),
+                'yes': yes_action.capitalize(),
+                'no': no_action.capitalize()
+            }
+            continue
+        
+        # Regular steps
+        # Clean up the text
+        cleaned = sent.strip()
+        if cleaned:
+            # Capitalize first letter
+            cleaned = cleaned[0].upper() + cleaned[1:]
+            steps.append(cleaned)
+    
+    return steps, decision_point
+
+def generate_graphviz_v3(description):
+    """Generate clean GraphViz with proper labels and flow"""
+    steps, decision = parse_description_to_steps(description)
+    
+    code = 'digraph Workflow {\n'
+    code += '  // Graph settings\n'
+    code += '  bgcolor="transparent"\n'
+    code += '  rankdir=TB\n'
+    code += '  node [fontname="Arial", fontsize=12, style="filled,rounded", penwidth=2]\n'
+    code += '  edge [fontname="Arial", fontsize=11, penwidth=2]\n\n'
+    
+    node_id = 0
+    
+    # Add start node
+    code += f'  N{node_id} [label="START", shape=ellipse, fillcolor="#dcfce7", color="#16a34a", fontcolor="#16a34a", fontsize=13, style="filled"]\n'
+    last_node = f'N{node_id}'
+    node_id += 1
+    
+    # Add steps
+    for i, step in enumerate(steps):
+        current = f'N{node_id}'
+        
+        # Determine node type based on keywords
+        if any(word in step.lower() for word in ['validate', 'check', 'verify', 'confirm']):
+            code += f'  {current} [label="{step}", shape=box, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#92400e"]\n'
+        elif any(word in step.lower() for word in ['error', 'fail', 'reject', 'deny']):
+            code += f'  {current} [label="{step}", shape=box, fillcolor="#fee2e2", color="#dc2626", fontcolor="#991b1b"]\n'
+        elif any(word in step.lower() for word in ['save', 'store', 'database']):
+            code += f'  {current} [label="{step}", shape=cylinder, fillcolor="#e0e7ff", color="#4f46e5", fontcolor="#3730a3"]\n'
+        else:
+            code += f'  {current} [label="{step}", shape=box, fillcolor="#e0f2fe", color="#0284c7", fontcolor="#075985"]\n'
+        
+        code += f'  {last_node} -> {current} [color="#64748b"]\n'
+        last_node = current
+        node_id += 1
+    
+    # Add decision point if exists
+    if decision:
+        decision_node = f'N{node_id}'
+        yes_node = f'N{node_id + 1}'
+        no_node = f'N{node_id + 2}'
+        
+        code += f'\n  // Decision point\n'
+        code += f'  {decision_node} [label="{decision["condition"]}?", shape=diamond, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#92400e", fontsize=12]\n'
+        code += f'  {yes_node} [label="{decision["yes"]}", shape=box, fillcolor="#dcfce7", color="#16a34a", fontcolor="#16a34a"]\n'
+        code += f'  {no_node} [label="{decision["no"]}", shape=box, fillcolor="#fee2e2", color="#dc2626", fontcolor="#991b1b"]\n'
+        
+        code += f'  {last_node} -> {decision_node} [color="#64748b"]\n'
+        code += f'  {decision_node} -> {yes_node} [label="YES", color="#16a34a", fontcolor="#16a34a"]\n'
+        code += f'  {decision_node} -> {no_node} [label="NO", color="#dc2626", fontcolor="#dc2626"]\n'
+        
+        last_node = yes_node
+        node_id += 3
+    
+    # Add end node
+    code += f'\n  N{node_id} [label="END", shape=ellipse, fillcolor="#dcfce7", color="#16a34a", fontcolor="#16a34a", fontsize=13, style="filled"]\n'
+    code += f'  {last_node} -> N{node_id} [color="#64748b"]\n'
+    
+    code += '}\n'
+    return code
+
+def generate_mermaid_v3(description):
+    """Generate clean Mermaid with proper labels and flow"""
+    steps, decision = parse_description_to_steps(description)
+    
+    code = 'flowchart TD\n'
+    code += '  %% Styles\n'
+    code += '  classDef startEnd fill:#dcfce7,stroke:#16a34a,stroke-width:3px,color:#16a34a\n'
+    code += '  classDef process fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e\n'
+    code += '  classDef decision fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#92400e\n'
+    code += '  classDef success fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#16a34a\n'
+    code += '  classDef error fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#991b1b\n\n'
+    
+    node_id = 0
+    
+    # Start node
+    code += f'  N{node_id}([START]):::startEnd\n'
+    last_node = f'N{node_id}'
+    node_id += 1
+    
+    # Steps
+    for step in steps:
+        current = f'N{node_id}'
+        
+        if any(word in step.lower() for word in ['error', 'fail', 'reject']):
+            code += f'  {current}["{step}"]:::error\n'
+        elif any(word in step.lower() for word in ['validate', 'check', 'verify']):
+            code += f'  {current}["{step}"]:::decision\n'
+        else:
+            code += f'  {current}["{step}"]:::process\n'
+        
+        code += f'  {last_node} --> {current}\n'
+        last_node = current
+        node_id += 1
+    
+    # Decision point
+    if decision:
+        decision_node = f'N{node_id}'
+        yes_node = f'N{node_id + 1}'
+        no_node = f'N{node_id + 2}'
+        
+        code += f'\n  %% Decision\n'
+        code += f'  {decision_node}{{{{{decision["condition"]}?}}}}:::decision\n'
+        code += f'  {yes_node}["{decision["yes"]}"]:::success\n'
+        code += f'  {no_node}["{decision["no"]}"]:::error\n'
+        
+        code += f'  {last_node} --> {decision_node}\n'
+        code += f'  {decision_node} -->|YES| {yes_node}\n'
+        code += f'  {decision_node} -->|NO| {no_node}\n'
+        
+        last_node = yes_node
+        node_id += 3
+    
+    # End node
+    code += f'\n  N{node_id}([END]):::startEnd\n'
+    code += f'  {last_node} --> N{node_id}\n'
+    
+    return code
+
+def generate_plantuml_v3(description):
+    """Generate clean PlantUML with proper labels and flow"""
+    steps, decision = parse_description_to_steps(description)
+    
+    code = '@startuml\n'
+    code += 'skinparam backgroundColor transparent\n'
+    code += 'skinparam defaultFontSize 12\n'
+    code += 'skinparam defaultFontName Arial\n'
+    code += 'skinparam activityBackgroundColor #e0f2fe\n'
+    code += 'skinparam activityBorderColor #0284c7\n'
+    code += 'skinparam activityBorderThickness 2\n'
+    code += 'skinparam activityFontColor #0c4a6e\n'
+    code += 'skinparam activityDiamondBackgroundColor #fef3c7\n'
+    code += 'skinparam activityDiamondBorderColor #f59e0b\n'
+    code += 'skinparam ArrowColor #64748b\n'
+    code += 'skinparam ArrowThickness 2\n\n'
+    
+    code += 'start\n\n'
+    
+    # Steps
+    for step in steps:
+        if any(word in step.lower() for word in ['error', 'fail', 'reject']):
+            code += f'#{dc2626}:{step};\n'
+        elif any(word in step.lower() for word in ['validate', 'check']):
+            code += f'#{f59e0b}:{step};\n'
+        else:
+            code += f':{step};\n'
+    
+    # Decision
+    if decision:
+        code += f'\nif ({decision["condition"]}?) then (yes)\n'
+        code += f'  #{dcfce7}:{decision["yes"]};\n'
+        code += 'else (no)\n'
+        code += f'  #{fee2e2}:{decision["no"]};\n'
+        code += 'endif\n'
+    
+    code += '\nstop\n'
+    code += '@enduml\n'
+    
+    return code
+
+def generate_excalidraw_v3(description):
+    """Generate clean Excalidraw with proper labels and flow"""
+    steps, decision = parse_description_to_steps(description)
+    
+    elements = []
+    element_id = 1
+    y_pos = 100
+    x_pos = 400
+    
+    def make_element(elem_type, x, y, width, height, text, bg_color, stroke_color):
+        nonlocal element_id
+        elem_id = f"element-{element_id}"
+        element_id += 1
+        
+        elem = {
+            "id": elem_id,
+            "type": elem_type,
+            "x": x,
+            "y": y,
+            "width": width,
+            "height": height,
+            "angle": 0,
+            "strokeColor": stroke_color,
+            "backgroundColor": bg_color,
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 1,
+            "opacity": 100,
+            "seed": 12345,
+            "version": 1,
+            "versionNonce": 1,
+            "isDeleted": False,
+            "boundElements": [],
+            "updated": 1,
+            "link": None,
+            "locked": False
+        }
+        
+        if elem_type == "ellipse":
+            elem["roundness"] = None
+        else:
+            elem["roundness"] = {"type": 3, "value": 16}
+        
+        elements.append(elem)
+        
+        # Add text
+        text_id = f"text-{element_id}"
+        element_id += 1
+        
+        text_elem = {
+            "id": text_id,
+            "type": "text",
+            "x": x + 10,
+            "y": y + (height - 25) // 2,
+            "width": width - 20,
+            "height": 25,
+            "angle": 0,
+            "strokeColor": stroke_color,
+            "backgroundColor": "transparent",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 0,
+            "opacity": 100,
+            "seed": 12345,
+            "version": 1,
+            "versionNonce": 1,
+            "isDeleted": False,
+            "boundElements": [],
+            "updated": 1,
+            "link": None,
+            "locked": False,
+            "text": text,
+            "fontSize": 16,
+            "fontFamily": 1,
+            "textAlign": "center",
+            "verticalAlign": "middle",
+            "baseline": 18,
+            "containerId": elem_id,
+            "originalText": text,
+            "lineHeight": 1.25
+        }
+        
+        elements.append(text_elem)
+        return elem_id, x + width // 2, y + height
+    
+    def make_arrow(from_x, from_y, to_x, to_y, label=None, color="#64748b"):
+        nonlocal element_id
+        arrow_id = f"arrow-{element_id}"
+        element_id += 1
+        
+        arrow = {
+            "id": arrow_id,
+            "type": "arrow",
+            "x": from_x,
+            "y": from_y,
+            "width": to_x - from_x,
+            "height": to_y - from_y,
+            "angle": 0,
+            "strokeColor": color,
+            "backgroundColor": "transparent",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 1,
+            "opacity": 100,
+            "seed": 12345,
+            "version": 1,
+            "versionNonce": 1,
+            "isDeleted": False,
+            "boundElements": [],
+            "updated": 1,
+            "link": None,
+            "locked": False,
+            "points": [[0, 0], [to_x - from_x, to_y - from_y]],
+            "lastCommittedPoint": None,
+            "startBinding": None,
+            "endBinding": None,
+            "startArrowhead": None,
+            "endArrowhead": "arrow"
+        }
+        
+        elements.append(arrow)
+        
+        if label:
+            text_id = f"label-{element_id}"
+            element_id += 1
+            
+            mid_x = from_x + (to_x - from_x) // 2
+            mid_y = from_y + (to_y - from_y) // 2
+            
+            label_elem = {
+                "id": text_id,
+                "type": "text",
+                "x": mid_x - 20,
+                "y": mid_y - 10,
+                "width": 40,
+                "height": 20,
+                "text": label,
+                "fontSize": 14,
+                "fontFamily": 1,
+                "textAlign": "center",
+                "verticalAlign": "middle",
+                "strokeColor": color,
+                "backgroundColor": "#ffffff",
+                "fillStyle": "solid",
+                "strokeWidth": 0,
+                "roughness": 0,
+                "opacity": 100,
+                "angle": 0,
+                "seed": 12345,
+                "version": 1,
+                "versionNonce": 1,
+                "isDeleted": False,
+                "lineHeight": 1.25,
+                "baseline": 14
+            }
+            
+            elements.append(label_elem)
+    
+    # Start
+    last_id, last_x, last_y = make_element("ellipse", x_pos, y_pos, 200, 80, "START", "#dcfce7", "#16a34a")
+    y_pos += 120
+    
+    # Steps
+    for step in steps:
+        if any(word in step.lower() for word in ['error', 'fail']):
+            bg, stroke = "#fee2e2", "#dc2626"
+        else:
+            bg, stroke = "#e0f2fe", "#0284c7"
+        
+        curr_id, curr_x, curr_y = make_element("rectangle", x_pos, y_pos, 220, 70, step[:40], bg, stroke)
+        make_arrow(last_x, last_y, curr_x, y_pos, None, "#64748b")
+        
+        last_id, last_x, last_y = curr_id, curr_x, curr_y
+        y_pos += 110
+    
+    # Decision
+    if decision:
+        dec_id, dec_x, dec_y = make_element("diamond", x_pos, y_pos, 200, 100, decision['condition'][:30] + "?", "#fef3c7", "#f59e0b")
+        make_arrow(last_x, last_y, dec_x, y_pos, None, "#64748b")
+        
+        y_pos += 140
+        
+        # Yes branch (left)
+        yes_x = x_pos - 250
+        yes_id, yes_cx, yes_cy = make_element("rectangle", yes_x, y_pos, 200, 70, decision['yes'][:35], "#dcfce7", "#16a34a")
+        make_arrow(dec_x, dec_y, yes_cx, y_pos, "YES", "#16a34a")
+        
+        # No branch (right)
+        no_x = x_pos + 250
+        no_id, no_cx, no_cy = make_element("rectangle", no_x, y_pos, 200, 70, decision['no'][:35], "#fee2e2", "#dc2626")
+        make_arrow(dec_x, dec_y, no_cx, y_pos, "NO", "#dc2626")
+        
+        last_x, last_y = yes_cx, yes_cy
+        y_pos += 110
+    
+    # End
+    end_id, end_x, end_y = make_element("ellipse", x_pos, y_pos, 200, 80, "END", "#dcfce7", "#16a34a")
+    make_arrow(last_x, last_y, end_x, y_pos, None, "#64748b")
+    
+    result = {
+        "type": "excalidraw",
+        "version": 2,
+        "source": "https://excalidraw.com",
+        "elements": elements,
+        "appState": {
+            "gridSize": None,
+            "viewBackgroundColor": "#ffffff"
+        },
+        "files": {}
+    }
+    
+    return json.dumps(result)
