@@ -127,6 +127,7 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
               {renderedDiagram.type === 'svg' ? (
                 <div
                   className="w-full h-full flex items-center justify-center"
+                  style={{ transform: `scale(${zoom / 100})` }}
                   dangerouslySetInnerHTML={{ __html: renderedDiagram.content }}
                 />
               ) : (
@@ -134,6 +135,7 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
                   src={renderedDiagram.content}
                   alt="Generated diagram"
                   className="max-w-full max-h-full object-contain"
+                  style={{ transform: `scale(${zoom / 100})` }}
                 />
               )}
             </div>
