@@ -112,7 +112,7 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
                   <Sparkles className="w-6 h-6 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                 </div>
               </div>
-              <p className="text-center text-sm text-muted-foreground">Creating your diagram...</p>
+              <p className="text-center text-base text-muted-foreground">Creating your diagram...</p>
             </div>
           ) : error ? (
             <Alert variant="destructive" className="m-6 max-w-2xl">
