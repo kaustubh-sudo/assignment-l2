@@ -257,12 +257,34 @@ def main():
             print(f"      Status: {result['status_code']}, Time: {result.get('response_time', 0):.2f}s")
             if result.get('code_length', 0) > 0:
                 print(f"      Generated {result['code_length']} chars of {result.get('response_data', {}).get('kroki_type', 'unknown')} code")
+                
+                # Check sophistication
+                is_sophisticated = result.get('is_sophisticated', False)
+                soph_status = "✅" if is_sophisticated else "❌"
+                print(f"      Sophisticated: {soph_status} (>= 600 chars)")
+                
+                # Check features
+                features_passed = result.get('features_passed', 0)
+                total_features = result.get('total_features', 0)
+                if total_features > 0:
+                    feature_status = "✅" if features_passed == total_features else "⚠️" if features_passed > 0 else "❌"
+                    print(f"      Features: {feature_status} {features_passed}/{total_features}")
+                
+                # Check Kroki rendering
+                kroki_success = result.get('kroki_success', False)
+                kroki_status = "✅" if kroki_success else "❌"
+                print(f"      Kroki render: {kroki_status}")
+                
+                # Flag issues
+                if not is_sophisticated:
+                    critical_issues.append(f"CRITICAL: {result['test_name']} - Generated code too simplistic ({result.get('code_length', 0)} chars < 600)")
+                if not kroki_success:
+                    critical_issues.append(f"CRITICAL: {result['test_name']} - Kroki rendering failed (HTTP {result.get('kroki_status', 'N/A')})")
+                if features_passed < total_features:
+                    critical_issues.append(f"WARNING: {result['test_name']} - Missing advanced features ({features_passed}/{total_features})")
         else:
             failed += 1
-            if result['test_name'] == "Complex GraphViz Workflow (Bug Fix Test)":
-                critical_issues.append(f"CRITICAL: {result['test_name']} failed - this was the main bug fix target")
-            else:
-                critical_issues.append(f"FAILED: {result['test_name']}")
+            critical_issues.append(f"CRITICAL: {result['test_name']} - API call failed")
             
             if result.get('status_code'):
                 print(f"      Status: {result['status_code']}")
