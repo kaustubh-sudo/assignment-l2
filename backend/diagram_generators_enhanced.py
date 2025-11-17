@@ -373,3 +373,140 @@ def generate_graphviz_enhanced(description):
     code += '}\n'
     
     return code
+
+def generate_mermaid_diagram(description):
+    """Generate advanced Mermaid flowchart with subgraphs, styling, and conditionals"""
+    workflow = parse_workflow(description)
+    
+    code = "%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#e0f2fe','primaryTextColor':'#0c4a6e','primaryBorderColor':'#0284c7','lineColor':'#64748b','secondaryColor':'#dcfce7','tertiaryColor':'#fef3c7'}}}%%\n"
+    code += "flowchart TD\n"
+    
+    # Style definitions
+    code += "    classDef startStyle fill:#dcfce7,stroke:#16a34a,stroke-width:3px,color:#16a34a\n"
+    code += "    classDef processStyle fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e\n"
+    code += "    classDef decisionStyle fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#92400e\n"
+    code += "    classDef errorStyle fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#991b1b\n"
+    code += "    classDef databaseStyle fill:#e0e7ff,stroke:#4f46e5,stroke-width:2px,color:#3730a3\n"
+    code += "    classDef endStyle fill:#dcfce7,stroke:#16a34a,stroke-width:3px,color:#16a34a\n\n"
+    
+    # Generate nodes
+    node_ids = []
+    for i, step in enumerate(workflow['steps']):
+        node_id = f"N{i}"
+        node_ids.append((node_id, step['type']))
+        text = step['text'][:40]
+        
+        # Choose shape based on type
+        if step['type'] == 'start':
+            code += f"    {node_id}([{text}]):::{step['type']}Style\n"
+        elif step['type'] == 'end':
+            code += f"    {node_id}([{text}]):::{step['type']}Style\n"
+        elif step['type'] == 'decision':
+            code += f"    {node_id}{{{{{text}?}}}}}:::{step['type']}Style\n"
+        elif step['type'] == 'database':
+            code += f"    {node_id}[({text})]:::{step['type']}Style\n"
+        elif step['type'] == 'error':
+            code += f"    {node_id}[{text}]:::{step['type']}Style\n"
+        else:
+            code += f"    {node_id}[{text}]:::{step['type']}Style\n"
+    
+    # Add conditional nodes
+    cond_nodes = []
+    for i, cond in enumerate(workflow['conditions']):
+        cond_id = f"C{i}"
+        yes_id = f"Y{i}"
+        no_id = f"No{i}"
+        
+        code += f"    {cond_id}{{{{{cond['condition']}?}}}}:::decisionStyle\n"
+        code += f"    {yes_id}[{cond['yes']}]:::processStyle\n"
+        code += f"    {no_id}[{cond['no']}]:::errorStyle\n"
+        
+        cond_nodes.append((cond_id, yes_id, no_id))
+    
+    code += "\n"
+    
+    # Connect steps
+    for i in range(len(node_ids) - 1):
+        code += f"    {node_ids[i][0]} --> {node_ids[i+1][0]}\n"
+    
+    # Connect conditionals
+    last_node = node_ids[-1][0] if node_ids else None
+    for cond_id, yes_id, no_id in cond_nodes:
+        if last_node:
+            code += f"    {last_node} --> {cond_id}\n"
+        code += f"    {cond_id} -->|Yes| {yes_id}\n"
+        code += f"    {cond_id} -->|No| {no_id}\n"
+        last_node = cond_id
+    
+    return code
+
+def generate_plantuml_diagram(description):
+    """Generate advanced PlantUML activity diagram with partitions, colors, and conditionals"""
+    workflow = parse_workflow(description)
+    
+    code = "@startuml\n"
+    
+    # Skinparam for beautiful styling
+    code += "skinparam backgroundColor transparent\n"
+    code += "skinparam activityShape octagon\n"
+    code += "skinparam activityBackgroundColor #e0f2fe\n"
+    code += "skinparam activityBorderColor #0284c7\n"
+    code += "skinparam activityBorderThickness 2\n"
+    code += "skinparam activityFontColor #0c4a6e\n"
+    code += "skinparam activityFontSize 12\n"
+    code += "skinparam activityDiamondBackgroundColor #fef3c7\n"
+    code += "skinparam activityDiamondBorderColor #f59e0b\n"
+    code += "skinparam partitionBackgroundColor #f0f9ff\n"
+    code += "skinparam partitionBorderColor #0284c7\n"
+    code += "skinparam ArrowColor #64748b\n"
+    code += "skinparam ArrowThickness 2\n\n"
+    
+    code += "start\n\n"
+    
+    # Group steps into a partition if there are multiple
+    if len(workflow['steps']) > 2:
+        code += "partition \"Workflow Steps\" #e0f2fe {\n"
+        indent = "  "
+    else:
+        indent = ""
+    
+    # Generate activities
+    for i, step in enumerate(workflow['steps']):
+        text = step['text'][:50]
+        
+        if step['type'] == 'decision':
+            code += f"{indent}:{text};\n"
+            code += f"{indent}note right\n"
+            code += f"{indent}  Decision point\n"
+            code += f"{indent}end note\n"
+        elif step['type'] == 'error':
+            code += f"{indent}#{dc2626}:{text};\n"
+        elif step['type'] == 'database':
+            code += f"{indent}#{4f46e5}:{text};\n"
+        elif step['type'] == 'process':
+            code += f"{indent}#{7c3aed}:{text};\n"
+        else:
+            code += f"{indent}:{text};\n"
+    
+    if len(workflow['steps']) > 2:
+        code += "}\n\n"
+    
+    # Add conditional logic
+    for cond in workflow['conditions']:
+        code += f"if ({cond['condition']}?) then (yes)\n"
+        code += f"  #{dcfce7}:{cond['yes']};\n"
+        code += "else (no)\n"
+        code += f"  #{fee2e2}:{cond['no']};\n"
+        code += "endif\n\n"
+    
+    # Add note if there are complex workflows
+    if workflow['has_conditionals']:
+        code += "note right\n"
+        code += "  Workflow includes\n"
+        code += "  conditional branches\n"
+        code += "end note\n\n"
+    
+    code += "stop\n"
+    code += "@enduml\n"
+    
+    return code
