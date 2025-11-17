@@ -461,8 +461,8 @@ def generate_excalidraw_v3(description):
             stroke
         )
         
-        # Arrow from previous element
-        make_arrow(last_x, last_y, curr_x, current_y, None, "#64748b")
+        # Arrow from previous element with proper binding
+        make_arrow(last_x, last_y, curr_x, current_y, None, "#64748b", last_id, curr_id)
         
         last_id, last_x, last_y = curr_id, curr_x, curr_y
         current_y += step_height + vertical_spacing
@@ -482,8 +482,8 @@ def generate_excalidraw_v3(description):
             "#f59e0b"
         )
         
-        # Arrow to decision
-        make_arrow(last_x, last_y, dec_x, current_y, None, "#64748b")
+        # Arrow to decision with proper binding
+        make_arrow(last_x, last_y, dec_x + dec_width // 2, current_y, None, "#64748b", last_id, dec_id)
         
         current_y += dec_height + vertical_spacing
         
@@ -503,8 +503,14 @@ def generate_excalidraw_v3(description):
             "#16a34a"
         )
         
-        # Arrow from decision to YES (angled)
-        make_arrow(dec_x - 60, dec_y + 40, yes_cx, current_y, "YES", "#16a34a")
+        # Calculate proper connection points
+        dec_left_x = dec_x + 30
+        dec_left_y = dec_y + dec_height // 2
+        yes_top_x = yes_cx
+        yes_top_y = current_y
+        
+        # Arrow from decision to YES with proper binding
+        make_arrow(dec_left_x, dec_left_y, yes_top_x, yes_top_y, "YES", "#16a34a", dec_id, yes_id)
         
         # NO branch (right side)
         no_width = max(240, min(340, len(decision['no']) * 7))
@@ -522,8 +528,14 @@ def generate_excalidraw_v3(description):
             "#dc2626"
         )
         
-        # Arrow from decision to NO (angled)
-        make_arrow(dec_x + dec_width + 60, dec_y + 40, no_cx, current_y, "NO", "#dc2626")
+        # Calculate proper connection points
+        dec_right_x = dec_x + dec_width - 30
+        dec_right_y = dec_y + dec_height // 2
+        no_top_x = no_cx
+        no_top_y = current_y
+        
+        # Arrow from decision to NO with proper binding
+        make_arrow(dec_right_x, dec_right_y, no_top_x, no_top_y, "NO", "#dc2626", dec_id, no_id)
         
         current_y += yes_height + vertical_spacing
         
@@ -544,14 +556,15 @@ def generate_excalidraw_v3(description):
         "#16a34a"
     )
     
-    # Arrow from last element to END
+    # Arrow from last element to END with proper binding
     if decision:
         # From YES branch to END
-        make_arrow(yes_cx, yes_cy, end_x, current_y, None, "#64748b")
+        end_center_x = end_x + end_width // 2
+        make_arrow(yes_cx, yes_cy, end_center_x, current_y, None, "#64748b", yes_id, end_id)
         # From NO branch to END  
-        make_arrow(no_cx, no_cy, end_x + end_width, current_y, None, "#64748b")
+        make_arrow(no_cx, no_cy, end_center_x, current_y, None, "#64748b", no_id, end_id)
     else:
-        make_arrow(last_x, last_y, end_x, current_y, None, "#64748b")
+        make_arrow(last_x, last_y, end_x + end_width // 2, current_y, None, "#64748b", last_id, end_id)
     
     result = {
         "type": "excalidraw",
