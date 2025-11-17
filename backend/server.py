@@ -16,8 +16,7 @@ from diagram_generators_enhanced import (
     generate_blockdiag_diagram, 
     generate_graphviz_enhanced,
     generate_mermaid_diagram,
-    generate_plantuml_diagram,
-    generate_excalidraw_diagram
+    generate_plantuml_diagram
 )
 from diagram_generators_v3 import (
     generate_graphviz_v3,
