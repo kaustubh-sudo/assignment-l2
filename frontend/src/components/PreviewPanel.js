@@ -139,10 +139,10 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
               )}
             </div>
           ) : (
-            <div className="text-center text-muted-foreground space-y-3 p-6">
-              <ImageIcon className="w-16 h-16 mx-auto opacity-30" />
-              <p className="text-base font-medium">Ready to create something amazing?</p>
-              <p className="text-sm">Describe your diagram on the left and click "Generate Diagram"</p>
+            <div className="text-center text-muted-foreground space-y-4 p-8">
+              <ImageIcon className="w-20 h-20 md:w-24 md:h-24 mx-auto opacity-30" />
+              <p className="text-lg md:text-xl font-medium">Ready to create something amazing?</p>
+              <p className="text-base">Describe your diagram on the left and click "Generate Diagram"</p>
             </div>
           )}
         </div>
