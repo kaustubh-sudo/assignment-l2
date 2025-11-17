@@ -465,10 +465,15 @@ def generate_excalidraw_v3(description):
             stroke
         )
         
-        # Arrow from previous element with proper binding
-        make_arrow(last_x, last_y, curr_x, current_y, None, "#64748b", last_id, curr_id)
+        # Arrow from previous element with proper binding (to center top of current box)
+        box_center_x = center_x
+        box_top_y = current_y
+        make_arrow(last_x, last_y, box_center_x, box_top_y, None, "#64748b", last_id, curr_id)
         
-        last_id, last_x, last_y = curr_id, curr_x, curr_y
+        # Update last position to center bottom of this box
+        last_id = curr_id
+        last_x = box_center_x
+        last_y = current_y + step_height
         current_y += step_height + vertical_spacing
     
     # Decision point
