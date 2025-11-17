@@ -202,7 +202,8 @@ def main():
         result = test_api_endpoint(
             scenario["description"],
             scenario["diagram_type"], 
-            scenario["test_name"]
+            scenario["test_name"],
+            scenario.get("expected_features", [])
         )
         results.append(result)
     
