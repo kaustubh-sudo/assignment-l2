@@ -84,16 +84,8 @@ async def generate_diagram(request: DiagramGenerationRequest):
     try:
         import re
         
-        # Map user-friendly diagram type to Kroki type
-        kroki_type_mapping = {
-            'flowchart': 'graphviz',
-            'sequence': 'mermaid',
-            'mindmap': 'mermaid',
-            'process': 'graphviz',
-            'organization': 'graphviz',
-        }
-        
-        kroki_type = kroki_type_mapping.get(request.diagram_type, 'graphviz')
+        # Kroki type is passed directly from frontend
+        kroki_type = request.diagram_type
         description = request.description
         
         if request.diagram_type in ['flowchart', 'process']:
