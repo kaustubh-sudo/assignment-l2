@@ -398,46 +398,135 @@ def generate_excalidraw_v3(description):
             
             elements.append(label_elem)
     
-    # Start
-    last_id, last_x, last_y = make_element("ellipse", x_pos, y_pos, 200, 80, "START", "#dcfce7", "#16a34a")
-    y_pos += 120
+    current_y = start_y
     
-    # Steps
+    # Start node - centered
+    start_width, start_height = 220, 90
+    last_id, last_x, last_y = make_element(
+        "ellipse", 
+        center_x - start_width // 2, 
+        current_y, 
+        start_width, 
+        start_height, 
+        "START", 
+        "#dcfce7", 
+        "#16a34a"
+    )
+    current_y += start_height + vertical_spacing
+    
+    # Steps - all centered vertically
     for step in steps:
         if any(word in step.lower() for word in ['error', 'fail']):
             bg, stroke = "#fee2e2", "#dc2626"
         else:
             bg, stroke = "#e0f2fe", "#0284c7"
         
-        curr_id, curr_x, curr_y = make_element("rectangle", x_pos, y_pos, 220, 70, step[:40], bg, stroke)
-        make_arrow(last_x, last_y, curr_x, y_pos, None, "#64748b")
+        # Calculate width based on text length (min 240, max 360)
+        step_width = max(240, min(360, len(step) * 7))
+        step_height = 80
+        
+        curr_id, curr_x, curr_y = make_element(
+            "rectangle", 
+            center_x - step_width // 2, 
+            current_y, 
+            step_width, 
+            step_height, 
+            step[:50], 
+            bg, 
+            stroke
+        )
+        
+        # Arrow from previous element
+        make_arrow(last_x, last_y, curr_x, current_y, None, "#64748b")
         
         last_id, last_x, last_y = curr_id, curr_x, curr_y
-        y_pos += 110
+        current_y += step_height + vertical_spacing
     
-    # Decision
+    # Decision point
     if decision:
-        dec_id, dec_x, dec_y = make_element("diamond", x_pos, y_pos, 200, 100, decision['condition'][:30] + "?", "#fef3c7", "#f59e0b")
-        make_arrow(last_x, last_y, dec_x, y_pos, None, "#64748b")
+        # Decision diamond - centered
+        dec_width, dec_height = 240, 120
+        dec_id, dec_x, dec_y = make_element(
+            "diamond", 
+            center_x - dec_width // 2, 
+            current_y, 
+            dec_width, 
+            dec_height, 
+            decision['condition'][:40] + "?", 
+            "#fef3c7", 
+            "#f59e0b"
+        )
         
-        y_pos += 140
+        # Arrow to decision
+        make_arrow(last_x, last_y, dec_x, current_y, None, "#64748b")
         
-        # Yes branch (left)
-        yes_x = x_pos - 250
-        yes_id, yes_cx, yes_cy = make_element("rectangle", yes_x, y_pos, 200, 70, decision['yes'][:35], "#dcfce7", "#16a34a")
-        make_arrow(dec_x, dec_y, yes_cx, y_pos, "YES", "#16a34a")
+        current_y += dec_height + vertical_spacing
         
-        # No branch (right)
-        no_x = x_pos + 250
-        no_id, no_cx, no_cy = make_element("rectangle", no_x, y_pos, 200, 70, decision['no'][:35], "#fee2e2", "#dc2626")
-        make_arrow(dec_x, dec_y, no_cx, y_pos, "NO", "#dc2626")
+        # YES branch (left side)
+        yes_width = max(240, min(340, len(decision['yes']) * 7))
+        yes_height = 80
+        yes_x = center_x - horizontal_branch_offset - yes_width // 2
         
+        yes_id, yes_cx, yes_cy = make_element(
+            "rectangle", 
+            yes_x, 
+            current_y, 
+            yes_width, 
+            yes_height, 
+            decision['yes'][:45], 
+            "#dcfce7", 
+            "#16a34a"
+        )
+        
+        # Arrow from decision to YES (angled)
+        make_arrow(dec_x - 60, dec_y + 40, yes_cx, current_y, "YES", "#16a34a")
+        
+        # NO branch (right side)
+        no_width = max(240, min(340, len(decision['no']) * 7))
+        no_height = 80
+        no_x = center_x + horizontal_branch_offset - no_width // 2
+        
+        no_id, no_cx, no_cy = make_element(
+            "rectangle", 
+            no_x, 
+            current_y, 
+            no_width, 
+            no_height, 
+            decision['no'][:45], 
+            "#fee2e2", 
+            "#dc2626"
+        )
+        
+        # Arrow from decision to NO (angled)
+        make_arrow(dec_x + dec_width + 60, dec_y + 40, no_cx, current_y, "NO", "#dc2626")
+        
+        current_y += yes_height + vertical_spacing
+        
+        # Both branches converge to center for END
         last_x, last_y = yes_cx, yes_cy
-        y_pos += 110
+        merge_y = current_y - 40
     
-    # End
-    end_id, end_x, end_y = make_element("ellipse", x_pos, y_pos, 200, 80, "END", "#dcfce7", "#16a34a")
-    make_arrow(last_x, last_y, end_x, y_pos, None, "#64748b")
+    # End node - centered
+    end_width, end_height = 220, 90
+    end_id, end_x, end_y = make_element(
+        "ellipse", 
+        center_x - end_width // 2, 
+        current_y, 
+        end_width, 
+        end_height, 
+        "END", 
+        "#dcfce7", 
+        "#16a34a"
+    )
+    
+    # Arrow from last element to END
+    if decision:
+        # From YES branch to END
+        make_arrow(yes_cx, yes_cy, end_x, current_y, None, "#64748b")
+        # From NO branch to END  
+        make_arrow(no_cx, no_cy, end_x + end_width, current_y, None, "#64748b")
+    else:
+        make_arrow(last_x, last_y, end_x, current_y, None, "#64748b")
     
     result = {
         "type": "excalidraw",
