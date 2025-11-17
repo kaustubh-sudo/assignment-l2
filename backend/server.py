@@ -199,6 +199,7 @@ async def generate_diagram(request: DiagramGenerationRequest):
             ])
             
             # Use advanced generator for complex workflows
+            code = None
             if is_complex:
                 try:
                     code = generate_graphviz_advanced(description)
@@ -206,9 +207,8 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 except Exception as e:
                     logger.error(f"Advanced generator failed: {e}", exc_info=True)
                     is_complex = False
-                    code = None
             
-            if not is_complex:
+            if not is_complex or code is None:
                 # Original simple parsing for backwards compatibility
                 desc_lower = description.lower()
             
