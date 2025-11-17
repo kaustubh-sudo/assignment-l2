@@ -510,3 +510,427 @@ def generate_plantuml_diagram(description):
     code += "@enduml\n"
     
     return code
+
+def generate_excalidraw_diagram(description):
+    """Generate enhanced Excalidraw JSON with better layout and styling"""
+    import json
+    import hashlib
+    
+    workflow = parse_workflow(description)
+    
+    elements = []
+    element_id_counter = 1
+    y_position = 100
+    x_position = 200
+    
+    # Helper to generate unique IDs
+    def make_id():
+        nonlocal element_id_counter
+        element_id = f"element-{element_id_counter}"
+        element_id_counter += 1
+        return element_id
+    
+    # Track node positions for connections
+    node_positions = []
+    
+    # Generate nodes for steps
+    for i, step in enumerate(workflow['steps']):
+        text = step['text'][:40]
+        element_id = make_id()
+        
+        # Determine size based on text length
+        text_width = len(text) * 8
+        width = max(180, min(text_width, 280))
+        height = 70
+        
+        # Choose colors based on type
+        if step['type'] == 'start':
+            bg_color = "#dcfce7"
+            stroke_color = "#16a34a"
+        elif step['type'] == 'end':
+            bg_color = "#dcfce7"
+            stroke_color = "#16a34a"
+        elif step['type'] == 'decision':
+            bg_color = "#fef3c7"
+            stroke_color = "#f59e0b"
+        elif step['type'] == 'error':
+            bg_color = "#fee2e2"
+            stroke_color = "#dc2626"
+        elif step['type'] == 'database':
+            bg_color = "#e0e7ff"
+            stroke_color = "#4f46e5"
+        else:
+            bg_color = "#e0f2fe"
+            stroke_color = "#0284c7"
+        
+        # Add rectangle
+        elements.append({
+            "id": element_id,
+            "type": "rectangle",
+            "x": x_position,
+            "y": y_position,
+            "width": width,
+            "height": height,
+            "angle": 0,
+            "strokeColor": stroke_color,
+            "backgroundColor": bg_color,
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 1,
+            "opacity": 100,
+            "roundness": {"type": 3, "value": 16},
+            "seed": abs(hash(text)) % 100000,
+            "version": 1,
+            "versionNonce": abs(hash(text + str(i))) % 100000,
+            "isDeleted": False,
+            "boundElements": [],
+            "updated": 1,
+            "link": None,
+            "locked": False
+        })
+        
+        # Add text
+        text_id = make_id()
+        elements.append({
+            "id": text_id,
+            "type": "text",
+            "x": x_position + 10,
+            "y": y_position + (height - 20) / 2,
+            "width": width - 20,
+            "height": 25,
+            "angle": 0,
+            "strokeColor": stroke_color,
+            "backgroundColor": "transparent",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 0,
+            "opacity": 100,
+            "seed": abs(hash(text + "text")) % 100000,
+            "version": 1,
+            "versionNonce": abs(hash(text + "text" + str(i))) % 100000,
+            "isDeleted": False,
+            "boundElements": [],
+            "updated": 1,
+            "link": None,
+            "locked": False,
+            "text": text,
+            "fontSize": 16,
+            "fontFamily": 1,
+            "textAlign": "center",
+            "verticalAlign": "middle",
+            "baseline": 18,
+            "containerId": element_id,
+            "originalText": text,
+            "lineHeight": 1.25
+        })
+        
+        # Store position for connections
+        node_positions.append({
+            'id': element_id,
+            'x': x_position,
+            'y': y_position,
+            'width': width,
+            'height': height
+        })
+        
+        # Update position for next node
+        y_position += height + 100
+    
+    # Add arrows between nodes
+    for i in range(len(node_positions) - 1):
+        from_node = node_positions[i]
+        to_node = node_positions[i + 1]
+        
+        arrow_id = make_id()
+        
+        # Calculate connection points
+        start_x = from_node['x'] + from_node['width'] / 2
+        start_y = from_node['y'] + from_node['height']
+        end_x = to_node['x'] + to_node['width'] / 2
+        end_y = to_node['y']
+        
+        elements.append({
+            "id": arrow_id,
+            "type": "arrow",
+            "x": start_x,
+            "y": start_y,
+            "width": end_x - start_x,
+            "height": end_y - start_y,
+            "angle": 0,
+            "strokeColor": "#64748b",
+            "backgroundColor": "transparent",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 1,
+            "opacity": 100,
+            "seed": abs(hash(f"arrow{i}")) % 100000,
+            "version": 1,
+            "versionNonce": abs(hash(f"arrow{i}v")) % 100000,
+            "isDeleted": False,
+            "boundElements": [],
+            "updated": 1,
+            "link": None,
+            "locked": False,
+            "points": [[0, 0], [end_x - start_x, end_y - start_y]],
+            "lastCommittedPoint": None,
+            "startBinding": None,
+            "endBinding": None,
+            "startArrowhead": None,
+            "endArrowhead": "arrow"
+        })
+    
+    # Add conditional branches if any
+    for i, cond in enumerate(workflow['conditions']):
+        cond_y = y_position
+        
+        # Decision diamond
+        decision_id = make_id()
+        elements.append({
+            "id": decision_id,
+            "type": "diamond",
+            "x": x_position,
+            "y": cond_y,
+            "width": 200,
+            "height": 100,
+            "angle": 0,
+            "strokeColor": "#f59e0b",
+            "backgroundColor": "#fef3c7",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 1,
+            "opacity": 100,
+            "seed": abs(hash(cond['condition'])) % 100000,
+            "version": 1,
+            "versionNonce": abs(hash(cond['condition'] + "v")) % 100000,
+            "isDeleted": False,
+            "boundElements": [],
+            "updated": 1,
+            "link": None,
+            "locked": False
+        })
+        
+        # Decision text
+        decision_text_id = make_id()
+        elements.append({
+            "id": decision_text_id,
+            "type": "text",
+            "x": x_position + 20,
+            "y": cond_y + 40,
+            "width": 160,
+            "height": 20,
+            "text": cond['condition'][:30] + "?",
+            "fontSize": 14,
+            "fontFamily": 1,
+            "textAlign": "center",
+            "verticalAlign": "middle",
+            "containerId": decision_id,
+            "originalText": cond['condition'][:30] + "?",
+            "strokeColor": "#92400e",
+            "backgroundColor": "transparent",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 0,
+            "opacity": 100,
+            "angle": 0,
+            "seed": abs(hash(cond['condition'] + "text")) % 100000,
+            "version": 1,
+            "versionNonce": 1,
+            "isDeleted": False,
+            "lineHeight": 1.25,
+            "baseline": 14
+        })
+        
+        # Yes branch (left)
+        yes_id = make_id()
+        yes_x = x_position - 250
+        yes_y = cond_y + 120
+        
+        elements.append({
+            "id": yes_id,
+            "type": "rectangle",
+            "x": yes_x,
+            "y": yes_y,
+            "width": 180,
+            "height": 70,
+            "strokeColor": "#16a34a",
+            "backgroundColor": "#dcfce7",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 1,
+            "opacity": 100,
+            "roundness": {"type": 3, "value": 16},
+            "angle": 0,
+            "seed": abs(hash(cond['yes'])) % 100000,
+            "version": 1,
+            "versionNonce": 1,
+            "isDeleted": False,
+            "boundElements": [],
+            "updated": 1,
+            "link": None,
+            "locked": False
+        })
+        
+        # Yes text
+        elements.append({
+            "id": make_id(),
+            "type": "text",
+            "x": yes_x + 10,
+            "y": yes_y + 25,
+            "width": 160,
+            "height": 20,
+            "text": cond['yes'][:30],
+            "fontSize": 14,
+            "fontFamily": 1,
+            "textAlign": "center",
+            "verticalAlign": "middle",
+            "containerId": yes_id,
+            "originalText": cond['yes'][:30],
+            "strokeColor": "#16a34a",
+            "backgroundColor": "transparent",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "roughness": 0,
+            "opacity": 100,
+            "angle": 0,
+            "seed": 1,
+            "version": 1,
+            "versionNonce": 1,
+            "isDeleted": False,
+            "lineHeight": 1.25,
+            "baseline": 14
+        })
+        
+        # No branch (right)
+        no_id = make_id()
+        no_x = x_position + 250
+        no_y = cond_y + 120
+        
+        elements.append({
+            "id": no_id,
+            "type": "rectangle",
+            "x": no_x,
+            "y": no_y,
+            "width": 180,
+            "height": 70,
+            "strokeColor": "#dc2626",
+            "backgroundColor": "#fee2e2",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 1,
+            "opacity": 100,
+            "roundness": {"type": 3, "value": 16},
+            "angle": 0,
+            "seed": abs(hash(cond['no'])) % 100000,
+            "version": 1,
+            "versionNonce": 1,
+            "isDeleted": False,
+            "boundElements": [],
+            "updated": 1,
+            "link": None,
+            "locked": False
+        })
+        
+        # No text
+        elements.append({
+            "id": make_id(),
+            "type": "text",
+            "x": no_x + 10,
+            "y": no_y + 25,
+            "width": 160,
+            "height": 20,
+            "text": cond['no'][:30],
+            "fontSize": 14,
+            "fontFamily": 1,
+            "textAlign": "center",
+            "verticalAlign": "middle",
+            "containerId": no_id,
+            "originalText": cond['no'][:30],
+            "strokeColor": "#dc2626",
+            "backgroundColor": "transparent",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "roughness": 0,
+            "opacity": 100,
+            "angle": 0,
+            "seed": 1,
+            "version": 1,
+            "versionNonce": 1,
+            "isDeleted": False,
+            "lineHeight": 1.25,
+            "baseline": 14
+        })
+        
+        # Arrows from decision to branches
+        # Arrow to Yes
+        elements.append({
+            "id": make_id(),
+            "type": "arrow",
+            "x": x_position,
+            "y": cond_y + 50,
+            "width": yes_x + 180 - x_position,
+            "height": 70,
+            "strokeColor": "#16a34a",
+            "backgroundColor": "transparent",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 1,
+            "opacity": 100,
+            "angle": 0,
+            "seed": 1,
+            "version": 1,
+            "versionNonce": 1,
+            "isDeleted": False,
+            "points": [[0, 0], [yes_x + 180 - x_position, 70]],
+            "endArrowhead": "arrow",
+            "startArrowhead": None
+        })
+        
+        # Arrow to No
+        elements.append({
+            "id": make_id(),
+            "type": "arrow",
+            "x": x_position + 200,
+            "y": cond_y + 50,
+            "width": no_x - (x_position + 200),
+            "height": 70,
+            "strokeColor": "#dc2626",
+            "backgroundColor": "transparent",
+            "fillStyle": "solid",
+            "strokeWidth": 2,
+            "strokeStyle": "solid",
+            "roughness": 1,
+            "opacity": 100,
+            "angle": 0,
+            "seed": 1,
+            "version": 1,
+            "versionNonce": 1,
+            "isDeleted": False,
+            "points": [[0, 0], [no_x - (x_position + 200), 70]],
+            "endArrowhead": "arrow",
+            "startArrowhead": None
+        })
+        
+        y_position = cond_y + 220
+    
+    # Create Excalidraw JSON structure
+    excalidraw_data = {
+        "type": "excalidraw",
+        "version": 2,
+        "source": "https://excalidraw.com",
+        "elements": elements,
+        "appState": {
+            "gridSize": None,
+            "viewBackgroundColor": "#ffffff"
+        },
+        "files": {}
+    }
+    
+    return json.dumps(excalidraw_data)
