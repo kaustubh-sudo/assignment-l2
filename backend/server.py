@@ -147,21 +147,14 @@ async def generate_diagram(request: DiagramGenerationRequest):
             return result if result else text  # Fallback to original if nothing left
         
         if request.diagram_type == 'graphviz':
-            # Use enhanced GraphViz generator with better parsing
+            # Use v3 generator for clean, properly labeled diagrams
             try:
-                logger.info(f"Using enhanced GraphViz generator for description length: {len(description)}")
-                code = generate_graphviz_enhanced(description)
-                logger.info(f"Enhanced GraphViz generator succeeded, code length: {len(code)}")
+                logger.info(f"Using GraphViz v3 generator for description length: {len(description)}")
+                code = generate_graphviz_v3(description)
+                logger.info(f"GraphViz v3 generator succeeded, code length: {len(code)}")
                 return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
             except Exception as e:
-                logger.error(f"Enhanced generator failed, trying fallback: {str(e)}")
-                # Fallback to original advanced generator
-                try:
-                    code = generate_graphviz_advanced(description)
-                    logger.info(f"Fallback GraphViz generator succeeded, code length: {len(code)}")
-                    return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
-                except Exception as e2:
-                    logger.error(f"All GraphViz generators failed: {str(e2)}")
+                logger.error(f"GraphViz v3 generator failed: {str(e)}")
             
             # Last resort simple fallback
             logger.info("Using simple GraphViz fallback")
