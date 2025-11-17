@@ -78,9 +78,12 @@ async def get_status_checks():
 @api_router.post("/generate-diagram", response_model=DiagramGenerationResponse)
 async def generate_diagram(request: DiagramGenerationRequest):
     """
-    Convert natural language description to diagram code using AI
+    Convert natural language description to diagram code
+    Uses intelligent parsing to extract steps/entities from description
     """
     try:
+        import re
+        
         # Map user-friendly diagram type to Kroki type
         kroki_type_mapping = {
             'flowchart': 'graphviz',
@@ -91,108 +94,158 @@ async def generate_diagram(request: DiagramGenerationRequest):
         }
         
         kroki_type = kroki_type_mapping.get(request.diagram_type, 'graphviz')
+        description = request.description
         
-        # Initialize OpenAI client
-        client = OpenAI(
-            api_key=os.environ.get('OPENAI_API_KEY'),
-            base_url="https://api.openai.com/v1"
-        )
-        
-        # Create detailed prompts for each diagram type
-        prompts = {
-            'flowchart': f"""You are a GraphViz DOT code generator. Convert the following description into a flowchart using GraphViz DOT syntax.
-
-IMPORTANT STYLING RULES:
-- Always set bgcolor="transparent"
-- For START/END nodes: shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"
-- For PROCESS steps: shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"
-- For DECISION nodes: shape=diamond, style=filled, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#78350f"
-- All edges: color="#64748b"
-- Set: node [fontname="Arial", fontsize=12]
-- Use rankdir=TB for top-to-bottom flow
-
-USER'S DESCRIPTION:
-{request.description}
-
-Generate ONLY the GraphViz DOT code. Do NOT include markdown code blocks or explanations. Start with "digraph G {{".""",
+        if request.diagram_type in ['flowchart', 'process']:
+            # Extract steps from description
+            # Look for patterns like: "Step 1, Step 2" or "A -> B -> C" or "First X, then Y, finally Z"
+            steps = []
             
-            'sequence': f"""You are a Mermaid sequence diagram generator. Convert the following description into a sequence diagram using Mermaid syntax.
-
-USER'S DESCRIPTION:
-{request.description}
-
-Generate ONLY the Mermaid code. Start with "sequenceDiagram" and do NOT include markdown code blocks or explanations.""",
+            # Split by common delimiters
+            parts = re.split(r'[,;→\n]|->|then|next|after that|finally', description, flags=re.IGNORECASE)
             
-            'mindmap': f"""You are a Mermaid graph diagram generator. Convert the following description into a graph diagram using Mermaid syntax.
-
-USER'S DESCRIPTION:
-{request.description}
-
-Generate ONLY the Mermaid code. Start with "graph TD" (for top-down) and do NOT include markdown code blocks or explanations.""",
+            for part in parts:
+                part = part.strip()
+                if part and len(part) > 2:
+                    # Clean up common prefixes
+                    part = re.sub(r'^(step\s+\d+:?\s*|•\s*|-\s*|\d+\.\s*)', '', part, flags=re.IGNORECASE)
+                    if part:
+                        steps.append(part.strip())
             
-            'process': f"""You are a GraphViz DOT code generator for process diagrams. Convert the following description into a process diagram using GraphViz DOT syntax.
-
-IMPORTANT STYLING RULES:
-- Always set bgcolor="transparent"
-- For process steps: shape=box, style=filled, fillcolor="#ddd6fe", color="#7c3aed", fontcolor="#4c1d95"
-- All edges: color="#64748b"
-- Set: node [fontname="Arial", fontsize=12]
-- Use rankdir=LR for left-to-right flow
-
-USER'S DESCRIPTION:
-{request.description}
-
-Generate ONLY the GraphViz DOT code. Do NOT include markdown code blocks or explanations. Start with "digraph G {{".""",
+            # Generate flowchart
+            rankdir = 'LR' if request.diagram_type == 'process' else 'TB'
+            nodes = []
+            edges = []
             
-            'organization': f"""You are a GraphViz DOT code generator for organization charts. Convert the following description into an org chart using GraphViz DOT syntax.
-
-IMPORTANT STYLING RULES:
-- Always set bgcolor="transparent"
-- For all nodes: shape=box, style="rounded,filled", fillcolor="#fce7f3", color="#db2777", fontcolor="#831843"
-- Set: node [fontname="Arial", fontsize=12]
-- Use rankdir=TB for top-to-bottom hierarchy
-
-USER'S DESCRIPTION:
-{request.description}
-
-Generate ONLY the GraphViz DOT code. Do NOT include markdown code blocks or explanations. Start with "digraph G {{"."""
-        }
+            # Add start node
+            nodes.append('start [label="Start", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]')
+            
+            prev_node = 'start'
+            for i, step in enumerate(steps):
+                node_id = f'step{i+1}'
+                # Detect if it's a decision
+                is_decision = any(word in step.lower() for word in ['if', '?', 'decide', 'choice', 'check', 'approve', 'reject'])
+                
+                if is_decision:
+                    label = step.replace('"', '\\"')[:40]  # Limit label length
+                    nodes.append(f'{node_id} [label="{label}", shape=diamond, style=filled, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#78350f"]')
+                else:
+                    label = step.replace('"', '\\"')[:40]
+                    nodes.append(f'{node_id} [label="{label}", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]')
+                
+                edges.append(f'{prev_node} -> {node_id}')
+                prev_node = node_id
+            
+            # Add end node
+            nodes.append('end [label="End", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]')
+            edges.append(f'{prev_node} -> end')
+            
+            code = f'''digraph G {{
+  bgcolor="transparent"
+  rankdir={rankdir}
+  node [fontname="Arial", fontsize=12]
+  edge [fontname="Arial", fontsize=10, color="#64748b"]
+  
+  {chr(10).join(f"  {node}" for node in nodes)}
+  
+  {chr(10).join(f"  {edge}" for edge in edges)}
+}}'''
         
-        prompt = prompts.get(request.diagram_type, prompts['flowchart'])
-        
-        # Call OpenAI API
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are an expert diagram code generator. You generate clean, valid diagram code based on user descriptions. You ALWAYS return ONLY the code without any markdown formatting, explanations, or code block markers."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            temperature=0.7,
-            max_tokens=2000,
-        )
-        
-        # Extract and clean the generated code
-        code = response.choices[0].message.content.strip()
-        
-        # Remove any markdown artifacts
-        code = code.replace('```dot', '').replace('```graphviz', '').replace('```mermaid', '').replace('```', '').strip()
-        
-        # Remove any text before the actual code starts
-        if request.diagram_type in ['flowchart', 'process', 'organization']:
-            if 'digraph' in code:
-                code = 'digraph' + code.split('digraph', 1)[1]
         elif request.diagram_type == 'sequence':
-            if 'sequenceDiagram' in code:
-                code = 'sequenceDiagram' + code.split('sequenceDiagram', 1)[1]
+            # Extract participants and interactions
+            participants = []
+            interactions = []
+            
+            # Look for entities (capitalized words or quoted text)
+            words = description.split()
+            for word in words:
+                if word[0].isupper() and len(word) > 2 and word not in participants:
+                    participants.append(word)
+            
+            # If no participants found, use generic ones
+            if not participants:
+                participants = ['User', 'System', 'Database']
+            
+            # Extract interactions
+            parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
+            for part in parts:
+                part = part.strip()
+                if part and len(part) > 5:
+                    interactions.append(part[:50])
+            
+            # Build sequence diagram
+            code = 'sequenceDiagram\n'
+            for p in participants[:6]:  # Limit to 6 participants
+                code += f'    participant {p}\n'
+            code += '\n'
+            
+            # Generate interactions between participants
+            for i, interaction in enumerate(interactions[:8]):  # Limit interactions
+                sender = participants[i % len(participants)]
+                receiver = participants[(i + 1) % len(participants)]
+                code += f'    {sender}->>{receiver}: {interaction}\n'
+        
         elif request.diagram_type == 'mindmap':
-            if 'graph' in code:
-                code = 'graph' + code.split('graph', 1)[1]
+            # Extract topics and subtopics
+            lines = [line.strip() for line in description.split('\n') if line.strip()]
+            if not lines:
+                lines = [part.strip() for part in description.split(',') if part.strip()]
+            
+            main_topic = lines[0] if lines else "Main Topic"
+            subtopics = lines[1:] if len(lines) > 1 else ["Subtopic 1", "Subtopic 2"]
+            
+            code = f'''graph TD
+    A[{main_topic[:30]}]'''
+            
+            for i, topic in enumerate(subtopics[:6]):  # Limit to 6 subtopics
+                node_id = chr(66 + i)  # B, C, D, etc.
+                code += f'\n    A --> {node_id}[{topic[:30]}]'
+        
+        elif request.diagram_type == 'organization':
+            # Extract roles from description
+            roles = []
+            
+            # Look for job titles or roles
+            common_roles = ['CEO', 'CTO', 'CFO', 'COO', 'Manager', 'Director', 'Lead', 'Developer', 'Engineer', 
+                          'Designer', 'Analyst', 'Accountant', 'HR', 'Sales', 'Marketing']
+            
+            for role in common_roles:
+                if role.lower() in description.lower():
+                    roles.append(role)
+            
+            # Extract custom roles (capitalized words)
+            words = description.split()
+            for word in words:
+                if word[0].isupper() and len(word) > 3 and word not in roles:
+                    roles.append(word)
+            
+            # If no roles found, use defaults
+            if not roles:
+                roles = ['CEO', 'Manager', 'Team Lead', 'Employee']
+            
+            # Build org chart with hierarchy
+            nodes = []
+            edges = []
+            
+            for i, role in enumerate(roles[:10]):  # Limit to 10 nodes
+                node_id = f'node{i}'
+                label = role.replace('"', '\\"')
+                nodes.append(f'{node_id} [label="{label}"]')
+                
+                # Create hierarchy
+                if i > 0:
+                    parent_id = f'node{i // 2}'  # Simple tree structure
+                    edges.append(f'{parent_id} -> {node_id}')
+            
+            code = f'''digraph G {{
+  bgcolor="transparent"
+  rankdir=TB
+  node [fontname="Arial", fontsize=12, shape=box, style="rounded,filled", fillcolor="#fce7f3", color="#db2777", fontcolor="#831843"]
+  
+  {chr(10).join(f"  {node}" for node in nodes)}
+  
+  {chr(10).join(f"  {edge}" for edge in edges)}
+}}'''
         
         logger.info(f"Generated diagram code for type: {request.diagram_type}")
         
