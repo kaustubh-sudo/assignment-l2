@@ -30,11 +30,11 @@ const InputPanel = ({
 
   return (
     <Card className="h-full flex flex-col shadow-lg border-border/50 bg-card/95 backdrop-blur-sm">
-      <CardHeader className="pb-2.5 border-b border-border/50">
+      <CardHeader className="pb-3 border-b border-border/50">
         <CardTitle className="text-base font-semibold">
           Describe Your Diagram
         </CardTitle>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-sm text-muted-foreground mt-1.5">
           Explain what you want to visualize in plain language
         </p>
       </CardHeader>
