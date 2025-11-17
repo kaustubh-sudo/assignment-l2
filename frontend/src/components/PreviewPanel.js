@@ -123,19 +123,19 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
               </AlertDescription>
             </Alert>
           ) : renderedDiagram ? (
-            <div className="w-full h-full p-6 flex items-center justify-center animate-fade-in">
+            <div className="w-full h-full p-6 flex items-center justify-center animate-fade-in overflow-auto">
               {renderedDiagram.type === 'svg' ? (
                 <div
-                  className="w-full h-full flex items-center justify-center"
-                  style={{ transform: `scale(${zoom / 100})` }}
+                  className="flex items-center justify-center transition-transform duration-200"
+                  style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'center center' }}
                   dangerouslySetInnerHTML={{ __html: renderedDiagram.content }}
                 />
               ) : (
                 <img
                   src={renderedDiagram.content}
                   alt="Generated diagram"
-                  className="max-w-full max-h-full object-contain"
-                  style={{ transform: `scale(${zoom / 100})` }}
+                  className="object-contain transition-transform duration-200"
+                  style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'center center' }}
                 />
               )}
             </div>
