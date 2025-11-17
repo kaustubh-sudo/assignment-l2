@@ -31,18 +31,33 @@ def parse_workflow(description):
     # Split by common delimiters
     parts = re.split(r'[,;]|\bthen\b|\bnext\b|\bafter\b', description, flags=re.IGNORECASE)
     
-    # Find conditionals (if/else, either/or) - improved patterns
-    conditional_patterns = [
-        r'if\s+([^,]+?)\s+([^,]+?)(?:\s+else\s+([^,]+?))?(?:[,;.]|$)',
-        r'(?:either|when)\s+([^,]+?)\s+(?:or|otherwise)\s+([^,]+?)(?:[,;.]|$)',
+    # Enhanced conditional detection for specific patterns
+    # Pattern 1: "if X Y else Z" (e.g., "if approved ship product else refund")
+    if_else_match = re.search(r'if\s+([^,]+?)\s+([^,]+?)\s+else\s+([^,]+?)(?:[,;.]|$)', description, re.IGNORECASE)
+    if if_else_match:
+        condition = clean_text(if_else_match.group(1), max_words=3)
+        yes_action = clean_text(if_else_match.group(2), max_words=5)
+        no_action = clean_text(if_else_match.group(3), max_words=5)
+        
+        conditions.append({
+            'condition': condition,
+            'yes': yes_action,
+            'no': no_action
+        })
+    
+    # Pattern 2: Look for approval/rejection patterns
+    approval_patterns = [
+        r'(approved?|authorized?|valid)\s+([^,]+?)\s+(?:else|otherwise)\s+([^,]+?)(?:[,;.]|$)',
+        r'if\s+(approved?|authorized?|valid)\s+([^,]+?)(?:[,;.]|$)',
     ]
     
-    for pattern in conditional_patterns:
-        for match in re.finditer(pattern, description, re.IGNORECASE):
+    for pattern in approval_patterns:
+        match = re.search(pattern, description, re.IGNORECASE)
+        if match and not conditions:  # Only if we haven't found conditions yet
             groups = match.groups()
-            condition = clean_text(groups[0], max_words=5)
-            yes_action = clean_text(groups[1], max_words=5)
-            no_action = clean_text(groups[2], max_words=5) if len(groups) > 2 and groups[2] else "Alternative path"
+            condition = groups[0]
+            yes_action = clean_text(groups[1], max_words=5) if len(groups) > 1 else "proceed"
+            no_action = clean_text(groups[2], max_words=5) if len(groups) > 2 else "reject"
             
             conditions.append({
                 'condition': condition,
@@ -50,12 +65,15 @@ def parse_workflow(description):
                 'no': no_action
             })
     
-    # Extract regular steps
+    # Extract regular steps (excluding conditional parts)
+    conditional_text = if_else_match.group(0) if if_else_match else ""
+    
     for part in parts:
         part = part.strip()
-        if len(part) > 5 and not any(cond['condition'] in part for cond in conditions):
+        # Skip if this part is within the conditional we found
+        if len(part) > 3 and conditional_text not in part:
             cleaned = clean_text(part, max_words=6)
-            if cleaned:
+            if cleaned and len(cleaned) > 2:
                 steps.append(cleaned)
     
     # Identify step types
