@@ -120,6 +120,18 @@ backend:
         agent: "testing"
         comment: "✅ VERIFIED: Bug fix successful. All 4 test scenarios passed: Complex GraphViz (1004 chars generated), Simple GraphViz (149 chars), Mermaid (112 chars), PlantUML (261 chars). Advanced GraphViz generator working correctly with proper return statement preventing fall-through. Backend logs confirm successful API calls with 200 status. No 500 errors detected."
 
+  - task: "Fix GraphViz Syntax Error in Advanced Generator"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/diagram_generator.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed invalid GraphViz syntax in add_edge function. The label_attr was producing '[, label=...' with a leading comma, causing Kroki 400 errors. Changed to 'label=\"...\", ' format to produce valid syntax '[label=\"...\", color=...]'."
+
 
 frontend:
   - task: "Initial Load & UI Elements"
