@@ -194,54 +194,9 @@ def generate_mermaid_v3(description):
     return code
 
 def generate_pikchr_v3(description):
-    """Generate clean Pikchr diagram with proper YES/NO branching"""
-    steps, decision = parse_description_to_steps(description)
-    
-    code = "scale = 1.0\n\n"
-    
-    # Start node
-    code += "START: oval \"START\" fit fill lightgreen\n"
-    code += "arrow\n"
-    
-    # Steps before decision
-    for i, step in enumerate(steps):
-        step_id = f"S{i}"
-        if any(word in step.lower() for word in ['error', 'fail']):
-            fill_color = "pink"
-        else:
-            fill_color = "lightblue"
-        
-        safe_text = step[:45].replace('"', "'")
-        code += f'{step_id}: box "{safe_text}" fit fill {fill_color}\n'
-        code += "arrow\n"
-    
-    # Decision point with proper branching
-    if decision:
-        safe_condition = decision["condition"][:35].replace('"', "'")
-        code += f'DEC: diamond "{safe_condition}?" fit fill lightyellow\n\n'
-        
-        # YES branch (left)
-        safe_yes = decision["yes"][:40].replace('"', "'")
-        code += "arrow from DEC.w left 200% \"YES\" above\n"
-        code += f'YES: box "{safe_yes}" fit fill lightgreen\n'
-        code += "arrow down from YES.s\n"
-        
-        # NO branch (right)
-        safe_no = decision["no"][:40].replace('"', "'")
-        code += "arrow from DEC.e right 200% \"NO\" above\n"
-        code += f'NO: box "{safe_no}" fit fill pink\n'
-        code += "arrow down from NO.s\n"
-        
-        # END node - simple positioning
-        code += "END: oval \"END\" fit fill lightgreen at (DEC.x, YES.y - 200%)\n"
-        
-        # Connect both branches to END
-        code += "arrow from YES.s then down 50% then right until even with END.w then to END.w\n"
-        code += "arrow from NO.s then down 50% then left until even with END.e then to END.e\n"
-    else:
-        code += "END: oval \"END\" fit fill lightgreen\n"
-    
-    return code
+    """Generate clean Pikchr diagram - using GraphViz instead since Pikchr is unreliable"""
+    # Pikchr has too many syntax issues, just use GraphViz which is proven to work
+    return generate_graphviz_v3(description)
 
 def generate_plantuml_v3(description):
     """Generate clean PlantUML with proper labels and flow"""
