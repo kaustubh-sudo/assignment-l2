@@ -70,7 +70,7 @@ const InputPanel = ({
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             placeholder="Example: Create a flowchart showing the customer support process from ticket creation to resolution..."
-            className="flex-1 text-sm md:text-base leading-relaxed custom-scrollbar resize-none min-h-[150px] md:min-h-[200px]"
+            className="flex-1 text-base leading-relaxed custom-scrollbar resize-none min-h-[150px] md:min-h-[200px]"
           />
         </div>
 
