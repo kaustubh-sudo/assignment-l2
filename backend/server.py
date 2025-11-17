@@ -16,7 +16,8 @@ from diagram_generators_enhanced import (
     generate_blockdiag_diagram, 
     generate_graphviz_enhanced,
     generate_mermaid_diagram,
-    generate_plantuml_diagram
+    generate_plantuml_diagram,
+    generate_excalidraw_diagram
 )
 
 # Configure logging early
