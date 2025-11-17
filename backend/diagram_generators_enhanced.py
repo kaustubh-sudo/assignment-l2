@@ -31,9 +31,9 @@ def parse_workflow(description):
     # Split by common delimiters
     parts = re.split(r'[,;]|\bthen\b|\bnext\b|\bafter\b', description, flags=re.IGNORECASE)
     
-    # Find conditionals (if/else, either/or)
+    # Find conditionals (if/else, either/or) - improved patterns
     conditional_patterns = [
-        r'if\s+([^,]+?)\s+(show|display|go to|then|:)\s+([^,]+?)(?:\s+else\s+([^,]+?))?(?:[,;.]|$)',
+        r'if\s+([^,]+?)\s+([^,]+?)(?:\s+else\s+([^,]+?))?(?:[,;.]|$)',
         r'(?:either|when)\s+([^,]+?)\s+(?:or|otherwise)\s+([^,]+?)(?:[,;.]|$)',
     ]
     
