@@ -26,31 +26,29 @@ const DiagramRenderer = () => {
 
   // Generate diagram code from natural language using backend
   const generateDiagramCode = async (description, type) => {
-    // Use relative URL - Kubernetes ingress routes /api to backend automatically
-    try {
-      const response = await fetch('/api/generate-diagram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          description: description,
-          diagram_type: type,
-        }),
-      });
+    const response = await fetch('/api/generate-diagram', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        description: description,
+        diagram_type: type,
+      }),
+    });
 
-      // Read response body only once
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.detail || `Failed to generate diagram code: ${response.status}`);
-      }
-
-      return data.code;
-    } catch (error) {
-      console.error('Error generating diagram code:', error);
-      throw new Error(error.message || 'Failed to generate diagram code. Please try again.');
+    // Store status BEFORE reading body
+    const { status, ok } = response;
+    
+    // Read response body only once
+    const data = await response.json();
+    
+    // Check status AFTER reading body
+    if (!ok) {
+      throw new Error(data.detail || `Backend error: ${status}`);
     }
+
+    return data.code;
   };
 
   // Render the diagram using Kroki API  
