@@ -128,12 +128,19 @@ async def generate_diagram(request: DiagramGenerationRequest):
         
         if request.diagram_type == 'graphviz':
             # Use advanced generator for all GraphViz diagrams
+            code = None
             try:
+                logger.info(f"Calling advanced generator with description length: {len(description)}")
                 code = generate_graphviz_advanced(description)
-                logger.info("Advanced GraphViz generator used successfully")
+                logger.info(f"Advanced GraphViz generator succeeded, code length: {len(code) if code else 0}")
             except Exception as e:
-                logger.error(f"Advanced generator failed: {e}, using simple fallback", exc_info=True)
+                logger.error(f"Advanced generator exception: {type(e).__name__}: {str(e)}", exc_info=True)
                 # Fallback to simple version
+                code = None
+            
+            # If advanced generator failed, use simple fallback
+            if code is None:
+                logger.info("Using simple GraphViz fallback")
                 desc_lower = description.lower()
             
             # Detect layout preference
