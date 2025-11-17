@@ -12,10 +12,24 @@ def parse_description_to_steps(description):
     
     steps = []
     decision_point = None
+    decision_check_step = None
     
     for line in lines:
         line = line.strip()
         if not line or len(line) < 3:
+            continue
+        
+        # Check if this line mentions "checks if" - this becomes the decision node
+        check_match = re.search(r'(.+?)\s+checks?\s+if\s+(.+)', line, re.IGNORECASE)
+        if check_match:
+            action = check_match.group(1).strip()
+            condition = check_match.group(2).strip()
+            
+            # Add the action as a step
+            steps.append(action.capitalize())
+            
+            # Store the condition for the decision node
+            decision_check_step = condition.capitalize()
             continue
         
         # Check for decision pattern: "If X, then Y. If not X, then Z."
@@ -28,9 +42,11 @@ def parse_description_to_steps(description):
             
             # Check if we haven't set decision yet
             if not decision_point:
+                # Use the condition from "checks if" if available, otherwise construct it
+                condition_text = decision_check_step if decision_check_step else f"{subject.capitalize()} is {state}"
                 # This is the YES branch
                 decision_point = {
-                    'condition': f"{subject.capitalize()} is {state}",
+                    'condition': condition_text,
                     'yes': action.capitalize(),
                     'no': None  # Will be filled by next "if not" statement
                 }
