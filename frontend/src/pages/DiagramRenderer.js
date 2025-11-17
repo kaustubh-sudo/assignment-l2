@@ -30,7 +30,8 @@ const DiagramRenderer = () => {
 
   // Generate diagram code from natural language using backend AI
   const generateDiagramCode = async (description, type) => {
-    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+    // Use local backend URL to avoid CORS issues
+    const BACKEND_URL = window.location.hostname === 'localhost' ? 'http://localhost:8001' : process.env.REACT_APP_BACKEND_URL;
     
     try {
       const response = await fetch(`${BACKEND_URL}/api/generate-diagram`, {
@@ -45,14 +46,15 @@ const DiagramRenderer = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to generate diagram code: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `Failed to generate diagram code: ${response.status}`);
       }
 
       const data = await response.json();
       return data.code;
     } catch (error) {
       console.error('Error generating diagram code:', error);
-      throw new Error('Failed to generate diagram code. Please try again.');
+      throw new Error(error.message || 'Failed to generate diagram code. Please try again.');
     }
   };
 
