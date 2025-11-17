@@ -402,8 +402,9 @@ async def generate_diagram(request: DiagramGenerationRequest):
             code = json.dumps(excalidraw_data)
         
         elif request.diagram_type == 'plantuml':
-            # Generate PlantUML diagram
-            # Extract entities/steps
+            # Generate sophisticated PlantUML diagram
+            desc_lower = description.lower()
+            
             parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
             steps = []
             for p in parts:
@@ -412,17 +413,55 @@ async def generate_diagram(request: DiagramGenerationRequest):
                     cleaned = clean_step(p)
                     if cleaned:
                         steps.append(cleaned)
-            steps = steps[:8]
             
             code = '@startuml\n'
             code += 'skinparam backgroundColor transparent\n'
-            code += 'start\n'
+            code += 'skinparam activity {\n'
+            code += '  BackgroundColor #e0f2fe\n'
+            code += '  BorderColor #0284c7\n'
+            code += '  DiamondBackgroundColor #fef3c7\n'
+            code += '  DiamondBorderColor #f59e0b\n'
+            code += '}\n\n'
+            code += 'start\n\n'
             
-            for step in steps:
-                step = step.replace('"', '\\"')[:40]
-                code += f':{step};\n'
+            for i, step in enumerate(steps):
+                step_lower = step.lower()
+                step_text = step.replace('"', '\\"')
+                
+                # Detect decision points
+                if any(word in step_lower for word in ['route', 'decide', 'check', 'if', '?', 'either', 'or']):
+                    # Create a decision diamond
+                    code += f'if ({step_text}?) then (yes)\n'
+                    if i < len(steps) - 1:
+                        code += f'  :{steps[i+1]};\n'
+                    code += 'else (no)\n'
+                    code += '  :Alternative path;\n'
+                    code += 'endif\n\n'
+                # Detect parallel/fork points
+                elif any(word in step_lower for word in ['parallel', 'concurrent', 'fork', 'split']):
+                    code += f'fork\n'
+                    code += f'  :{step_text};\n'
+                    code += 'fork again\n'
+                    code += '  :Parallel task 2;\n'
+                    code += 'end fork\n\n'
+                # Detect error handling
+                elif any(word in step_lower for word in ['retry', 'error', 'fail']):
+                    code += f':{step_text};\n'
+                    code += 'note right\n'
+                    code += '  Handle errors with\n'
+                    code += '  exponential backoff\n'
+                    code += 'end note\n\n'
+                # Regular activity
+                else:
+                    # Add multiline support for long descriptions
+                    if len(step_text) > 35:
+                        parts = [step_text[i:i+35] for i in range(0, len(step_text), 35)]
+                        formatted = '\\n'.join(parts[:2])
+                        code += f':{formatted};\n'
+                    else:
+                        code += f':{step_text};\n'
             
-            code += 'stop\n@enduml'
+            code += '\nstop\n@enduml'
         
         elif request.diagram_type == 'blockdiag':
             # Generate BlockDiag diagram
