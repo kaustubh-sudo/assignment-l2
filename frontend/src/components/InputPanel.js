@@ -39,8 +39,8 @@ const InputPanel = ({
         </p>
       </CardHeader>
       
-      <CardContent className="flex-1 flex flex-col gap-3 pt-3 overflow-hidden">
-        <div className="space-y-1.5">
+      <CardContent className="flex-1 flex flex-col gap-4 pt-4 overflow-hidden">
+        <div className="space-y-2">
           <Label htmlFor="diagram-type" className="text-sm font-medium">
             What type of diagram?
           </Label>
