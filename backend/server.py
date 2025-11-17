@@ -178,23 +178,107 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 receiver = participants[(i + 1) % len(participants)]
                 code += f'    {sender}->>{receiver}: {interaction}\n'
         
-        elif request.diagram_type == 'mindmap':
-            # Extract topics and subtopics
-            lines = [line.strip() for line in description.split('\n') if line.strip()]
-            if not lines:
-                lines = [part.strip() for part in description.split(',') if part.strip()]
+        elif request.diagram_type == 'plantuml':
+            # Generate PlantUML diagram
+            # Extract entities/steps
+            parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
+            steps = [p.strip() for p in parts if p.strip() and len(p.strip()) > 2][:8]
             
-            main_topic = lines[0] if lines else "Main Topic"
-            subtopics = lines[1:] if len(lines) > 1 else ["Subtopic 1", "Subtopic 2"]
+            code = '@startuml\n'
+            code += 'skinparam backgroundColor transparent\n'
+            code += 'start\n'
             
-            code = f'''graph TD
-    A[{main_topic[:30]}]'''
+            for step in steps:
+                step = step.replace('"', '\\"')[:40]
+                code += f':{step};\n'
             
-            for i, topic in enumerate(subtopics[:6]):  # Limit to 6 subtopics
-                node_id = chr(66 + i)  # B, C, D, etc.
-                code += f'\n    A --> {node_id}[{topic[:30]}]'
+            code += 'stop\n@enduml'
         
-        elif request.diagram_type == 'organization':
+        elif request.diagram_type == 'blockdiag':
+            # Generate BlockDiag diagram
+            parts = re.split(r'[,;→\n]|->|then', description, flags=re.IGNORECASE)
+            nodes = [p.strip().replace('"', '')[:20] for p in parts if p.strip() and len(p.strip()) > 2][:8]
+            
+            code = 'blockdiag {\n'
+            for i, node in enumerate(nodes):
+                if i > 0:
+                    code += f'  {nodes[i-1].replace(" ", "_")} -> {node.replace(" ", "_")};\n'
+            code += '}'
+        
+        elif request.diagram_type == 'd2':
+            # Generate D2 diagram
+            parts = re.split(r'[,;.\n]|then|next', description, flags=re.IGNORECASE)
+            steps = [p.strip().replace('"', '')[:30] for p in parts if p.strip() and len(p.strip()) > 2][:8]
+            
+            code = ''
+            for i, step in enumerate(steps):
+                safe_id = f"step{i}"
+                code += f'{safe_id}: {step}\n'
+                if i > 0:
+                    code += f'step{i-1} -> {safe_id}\n'
+        
+        elif request.diagram_type == 'ditaa':
+            # Generate Ditaa ASCII art
+            parts = re.split(r'[,;.\n]|then|next', description, flags=re.IGNORECASE)
+            steps = [p.strip()[:15] for p in parts if p.strip() and len(p.strip()) > 2][:5]
+            
+            code = '+' + '-' * 20 + '+\n'
+            for step in steps:
+                code += f'| {step:<18} |\n'
+                code += '+' + '-' * 20 + '+\n'
+                if step != steps[-1]:
+                    code += '       |\n'
+                    code += '       v\n'
+        
+        elif request.diagram_type == 'structurizr':
+            # Generate Structurizr C4 model
+            code = '''workspace {
+    model {
+        user = person "User"
+        system = softwareSystem "System" {
+            webapp = container "Web Application"
+            database = container "Database"
+        }
+        
+        user -> webapp "Uses"
+        webapp -> database "Reads/Writes"
+    }
+    
+    views {
+        systemContext system {
+            include *
+            autolayout lr
+        }
+    }
+}'''
+        
+        elif request.diagram_type == 'svgbob':
+            # Generate Svgbob ASCII diagram
+            parts = re.split(r'[,;.\n]|then|next', description, flags=re.IGNORECASE)
+            steps = [p.strip()[:12] for p in parts if p.strip() and len(p.strip()) > 2][:4]
+            
+            code = ''
+            for i, step in enumerate(steps):
+                code += f'  .-------.\n'
+                code += f'  | {step:<5} |\n'
+                code += f'  \'-------\'\n'
+                if i < len(steps) - 1:
+                    code += '      |\n'
+                    code += '      v\n'
+        
+        elif request.diagram_type == 'symbolator':
+            # Generate Symbolator timing diagram
+            # This is a specialized format for hardware
+            code = '''-- Example timing diagram
+signal clk : std_logic;
+signal data : std_logic_vector(7 downto 0);
+signal valid : std_logic;
+
+clk <= '0', '1' after 10 ns, '0' after 20 ns;
+data <= x"AA", x"BB" after 15 ns;
+valid <= '0', '1' after 5 ns, '0' after 25 ns;'''
+        
+        else:
             # Extract roles from description
             roles = []
             
