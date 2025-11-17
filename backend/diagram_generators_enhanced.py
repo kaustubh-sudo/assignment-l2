@@ -41,8 +41,8 @@ def parse_workflow(description):
         for match in re.finditer(pattern, description, re.IGNORECASE):
             groups = match.groups()
             condition = clean_text(groups[0], max_words=5)
-            yes_action = clean_text(groups[2] if len(groups) > 2 else groups[1], max_words=5)
-            no_action = clean_text(groups[3], max_words=5) if len(groups) > 3 and groups[3] else "Alternative path"
+            yes_action = clean_text(groups[1], max_words=5)
+            no_action = clean_text(groups[2], max_words=5) if len(groups) > 2 and groups[2] else "Alternative path"
             
             conditions.append({
                 'condition': condition,
