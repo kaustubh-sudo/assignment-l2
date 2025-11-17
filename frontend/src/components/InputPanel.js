@@ -30,18 +30,13 @@ const InputPanel = ({
 
   return (
     <Card className="h-full flex flex-col shadow-lg border-border/50 bg-card/95 backdrop-blur-sm">
-      <CardHeader className="pb-3 border-b border-border/50">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg flex items-center gap-2.5">
-              <Sparkles className="w-5 h-5 text-accent flex-shrink-0" style={{marginTop: '-1px'}} />
-              Describe Your Idea
-            </CardTitle>
-            <p className="text-xs text-muted-foreground mt-1.5">
-              Tell us what you want to visualize in plain English
-            </p>
-          </div>
-        </div>
+      <CardHeader className="pb-2.5 border-b border-border/50">
+        <CardTitle className="text-base font-semibold">
+          Describe Your Diagram
+        </CardTitle>
+        <p className="text-xs text-muted-foreground mt-1">
+          Explain what you want to visualize in plain language
+        </p>
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col gap-3.5 pt-4 overflow-hidden">
