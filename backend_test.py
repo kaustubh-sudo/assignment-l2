@@ -158,69 +158,49 @@ def test_kroki_rendering(code: str, diagram_type: str) -> Dict[str, Any]:
 
 def main():
     """Run all test scenarios"""
-    print("🚀 Starting Backend API Tests for Diagram Generation")
+    print("🚀 Starting Backend API Tests for Final 4 Diagram Types")
     print(f"Backend URL: {BACKEND_URL}")
     
-    # Test scenarios from the review request - Enhanced D2, BlockDiag, and GraphViz
+    # Test scenarios from the review request - EXACT 4 scenarios for final implementation
     test_scenarios = [
-        # Complex workflow with conditionals (tests all three types)
+        # 1. GraphViz - Complex conditional workflow
         {
-            "description": "User logs in, system validates credentials, if valid show dashboard with user profile and activity feed else show error message, user can logout or refresh",
-            "diagram_type": "d2",
-            "test_name": "Complex D2 Workflow with Conditionals",
-            "expected_features": ["classes", "shapes", "styling", "conditional branches", "Yes/No"]
-        },
-        {
-            "description": "User logs in, system validates credentials, if valid show dashboard with user profile and activity feed else show error message, user can logout or refresh",
-            "diagram_type": "blockdiag",
-            "test_name": "Complex BlockDiag Workflow with Conditionals",
-            "expected_features": ["colors", "node attributes", "roundedbox shape", "Yes/No labels"]
-        },
-        {
-            "description": "User logs in, system validates credentials, if valid show dashboard with user profile and activity feed else show error message, user can logout or refresh",
+            "description": "User logs in, system checks credentials, if valid load dashboard with profile and settings else show error and retry, user can logout",
             "diagram_type": "graphviz",
-            "test_name": "Complex GraphViz Workflow with Conditionals",
-            "expected_features": ["typed nodes", "ellipse/diamond/box", "fillcolor/color attributes", "Yes/No edges"]
+            "test_name": "GraphViz - Complex conditional workflow",
+            "expected_features": ["ellipse/diamond/box nodes", "proper shapes", "colors", "conditional branches"],
+            "expected_length_min": 800,
+            "expected_length_max": 1500
         },
         
-        # Multi-step process (tests depth)
+        # 2. Mermaid - Multi-step process with conditionals
         {
-            "description": "Start process, validate input, check database, process data, generate report, send notification, archive results, complete",
-            "diagram_type": "d2",
-            "test_name": "Multi-step D2 Process",
-            "expected_features": ["sequential connections", "proper node types"]
-        },
-        {
-            "description": "Start process, validate input, check database, process data, generate report, send notification, archive results, complete",
-            "diagram_type": "blockdiag",
-            "test_name": "Multi-step BlockDiag Process",
-            "expected_features": ["all steps captured", "sequential connections"]
-        },
-        {
-            "description": "Start process, validate input, check database, process data, generate report, send notification, archive results, complete",
-            "diagram_type": "graphviz",
-            "test_name": "Multi-step GraphViz Process",
-            "expected_features": ["all steps captured", "proper node types"]
+            "description": "Submit order, validate payment, if approved ship product and send confirmation else refund and notify customer",
+            "diagram_type": "mermaid",
+            "test_name": "Mermaid - Multi-step process with conditionals",
+            "expected_features": ["flowchart with styled nodes", "Yes/No branches", "color-coded types"],
+            "expected_length_min": 900,
+            "expected_length_max": 1200
         },
         
-        # Error handling workflow
+        # 3. PlantUML - Workflow with partitions
         {
-            "description": "Submit request, if valid process else reject, on error retry with backoff, on success save to database",
-            "diagram_type": "d2",
-            "test_name": "Error Handling D2 Workflow",
-            "expected_features": ["error nodes styled differently", "conditional branches"]
+            "description": "Start application, user authentication, if authorized access resources and perform actions else deny access, end session",
+            "diagram_type": "plantuml",
+            "test_name": "PlantUML - Workflow with partitions",
+            "expected_features": ["activity diagram", "skinparam styling", "partitions", "conditional logic"],
+            "expected_length_min": 650,
+            "expected_length_max": 850
         },
+        
+        # 4. Excalidraw - Hand-drawn style flowchart
         {
-            "description": "Submit request, if valid process else reject, on error retry with backoff, on success save to database",
-            "diagram_type": "blockdiag",
-            "test_name": "Error Handling BlockDiag Workflow",
-            "expected_features": ["error nodes styled differently", "conditional branches"]
-        },
-        {
-            "description": "Submit request, if valid process else reject, on error retry with backoff, on success save to database",
-            "diagram_type": "graphviz",
-            "test_name": "Error Handling GraphViz Workflow",
-            "expected_features": ["error nodes styled differently", "conditional branches"]
+            "description": "Design wireframe, review with team, if approved develop feature else iterate design, test and deploy",
+            "diagram_type": "excalidraw",
+            "test_name": "Excalidraw - Hand-drawn style flowchart",
+            "expected_features": ["JSON format", "rectangles", "arrows", "proper element structure"],
+            "expected_length_min": 3000,
+            "expected_length_max": 6000
         }
     ]
     
