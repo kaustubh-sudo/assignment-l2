@@ -94,27 +94,66 @@ def main():
     print("🚀 Starting Backend API Tests for Diagram Generation")
     print(f"Backend URL: {BACKEND_URL}")
     
-    # Test scenarios from the review request
+    # Test scenarios from the review request - Enhanced D2, BlockDiag, and GraphViz
     test_scenarios = [
+        # Complex workflow with conditionals (tests all three types)
         {
-            "description": "A user submits a request. If valid, route to either fast-path processing or slow-path queue. For transient errors: retry with backoff. For fatal errors: send to dead letter queue and raise alert. On success: archive to S3.",
+            "description": "User logs in, system validates credentials, if valid show dashboard with user profile and activity feed else show error message, user can logout or refresh",
+            "diagram_type": "d2",
+            "test_name": "Complex D2 Workflow with Conditionals",
+            "expected_features": ["classes", "shapes", "styling", "conditional branches", "Yes/No"]
+        },
+        {
+            "description": "User logs in, system validates credentials, if valid show dashboard with user profile and activity feed else show error message, user can logout or refresh",
+            "diagram_type": "blockdiag",
+            "test_name": "Complex BlockDiag Workflow with Conditionals",
+            "expected_features": ["colors", "node attributes", "roundedbox shape", "Yes/No labels"]
+        },
+        {
+            "description": "User logs in, system validates credentials, if valid show dashboard with user profile and activity feed else show error message, user can logout or refresh",
             "diagram_type": "graphviz",
-            "test_name": "Complex GraphViz Workflow (Bug Fix Test)"
+            "test_name": "Complex GraphViz Workflow with Conditionals",
+            "expected_features": ["typed nodes", "ellipse/diamond/box", "fillcolor/color attributes", "Yes/No edges"]
+        },
+        
+        # Multi-step process (tests depth)
+        {
+            "description": "Start process, validate input, check database, process data, generate report, send notification, archive results, complete",
+            "diagram_type": "d2",
+            "test_name": "Multi-step D2 Process",
+            "expected_features": ["sequential connections", "proper node types"]
         },
         {
-            "description": "user logs in, checks credentials, shows dashboard, logs out",
-            "diagram_type": "graphviz", 
-            "test_name": "Simple GraphViz Workflow"
+            "description": "Start process, validate input, check database, process data, generate report, send notification, archive results, complete",
+            "diagram_type": "blockdiag",
+            "test_name": "Multi-step BlockDiag Process",
+            "expected_features": ["all steps captured", "sequential connections"]
         },
         {
-            "description": "user logs in, system validates, database returns data",
-            "diagram_type": "mermaid",
-            "test_name": "Mermaid Diagram Test"
+            "description": "Start process, validate input, check database, process data, generate report, send notification, archive results, complete",
+            "diagram_type": "graphviz",
+            "test_name": "Multi-step GraphViz Process",
+            "expected_features": ["all steps captured", "proper node types"]
+        },
+        
+        # Error handling workflow
+        {
+            "description": "Submit request, if valid process else reject, on error retry with backoff, on success save to database",
+            "diagram_type": "d2",
+            "test_name": "Error Handling D2 Workflow",
+            "expected_features": ["error nodes styled differently", "conditional branches"]
         },
         {
-            "description": "start process, validate input, execute task, complete",
-            "diagram_type": "plantuml",
-            "test_name": "PlantUML Diagram Test"
+            "description": "Submit request, if valid process else reject, on error retry with backoff, on success save to database",
+            "diagram_type": "blockdiag",
+            "test_name": "Error Handling BlockDiag Workflow",
+            "expected_features": ["error nodes styled differently", "conditional branches"]
+        },
+        {
+            "description": "Submit request, if valid process else reject, on error retry with backoff, on success save to database",
+            "diagram_type": "graphviz",
+            "test_name": "Error Handling GraphViz Workflow",
+            "expected_features": ["error nodes styled differently", "conditional branches"]
         }
     ]
     
