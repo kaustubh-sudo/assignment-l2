@@ -146,7 +146,9 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 # Use meaningful names from text
                 words = text.split()[:2]
                 base = ''.join(w.capitalize() for w in words if w.lower() not in FILLER_WORDS)
-                if not base:
+                # Remove invalid characters for GraphViz IDs
+                base = base.replace(':', '').replace('-', '').replace('.', '').replace(',', '')
+                if not base or len(base) < 2:
                     base = f'Node{node_counter}'
                 node_counter += 1
                 return base
