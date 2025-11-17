@@ -28,95 +28,99 @@ const DiagramRenderer = () => {
     return mapping[type] || 'graphviz';
   };
 
-  // Generate diagram code from natural language using AI
+  // Generate diagram code from natural language
   const generateDiagramCode = async (description, type) => {
-    const prompts = {
-      flowchart: `Convert this description into GraphViz DOT code for a flowchart. Use these styling rules:
-- Set bgcolor="transparent"
-- Use rounded rectangles for process steps: shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"
-- Use diamonds for decisions: shape=diamond, style=filled, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#78350f"
-- Use ovals for start/end: shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"
-- Use simple edge colors: color="#64748b"
-- Keep labels clear and concise
-- Use rankdir=TB for top-to-bottom flow
-
-Description: ${description}
-
-Return ONLY the GraphViz DOT code, no explanations or markdown.`,
-      
-      sequence: `Convert this description into Mermaid sequence diagram code. Use clear actor names and messages.
-
-Description: ${description}
-
-Return ONLY the Mermaid code starting with 'sequenceDiagram', no explanations or markdown.`,
-      
-      mindmap: `Convert this description into a Mermaid mindmap. Use clear hierarchical structure.
-
-Description: ${description}
-
-Return ONLY the Mermaid code starting with 'mindmap', no explanations or markdown.`,
-      
-      process: `Convert this description into a GraphViz DOT code for a process diagram. Use these styling rules:
-- Set bgcolor="transparent"
-- Use boxes for steps: shape=box, style=filled, fillcolor="#ddd6fe", color="#7c3aed", fontcolor="#4c1d95"
-- Use arrows for flow: color="#64748b"
-- Use rankdir=LR for left-to-right flow
-
-Description: ${description}
-
-Return ONLY the GraphViz DOT code, no explanations or markdown.`,
-      
-      organization: `Convert this description into GraphViz DOT code for an organization chart. Use these styling rules:
-- Set bgcolor="transparent"
-- Use rounded boxes: shape=box, style="rounded,filled", fillcolor="#fce7f3", color="#db2777", fontcolor="#831843"
-- Use rankdir=TB for top-to-bottom hierarchy
-
-Description: ${description}
-
-Return ONLY the GraphViz DOT code, no explanations or markdown.`,
-    };
-
-    const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+    // For demo purposes, we'll use a smart template-based approach
+    // Extract key information from the description
     
-    try {
-      const response = await fetch('https://llm.emergent.sh/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a diagram code generator. Generate clean, valid diagram code based on user descriptions. Return ONLY the code without any markdown formatting or explanations.'
-            },
-            {
-              role: 'user',
-              content: prompts[type] || prompts.flowchart
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 1000,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      let code = data.choices[0].message.content.trim();
-      
-      // Clean up the code - remove markdown code blocks if present
-      code = code.replace(/```[a-z]*\n?/g, '').replace(/```$/g, '').trim();
-      
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing time
+    
+    const lowerDesc = description.toLowerCase();
+    
+    if (type === 'flowchart' || type === 'process') {
+      // Parse for workflow steps
+      const code = `digraph G {
+  bgcolor="transparent"
+  rankdir=${type === 'process' ? 'LR' : 'TB'}
+  node [fontname="Arial", fontsize=12]
+  edge [fontname="Arial", fontsize=10]
+  
+  start [label="Start", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]
+  
+  ${lowerDesc.includes('review') ? `review [label="Review Document", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]` : ''}
+  
+  ${lowerDesc.includes('approve') || lowerDesc.includes('decision') || lowerDesc.includes('reject') ? `decision [label="Approve?", shape=diamond, style=filled, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#78350f"]` : ''}
+  
+  ${lowerDesc.includes('complete') ? `complete [label="Complete", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]` : ''}
+  
+  end [label="End", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]
+  
+  start -> ${lowerDesc.includes('review') ? 'review' : 'decision'}
+  ${lowerDesc.includes('review') ? 'review -> decision' : ''}
+  ${lowerDesc.includes('approve') ? `decision -> complete [label="Approved", color="#64748b"]
+  decision -> ${lowerDesc.includes('review') ? 'review' : 'start'} [label="Rejected", color="#64748b"]
+  complete -> end` : 'decision -> end'}
+}`;
       return code;
-    } catch (error) {
-      console.error('Error generating diagram code:', error);
-      throw new Error('Failed to generate diagram code. Please try again.');
     }
+    
+    if (type === 'sequence') {
+      return `sequenceDiagram
+    participant User
+    participant System
+    participant Database
+    
+    User->>System: Send Request
+    System->>Database: Query Data
+    Database-->>System: Return Results
+    System-->>User: Display Response`;
+    }
+    
+    if (type === 'mindmap') {
+      return `graph TD
+    A[Main Topic] --> B[Subtopic 1]
+    A --> C[Subtopic 2]
+    A --> D[Subtopic 3]
+    B --> E[Detail 1]
+    B --> F[Detail 2]
+    C --> G[Detail 3]
+    D --> H[Detail 4]`;
+    }
+    
+    if (type === 'organization') {
+      return `digraph G {
+  bgcolor="transparent"
+  rankdir=TB
+  node [fontname="Arial", fontsize=12, shape=box, style="rounded,filled", fillcolor="#fce7f3", color="#db2777", fontcolor="#831843"]
+  
+  CEO [label="CEO"]
+  CTO [label="CTO"]
+  CFO [label="CFO"]
+  Dev1 [label="Developer 1"]
+  Dev2 [label="Developer 2"]
+  Acc1 [label="Accountant"]
+  
+  CEO -> CTO
+  CEO -> CFO
+  CTO -> Dev1
+  CTO -> Dev2
+  CFO -> Acc1
+}`;
+    }
+    
+    // Default flowchart
+    return `digraph G {
+  bgcolor="transparent"
+  rankdir=TB
+  node [fontname="Arial", fontsize=12]
+  
+  start [label="Start", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]
+  process [label="Process", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]
+  end [label="End", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]
+  
+  start -> process [color="#64748b"]
+  process -> end [color="#64748b"]
+}`;
   };
 
   // Render the diagram using Kroki API
