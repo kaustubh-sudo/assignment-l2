@@ -17,14 +17,16 @@ code, pre {
 
 /* Ensure Pikchr and other diagram SVGs are visible */
 svg.pikchr {
-    max-width: 100%;
-    height: auto;
-    display: block;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 300px !important;
+    display: block !important;
 }
 
 svg {
     max-width: 100%;
     height: auto;
+    min-height: 200px;
 }
 
 @layer base {
