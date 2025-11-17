@@ -8,11 +8,15 @@ import { Sparkles, RotateCcw, Code2, ChevronDown, ChevronUp } from 'lucide-react
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 
 const DIAGRAM_TYPES = [
-  { value: 'flowchart', label: '📊 Flowchart', description: 'Steps and decisions' },
-  { value: 'sequence', label: '💬 Sequence', description: 'Communication flow' },
-  { value: 'process', label: '⚙️ Process', description: 'Linear workflow' },
-  { value: 'mindmap', label: '🧠 Mind Map', description: 'Ideas and concepts' },
-  { value: 'organization', label: '👥 Organization', description: 'Team structure' },
+  { value: 'graphviz', label: '🔷 GraphViz', description: 'Graphs, flowcharts, and network diagrams' },
+  { value: 'mermaid', label: '🧜 Mermaid', description: 'Flowcharts, sequences, and state diagrams' },
+  { value: 'plantuml', label: '🌱 PlantUML', description: 'UML diagrams, sequences, and use cases' },
+  { value: 'blockdiag', label: '📦 BlockDiag', description: 'Simple block and network diagrams' },
+  { value: 'd2', label: '🎨 D2', description: 'Modern declarative diagram scripting language' },
+  { value: 'ditaa', label: '✏️ Ditaa', description: 'ASCII art to diagram converter' },
+  { value: 'structurizr', label: '🏗️ Structurizr', description: 'Software architecture diagrams (C4 model)' },
+  { value: 'svgbob', label: '🎭 Svgbob', description: 'ASCII diagrams to SVG converter' },
+  { value: 'symbolator', label: '🔣 Symbolator', description: 'Hardware timing diagrams from VHDL/Verilog' },
 ];
 
 const InputPanel = ({
