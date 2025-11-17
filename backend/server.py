@@ -279,50 +279,8 @@ data <= x"AA", x"BB" after 15 ns;
 valid <= '0', '1' after 5 ns, '0' after 25 ns;'''
         
         else:
-            # Extract roles from description
-            roles = []
-            
-            # Look for job titles or roles
-            common_roles = ['CEO', 'CTO', 'CFO', 'COO', 'Manager', 'Director', 'Lead', 'Developer', 'Engineer', 
-                          'Designer', 'Analyst', 'Accountant', 'HR', 'Sales', 'Marketing']
-            
-            for role in common_roles:
-                if role.lower() in description.lower():
-                    roles.append(role)
-            
-            # Extract custom roles (capitalized words)
-            words = description.split()
-            for word in words:
-                if word[0].isupper() and len(word) > 3 and word not in roles:
-                    roles.append(word)
-            
-            # If no roles found, use defaults
-            if not roles:
-                roles = ['CEO', 'Manager', 'Team Lead', 'Employee']
-            
-            # Build org chart with hierarchy
-            nodes = []
-            edges = []
-            
-            for i, role in enumerate(roles[:10]):  # Limit to 10 nodes
-                node_id = f'node{i}'
-                label = role.replace('"', '\\"')
-                nodes.append(f'{node_id} [label="{label}"]')
-                
-                # Create hierarchy
-                if i > 0:
-                    parent_id = f'node{i // 2}'  # Simple tree structure
-                    edges.append(f'{parent_id} -> {node_id}')
-            
-            code = f'''digraph G {{
-  bgcolor="transparent"
-  rankdir=TB
-  node [fontname="Arial", fontsize=12, shape=box, style="rounded,filled", fillcolor="#fce7f3", color="#db2777", fontcolor="#831843"]
-  
-  {chr(10).join(f"  {node}" for node in nodes)}
-  
-  {chr(10).join(f"  {edge}" for edge in edges)}
-}}'''
+            # Default fallback - simple diagram
+            code = description
         
         logger.info(f"Generated diagram code for type: {request.diagram_type}")
         
