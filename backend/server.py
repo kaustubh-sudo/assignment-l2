@@ -344,7 +344,7 @@ async def generate_diagram(request: DiagramGenerationRequest):
             code += '}'
         
         elif request.diagram_type == 'd2':
-            # Generate D2 diagram with proper styling
+            # Generate D2 diagram with proper styling and padding
             parts = re.split(r'[,;.\n]|then|next', description, flags=re.IGNORECASE)
             steps = []
             for p in parts:
@@ -355,8 +355,9 @@ async def generate_diagram(request: DiagramGenerationRequest):
                         steps.append(cleaned[:30])
             steps = steps[:8]
             
-            # Add direction and padding configuration
-            code = 'direction: down\n\n'
+            # Add direction and layout configuration with padding
+            code = 'direction: down\n'
+            code += 'pad: 50\n\n'  # Add padding to prevent cutoff
             
             # Generate nodes and connections
             for i, step in enumerate(steps):
