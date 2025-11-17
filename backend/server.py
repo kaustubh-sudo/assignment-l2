@@ -211,101 +211,119 @@ async def generate_diagram(request: DiagramGenerationRequest):
                         if not any(cleaned.lower().startswith(frag) for frag in ['if', 'else', 'when', 'or']):
                             steps.append({'type': 'step', 'text': cleaned})
             
+            # Add conditions as part of steps
+            for cond in conditions:
+                steps.append({'type': 'condition', 'data': cond})
+            
             if not steps:
-                steps = ['Process', 'Complete']
+                steps = [{'type': 'step', 'text': 'Start Process'}, {'type': 'step', 'text': 'Complete'}]
             
             # Build nodes with sophisticated types
-            for i, step in enumerate(steps):
-                node_id = make_node_id(step)
-                step_lower = step.lower()
-                label = step.replace('"', '\\"')
-                
-                # Determine node type and styling
-                if any(word in step_lower for word in ['submit', 'start', 'begin', 'input', 'request']):
-                    shape = 'ellipse'
-                    style = 'filled'
-                    fillcolor = '#dcfce7'
-                    color = '#16a34a'
-                elif any(word in step_lower for word in ['route', 'decide', 'check', 'validate', 'if', '?']):
-                    shape = 'diamond'
-                    style = 'filled'
-                    fillcolor = '#fef3c7'
-                    color = '#f59e0b'
-                elif any(word in step_lower for word in ['worker', 'parallel', 'process', 'executor']):
-                    shape = 'folder'
-                    style = 'filled'
-                    fillcolor = '#ddd6fe'
-                    color = '#7c3aed'
-                elif any(word in step_lower for word in ['queue', 'enqueue', 'buffer']):
-                    shape = 'cylinder'
-                    style = 'filled'
-                    fillcolor = '#fce7f3'
-                    color = '#db2777'
-                elif any(word in step_lower for word in ['error', 'fail', 'dlq', 'dead-letter']):
-                    shape = 'box'
-                    style = 'filled,rounded'
-                    fillcolor = '#fee2e2'
-                    color = '#dc2626'
-                elif any(word in step_lower for word in ['alert', 'notify', 'webhook']):
-                    shape = 'box'
-                    style = 'filled,rounded'
-                    fillcolor = '#fff7ed'
-                    color = '#ea580c'
-                elif any(word in step_lower for word in ['archive', 'store', 'save', 's3', 'database']):
-                    shape = 'box3d'
-                    style = 'filled'
-                    fillcolor = '#e0e7ff'
-                    color = '#4f46e5'
-                else:
-                    shape = 'box'
-                    style = 'filled,rounded'
-                    fillcolor = '#e0f2fe'
-                    color = '#0284c7'
-                
-                nodes.append(f'{node_id} [label="{label}", shape={shape}, style="{style}", fillcolor="{fillcolor}", color="{color}"]')
-                node_map[step] = node_id
-            
-            # Build edges with logic
-            if len(steps) > 1:
-                for i in range(len(steps) - 1):
-                    from_node = node_map[steps[i]]
-                    to_node = node_map[steps[i + 1]]
+            for item in steps:
+                if item['type'] == 'step':
+                    step = item['text']
+                    node_id = make_node_id(step)
+                    step_lower = step.lower()
+                    label = step.replace('"', '\\"')[:50]  # Limit label length
                     
-                    # Detect edge labels and styles
-                    step_text = steps[i].lower()
-                    next_text = steps[i + 1].lower()
-                    
-                    edge_label = ''
-                    edge_style = ''
-                    edge_color = '#64748b'
-                    
-                    # Check for branching/routing
-                    if 'route' in step_text or 'decide' in step_text:
-                        if 'fast' in next_text or 'sync' in next_text:
-                            edge_label = 'low-cost'
-                            edge_color = '#16a34a'
-                        elif 'slow' in next_text or 'queue' in next_text:
-                            edge_label = 'heavy'
-                            edge_color = '#ea580c'
-                    
-                    # Check for error paths
-                    if 'error' in next_text or 'fail' in next_text or 'dlq' in next_text:
-                        edge_label = 'error'
-                        edge_color = '#dc2626'
-                    elif 'retry' in next_text:
-                        edge_label = 'retry'
-                        edge_style = ', style=dashed'
-                    elif 'timeout' in next_text:
-                        edge_label = 'timeout'
-                        edge_color = '#ea580c'
-                    elif 'approve' in step_text or 'review' in step_text:
-                        edge_label = 'approved'
-                        edge_color = '#16a34a'
-                    
-                    if edge_label:
-                        edges.append(f'{from_node} -> {to_node} [label="{edge_label}", color="{edge_color}"{edge_style}]')
+                    # Determine node type and styling
+                    if any(word in step_lower for word in ['submit', 'start', 'begin', 'input', 'request', 'login', 'logs in']):
+                        shape = 'ellipse'
+                        style = 'filled'
+                        fillcolor = '#dcfce7'
+                        color = '#16a34a'
+                    elif any(word in step_lower for word in ['route', 'decide', 'check', 'validate', 'if', '?', 'credentials']):
+                        shape = 'diamond'
+                        style = 'filled'
+                        fillcolor = '#fef3c7'
+                        color = '#f59e0b'
+                    elif any(word in step_lower for word in ['worker', 'parallel', 'process', 'executor']):
+                        shape = 'folder'
+                        style = 'filled'
+                        fillcolor = '#ddd6fe'
+                        color = '#7c3aed'
+                    elif any(word in step_lower for word in ['queue', 'enqueue', 'buffer']):
+                        shape = 'cylinder'
+                        style = 'filled'
+                        fillcolor = '#fce7f3'
+                        color = '#db2777'
+                    elif any(word in step_lower for word in ['error', 'fail', 'dlq', 'dead-letter']):
+                        shape = 'box'
+                        style = 'filled,rounded'
+                        fillcolor = '#fee2e2'
+                        color = '#dc2626'
+                    elif any(word in step_lower for word in ['alert', 'notify', 'webhook']):
+                        shape = 'box'
+                        style = 'filled,rounded'
+                        fillcolor = '#fff7ed'
+                        color = '#ea580c'
+                    elif any(word in step_lower for word in ['archive', 'store', 'save', 's3', 'database']):
+                        shape = 'box3d'
+                        style = 'filled'
+                        fillcolor = '#e0e7ff'
+                        color = '#4f46e5'
+                    elif any(word in step_lower for word in ['dashboard', 'page', 'screen', 'view']):
+                        shape = 'box'
+                        style = 'filled,rounded'
+                        fillcolor = '#e0f2fe'
+                        color = '#0284c7'
+                    elif any(word in step_lower for word in ['logout', 'end', 'exit', 'complete']):
+                        shape = 'ellipse'
+                        style = 'filled'
+                        fillcolor = '#dcfce7'
+                        color = '#16a34a'
                     else:
-                        edges.append(f'{from_node} -> {to_node} [color="{edge_color}"]')
+                        shape = 'box'
+                        style = 'filled,rounded'
+                        fillcolor = '#e0f2fe'
+                        color = '#0284c7'
+                    
+                    nodes.append(f'{node_id} [label="{label}", shape={shape}, style="{style}", fillcolor="{fillcolor}", color="{color}"]')
+                    node_map[step] = node_id
+                    
+                elif item['type'] == 'condition':
+                    cond_data = item['data']
+                    # Create decision node
+                    decision_id = make_node_id(cond_data['condition'])
+                    decision_label = cond_data['condition'].replace('"', '\\"')[:40]
+                    nodes.append(f'{decision_id} [label="{decision_label}?", shape=diamond, style="filled", fillcolor="#fef3c7", color="#f59e0b"]')
+                    node_map[f"condition_{decision_id}"] = decision_id
+                    
+                    # Create yes branch nodes
+                    for yes_step in cond_data['yes']:
+                        yes_id = make_node_id(yes_step)
+                        yes_label = yes_step.replace('"', '\\"')[:50]
+                        nodes.append(f'{yes_id} [label="{yes_label}", shape=box, style="filled,rounded", fillcolor="#dcfce7", color="#16a34a"]')
+                        node_map[yes_step] = yes_id
+                        edges.append(f'{decision_id} -> {yes_id} [label="Yes", color="#16a34a"]')
+                    
+                    # Create no branch nodes
+                    for no_step in cond_data['no']:
+                        no_id = make_node_id(no_step)
+                        no_label = no_step.replace('"', '\\"')[:50]
+                        nodes.append(f'{no_id} [label="{no_label}", shape=box, style="filled,rounded", fillcolor="#fee2e2", color="#dc2626"]')
+                        node_map[no_step] = no_id
+                        edges.append(f'{decision_id} -> {no_id} [label="No", color="#dc2626"]')
+            
+            # Build sequential edges for regular steps
+            prev_step_node = None
+            for item in steps:
+                if item['type'] == 'step':
+                    step = item['text']
+                    current_node = node_map.get(step)
+                    
+                    if prev_step_node and current_node and prev_step_node != current_node:
+                        # Check if this edge already exists
+                        edge_exists = any(f'{prev_step_node} -> {current_node}' in e for e in edges)
+                        if not edge_exists:
+                            edges.append(f'{prev_step_node} -> {current_node} [color="#64748b"]')
+                    
+                    prev_step_node = current_node
+                elif item['type'] == 'condition':
+                    # Connect previous node to decision
+                    decision_id = node_map.get(f"condition_{make_node_id(item['data']['condition'])}")
+                    if prev_step_node and decision_id:
+                        edges.append(f'{prev_step_node} -> {decision_id} [color="#64748b"]')
             
             # Generate final code
             code = f'''digraph ComplexFlow {{
