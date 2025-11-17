@@ -20,16 +20,14 @@ def parse_description_to_steps(description):
             continue
         
         # Check if this line mentions "checks if" - this becomes the decision node
-        check_match = re.search(r'(.+?)\s+checks?\s+if\s+(.+)', line, re.IGNORECASE)
+        check_match = re.search(r'(.+)\s+checks?\s+if\s+(.+)', line, re.IGNORECASE)
         if check_match:
-            action = check_match.group(1).strip()
+            full_action = check_match.group(1).strip()
             condition = check_match.group(2).strip()
             
-            # Add the action as a step
-            steps.append(action.capitalize())
-            
-            # Store the condition for the decision node
+            # Store the condition for the decision node (will be used as the question)
             decision_check_step = condition.capitalize()
+            # Don't add the "checks if" step itself - it becomes the decision diamond
             continue
         
         # Check for decision pattern: "If X, then Y. If not X, then Z."
