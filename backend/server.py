@@ -88,7 +88,8 @@ async def generate_diagram(request: DiagramGenerationRequest):
         kroki_type = request.diagram_type
         description = request.description
         
-        if request.diagram_type in ['flowchart', 'process']:
+        if request.diagram_type == 'graphviz':
+            # Generate GraphViz diagram - flowchart/network style
             # Extract steps from description
             # Look for patterns like: "Step 1, Step 2" or "A -> B -> C" or "First X, then Y, finally Z"
             steps = []
