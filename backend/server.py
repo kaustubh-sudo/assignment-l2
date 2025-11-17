@@ -10,6 +10,7 @@ from typing import List
 import uuid
 from datetime import datetime, timezone
 from openai import OpenAI
+from diagram_generator import generate_graphviz_advanced
 
 
 ROOT_DIR = Path(__file__).parent
