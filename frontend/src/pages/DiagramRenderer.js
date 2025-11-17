@@ -28,99 +28,32 @@ const DiagramRenderer = () => {
     return mapping[type] || 'graphviz';
   };
 
-  // Generate diagram code from natural language
+  // Generate diagram code from natural language using backend AI
   const generateDiagramCode = async (description, type) => {
-    // For demo purposes, we'll use a smart template-based approach
-    // Extract key information from the description
+    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
     
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing time
-    
-    const lowerDesc = description.toLowerCase();
-    
-    if (type === 'flowchart' || type === 'process') {
-      // Parse for workflow steps
-      const code = `digraph G {
-  bgcolor="transparent"
-  rankdir=${type === 'process' ? 'LR' : 'TB'}
-  node [fontname="Arial", fontsize=12]
-  edge [fontname="Arial", fontsize=10]
-  
-  start [label="Start", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]
-  
-  ${lowerDesc.includes('review') ? `review [label="Review Document", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]` : ''}
-  
-  ${lowerDesc.includes('approve') || lowerDesc.includes('decision') || lowerDesc.includes('reject') ? `decision [label="Approve?", shape=diamond, style=filled, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#78350f"]` : ''}
-  
-  ${lowerDesc.includes('complete') ? `complete [label="Complete", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]` : ''}
-  
-  end [label="End", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]
-  
-  start -> ${lowerDesc.includes('review') ? 'review' : 'decision'}
-  ${lowerDesc.includes('review') ? 'review -> decision' : ''}
-  ${lowerDesc.includes('approve') ? `decision -> complete [label="Approved", color="#64748b"]
-  decision -> ${lowerDesc.includes('review') ? 'review' : 'start'} [label="Rejected", color="#64748b"]
-  complete -> end` : 'decision -> end'}
-}`;
-      return code;
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/generate-diagram`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          description: description,
+          diagram_type: type,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to generate diagram code: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.code;
+    } catch (error) {
+      console.error('Error generating diagram code:', error);
+      throw new Error('Failed to generate diagram code. Please try again.');
     }
-    
-    if (type === 'sequence') {
-      return `sequenceDiagram
-    participant User
-    participant System
-    participant Database
-    
-    User->>System: Send Request
-    System->>Database: Query Data
-    Database-->>System: Return Results
-    System-->>User: Display Response`;
-    }
-    
-    if (type === 'mindmap') {
-      return `graph TD
-    A[Main Topic] --> B[Subtopic 1]
-    A --> C[Subtopic 2]
-    A --> D[Subtopic 3]
-    B --> E[Detail 1]
-    B --> F[Detail 2]
-    C --> G[Detail 3]
-    D --> H[Detail 4]`;
-    }
-    
-    if (type === 'organization') {
-      return `digraph G {
-  bgcolor="transparent"
-  rankdir=TB
-  node [fontname="Arial", fontsize=12, shape=box, style="rounded,filled", fillcolor="#fce7f3", color="#db2777", fontcolor="#831843"]
-  
-  CEO [label="CEO"]
-  CTO [label="CTO"]
-  CFO [label="CFO"]
-  Dev1 [label="Developer 1"]
-  Dev2 [label="Developer 2"]
-  Acc1 [label="Accountant"]
-  
-  CEO -> CTO
-  CEO -> CFO
-  CTO -> Dev1
-  CTO -> Dev2
-  CFO -> Acc1
-}`;
-    }
-    
-    // Default flowchart
-    return `digraph G {
-  bgcolor="transparent"
-  rankdir=TB
-  node [fontname="Arial", fontsize=12]
-  
-  start [label="Start", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]
-  process [label="Process", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]
-  end [label="End", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]
-  
-  start -> process [color="#64748b"]
-  process -> end [color="#64748b"]
-}`;
   };
 
   // Render the diagram using Kroki API
