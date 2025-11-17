@@ -487,14 +487,14 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 code += '\n'.join(nodes) + '\n' + '\n'.join(edges)
         
         elif request.diagram_type == 'excalidraw':
-            # Use enhanced Excalidraw generator with better layout and styling
+            # Use v3 generator for clean, properly labeled diagrams
             try:
-                logger.info(f"Using enhanced Excalidraw generator for description length: {len(description)}")
-                code = generate_excalidraw_diagram(description)
-                logger.info(f"Enhanced Excalidraw generator succeeded, code length: {len(code)}")
+                logger.info(f"Using Excalidraw v3 generator for description length: {len(description)}")
+                code = generate_excalidraw_v3(description)
+                logger.info(f"Excalidraw v3 generator succeeded, code length: {len(code)}")
                 return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
             except Exception as e:
-                logger.error(f"Enhanced Excalidraw generator failed: {str(e)}, using simple fallback")
+                logger.error(f"Excalidraw v3 generator failed: {str(e)}, using simple fallback")
                 # Simple fallback
                 import json
                 
