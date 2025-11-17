@@ -297,7 +297,8 @@ metadata:
   last_updated: "Bug fix for 500 error"
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Fix GraphViz Syntax Error in Advanced Generator"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
