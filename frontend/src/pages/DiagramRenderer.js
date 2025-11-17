@@ -201,9 +201,9 @@ const DiagramRenderer = () => {
     <div className="flex flex-col h-screen bg-gradient-to-br from-background to-muted">
       <Header />
       
-      <div className="flex-1 flex flex-col lg:flex-row gap-3 md:gap-4 p-2 md:p-4 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row gap-2 md:gap-3 lg:gap-4 p-2 md:p-3 lg:p-4 overflow-hidden">
         {/* Left Side - Input */}
-        <div className="flex-1 min-h-0 lg:max-w-[50%]">
+        <div className="flex-none lg:flex-1 lg:min-h-0 lg:max-w-[50%]">
           <InputPanel
             userInput={userInput}
             setUserInput={setUserInput}
