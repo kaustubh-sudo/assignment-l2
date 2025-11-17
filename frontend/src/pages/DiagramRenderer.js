@@ -16,16 +16,9 @@ const DiagramRenderer = () => {
   const [error, setError] = useState(null);
   const [showCode, setShowCode] = useState(false);
 
-  // Convert user-friendly diagram type to Kroki type
+  // Kroki type is now directly the diagram type selected by user
   const getKrokiType = (type) => {
-    const mapping = {
-      'flowchart': 'graphviz',
-      'sequence': 'mermaid',
-      'mindmap': 'mermaid',
-      'process': 'graphviz',
-      'organization': 'graphviz',
-    };
-    return mapping[type] || 'graphviz';
+    return type;
   };
 
   // Generate diagram code from natural language using backend
