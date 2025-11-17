@@ -197,12 +197,11 @@ def generate_pikchr_v3(description):
     """Generate clean Pikchr diagram with proper YES/NO branching"""
     steps, decision = parse_description_to_steps(description)
     
-    code = "// Pikchr flowchart\n"
-    code += "scale = 1.2\n"
+    code = "scale = 1.2\n"
     code += "lineht = 0.5\n\n"
     
     # Start node
-    code += "START: oval \"START\" fit bold fill lightgreen\n"
+    code += "START: oval \"START\" fit fill lightgreen\n"
     code += "arrow down 150%\n"
     
     # Steps before decision
@@ -237,13 +236,13 @@ def generate_pikchr_v3(description):
         code += "arrow down 150%\n"
         
         # END node positioned below both branches
-        code += "END: oval \"END\" fit bold fill lightgreen with .n at 0.5<YES.s,NO.s> + (0,-50%)\n"
+        code += "END: oval \"END\" fit fill lightgreen with .n at 0.5<YES.s,NO.s> + (0,-50%)\n"
         
         # Connect both branches to END
         code += "arrow from YES.s to END.nw\n"
         code += "arrow from NO.s to END.ne\n"
     else:
-        code += "END: oval \"END\" fit bold fill lightgreen\n"
+        code += "END: oval \"END\" fit fill lightgreen\n"
     
     return code
 
