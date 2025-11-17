@@ -486,91 +486,16 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 
                 code += '\n'.join(nodes) + '\n' + '\n'.join(edges)
         
-        elif request.diagram_type == 'excalidraw':
-            # Use v3 generator for clean, properly labeled diagrams
+        elif request.diagram_type == 'pikchr':
+            # Use Pikchr - reliable, simple diagram language
             try:
-                logger.info(f"Using Excalidraw v3 generator for description length: {len(description)}")
-                code = generate_excalidraw_v3(description)
-                logger.info(f"Excalidraw v3 generator succeeded, code length: {len(code)}")
+                logger.info(f"Using Pikchr v3 generator for description length: {len(description)}")
+                code = generate_pikchr_v3(description)
+                logger.info(f"Pikchr v3 generator succeeded, code length: {len(code)}")
                 return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
             except Exception as e:
-                logger.error(f"Excalidraw v3 generator failed: {str(e)}, using simple fallback")
-                # Simple fallback
-                import json
-                
-                parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
-                steps = []
-                for p in parts:
-                    p = p.strip()
-                    if p and len(p) > 2:
-                        cleaned = clean_step(p)
-                        if cleaned:
-                            steps.append(cleaned.replace('"', '')[:30])
-                steps = steps[:6]
-                
-                elements = []
-                y_pos = 100
-                
-                for i, step in enumerate(steps):
-                    element_id = f"element-{i}"
-                    elements.append({
-                        "id": element_id,
-                        "type": "rectangle",
-                        "x": 100,
-                        "y": y_pos,
-                        "width": 200,
-                        "height": 60,
-                        "strokeColor": "#0284c7",
-                        "backgroundColor": "#e0f2fe",
-                        "fillStyle": "solid",
-                        "strokeWidth": 2,
-                        "roughness": 1,
-                        "opacity": 100
-                    })
-                    
-                    elements.append({
-                        "id": f"text-{i}",
-                        "type": "text",
-                        "x": 110,
-                        "y": y_pos + 20,
-                        "width": 180,
-                        "height": 20,
-                        "text": step,
-                        "fontSize": 16,
-                        "fontFamily": 1,
-                        "textAlign": "center",
-                        "verticalAlign": "middle"
-                    })
-                    
-                    if i < len(steps) - 1:
-                        elements.append({
-                            "id": f"arrow-{i}",
-                            "type": "arrow",
-                            "x": 200,
-                            "y": y_pos + 60,
-                            "width": 0,
-                            "height": 40,
-                            "points": [[0, 0], [0, 40]],
-                            "strokeColor": "#64748b",
-                            "backgroundColor": "transparent",
-                            "fillStyle": "solid",
-                            "strokeWidth": 2,
-                            "roughness": 1
-                        })
-                    
-                    y_pos += 120
-                
-                excalidraw_data = {
-                    "type": "excalidraw",
-                    "version": 2,
-                    "source": "diagram-maker",
-                    "elements": elements,
-                    "appState": {
-                        "viewBackgroundColor": "#ffffff"
-                    }
-                }
-                
-                code = json.dumps(excalidraw_data)
+                logger.error(f"Pikchr v3 generator failed: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Failed to generate Pikchr diagram: {str(e)}")
         
         elif request.diagram_type == 'plantuml':
             # Use v3 generator for clean, properly labeled diagrams
