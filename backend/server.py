@@ -78,8 +78,7 @@ async def get_status_checks():
 @api_router.post("/generate-diagram", response_model=DiagramGenerationResponse)
 async def generate_diagram(request: DiagramGenerationRequest):
     """
-    Convert natural language description to diagram code
-    This is a smart template-based approach that parses the description
+    Convert natural language description to diagram code using AI
     """
     try:
         # Map user-friendly diagram type to Kroki type
@@ -92,112 +91,108 @@ async def generate_diagram(request: DiagramGenerationRequest):
         }
         
         kroki_type = kroki_type_mapping.get(request.diagram_type, 'graphviz')
-        desc_lower = request.description.lower()
         
-        # Generate code based on diagram type and description keywords
-        if request.diagram_type == 'flowchart' or request.diagram_type == 'process':
-            # Parse for workflow keywords
-            rankdir = 'LR' if request.diagram_type == 'process' else 'TB'
-            nodes = []
-            edges = []
-            
-            # Always include start and end
-            nodes.append('start [label="Start", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]')
-            
-            # Detect workflow steps from description
-            if 'review' in desc_lower or 'check' in desc_lower:
-                nodes.append('review [label="Review Document", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]')
-                edges.append('start -> review')
-                last_node = 'review'
-            else:
-                last_node = 'start'
-            
-            if 'approve' in desc_lower or 'decision' in desc_lower or 'reject' in desc_lower:
-                nodes.append('decision [label="Approve?", shape=diamond, style=filled, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#78350f"]')
-                edges.append(f'{last_node} -> decision')
-                
-                if 'complete' in desc_lower or 'finish' in desc_lower:
-                    nodes.append('complete [label="Complete", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]')
-                    edges.append('decision -> complete [label="Approved", color="#64748b"]')
-                    edges.append(f'decision -> {last_node} [label="Rejected", color="#64748b"]')
-                    nodes.append('end [label="End", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]')
-                    edges.append('complete -> end')
-                else:
-                    nodes.append('end [label="End", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]')
-                    edges.append('decision -> end [label="Yes", color="#64748b"]')
-                    edges.append(f'decision -> {last_node} [label="No", color="#64748b"]')
-            else:
-                nodes.append('end [label="End", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]')
-                edges.append(f'{last_node} -> end')
-            
-            code = f'''digraph G {{
-  bgcolor="transparent"
-  rankdir={rankdir}
-  node [fontname="Arial", fontsize=12]
-  edge [fontname="Arial", fontsize=10, color="#64748b"]
-  
-  {chr(10).join(f"  {node}" for node in nodes)}
-  
-  {chr(10).join(f"  {edge}" for edge in edges)}
-}}'''
+        # Initialize OpenAI client
+        client = OpenAI(
+            api_key=os.environ.get('OPENAI_API_KEY'),
+            base_url="https://api.openai.com/v1"
+        )
         
+        # Create detailed prompts for each diagram type
+        prompts = {
+            'flowchart': f"""You are a GraphViz DOT code generator. Convert the following description into a flowchart using GraphViz DOT syntax.
+
+IMPORTANT STYLING RULES:
+- Always set bgcolor="transparent"
+- For START/END nodes: shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"
+- For PROCESS steps: shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"
+- For DECISION nodes: shape=diamond, style=filled, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#78350f"
+- All edges: color="#64748b"
+- Set: node [fontname="Arial", fontsize=12]
+- Use rankdir=TB for top-to-bottom flow
+
+USER'S DESCRIPTION:
+{request.description}
+
+Generate ONLY the GraphViz DOT code. Do NOT include markdown code blocks or explanations. Start with "digraph G {{".""",
+            
+            'sequence': f"""You are a Mermaid sequence diagram generator. Convert the following description into a sequence diagram using Mermaid syntax.
+
+USER'S DESCRIPTION:
+{request.description}
+
+Generate ONLY the Mermaid code. Start with "sequenceDiagram" and do NOT include markdown code blocks or explanations.""",
+            
+            'mindmap': f"""You are a Mermaid graph diagram generator. Convert the following description into a graph diagram using Mermaid syntax.
+
+USER'S DESCRIPTION:
+{request.description}
+
+Generate ONLY the Mermaid code. Start with "graph TD" (for top-down) and do NOT include markdown code blocks or explanations.""",
+            
+            'process': f"""You are a GraphViz DOT code generator for process diagrams. Convert the following description into a process diagram using GraphViz DOT syntax.
+
+IMPORTANT STYLING RULES:
+- Always set bgcolor="transparent"
+- For process steps: shape=box, style=filled, fillcolor="#ddd6fe", color="#7c3aed", fontcolor="#4c1d95"
+- All edges: color="#64748b"
+- Set: node [fontname="Arial", fontsize=12]
+- Use rankdir=LR for left-to-right flow
+
+USER'S DESCRIPTION:
+{request.description}
+
+Generate ONLY the GraphViz DOT code. Do NOT include markdown code blocks or explanations. Start with "digraph G {{".""",
+            
+            'organization': f"""You are a GraphViz DOT code generator for organization charts. Convert the following description into an org chart using GraphViz DOT syntax.
+
+IMPORTANT STYLING RULES:
+- Always set bgcolor="transparent"
+- For all nodes: shape=box, style="rounded,filled", fillcolor="#fce7f3", color="#db2777", fontcolor="#831843"
+- Set: node [fontname="Arial", fontsize=12]
+- Use rankdir=TB for top-to-bottom hierarchy
+
+USER'S DESCRIPTION:
+{request.description}
+
+Generate ONLY the GraphViz DOT code. Do NOT include markdown code blocks or explanations. Start with "digraph G {{"."""
+        }
+        
+        prompt = prompts.get(request.diagram_type, prompts['flowchart'])
+        
+        # Call OpenAI API
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert diagram code generator. You generate clean, valid diagram code based on user descriptions. You ALWAYS return ONLY the code without any markdown formatting, explanations, or code block markers."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.7,
+            max_tokens=2000,
+        )
+        
+        # Extract and clean the generated code
+        code = response.choices[0].message.content.strip()
+        
+        # Remove any markdown artifacts
+        code = code.replace('```dot', '').replace('```graphviz', '').replace('```mermaid', '').replace('```', '').strip()
+        
+        # Remove any text before the actual code starts
+        if request.diagram_type in ['flowchart', 'process', 'organization']:
+            if 'digraph' in code:
+                code = 'digraph' + code.split('digraph', 1)[1]
         elif request.diagram_type == 'sequence':
-            # Generate sequence diagram
-            code = '''sequenceDiagram
-    participant User
-    participant System
-    participant Database
-    
-    User->>System: Send Request
-    System->>Database: Query Data
-    Database-->>System: Return Results
-    System-->>User: Display Response'''
-        
+            if 'sequenceDiagram' in code:
+                code = 'sequenceDiagram' + code.split('sequenceDiagram', 1)[1]
         elif request.diagram_type == 'mindmap':
-            # Generate mindmap as graph
-            code = '''graph TD
-    A[Main Topic] --> B[Subtopic 1]
-    A --> C[Subtopic 2]
-    A --> D[Subtopic 3]
-    B --> E[Detail 1]
-    B --> F[Detail 2]
-    C --> G[Detail 3]
-    D --> H[Detail 4]'''
-        
-        elif request.diagram_type == 'organization':
-            # Generate org chart
-            code = '''digraph G {
-  bgcolor="transparent"
-  rankdir=TB
-  node [fontname="Arial", fontsize=12, shape=box, style="rounded,filled", fillcolor="#fce7f3", color="#db2777", fontcolor="#831843"]
-  
-  CEO [label="CEO"]
-  CTO [label="CTO"]
-  CFO [label="CFO"]
-  Dev1 [label="Developer 1"]
-  Dev2 [label="Developer 2"]
-  Acc1 [label="Accountant"]
-  
-  CEO -> CTO
-  CEO -> CFO
-  CTO -> Dev1
-  CTO -> Dev2
-  CFO -> Acc1
-}'''
-        else:
-            # Default simple flowchart
-            code = '''digraph G {
-  bgcolor="transparent"
-  rankdir=TB
-  node [fontname="Arial", fontsize=12]
-  
-  start [label="Start", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]
-  process [label="Process", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]
-  end [label="End", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]
-  
-  start -> process [color="#64748b"]
-  process -> end [color="#64748b"]
-}'''
+            if 'graph' in code:
+                code = 'graph' + code.split('graph', 1)[1]
         
         logger.info(f"Generated diagram code for type: {request.diagram_type}")
         
