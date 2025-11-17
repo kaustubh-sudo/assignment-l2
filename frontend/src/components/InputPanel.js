@@ -46,7 +46,9 @@ const InputPanel = ({
           </Label>
           <Select value={diagramType} onValueChange={setDiagramType}>
             <SelectTrigger id="diagram-type" className="h-12 bg-background/50">
-              <SelectValue />
+              <SelectValue>
+                {selectedType?.label}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className="bg-background border-border shadow-xl">
               {DIAGRAM_TYPES.map((type) => (
