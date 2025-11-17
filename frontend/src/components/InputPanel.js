@@ -11,7 +11,7 @@ const DIAGRAM_TYPES = [
   { value: 'graphviz', label: '🔷 GraphViz', description: 'Graphs, flowcharts, and network diagrams' },
   { value: 'mermaid', label: '🧜 Mermaid', description: 'Flowcharts, sequences, and state diagrams' },
   { value: 'plantuml', label: '🌱 PlantUML', description: 'UML diagrams, sequences, and use cases' },
-  { value: 'excalidraw', label: '✨ Excalidraw', description: 'Hand-drawn style diagrams and sketches' },
+  { value: 'pikchr', label: '✏️ Pikchr', description: 'Clean, simple flowcharts and diagrams' },
 ];
 
 const InputPanel = ({
