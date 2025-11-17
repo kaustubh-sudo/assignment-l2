@@ -31,32 +31,71 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Eye className="w-5 h-5 text-secondary" />
-            <CardTitle className="text-lg">Your Diagram</CardTitle>
+            <CardTitle className="text-lg">Preview</CardTitle>
           </div>
           
-          {renderedDiagram && !isLoading && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="sm"
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Export
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onExport('svg')}>
-                  <span className="font-medium">Download as SVG</span>
-                  <span className="text-xs text-muted-foreground ml-2">(Vector)</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onExport('png')}>
-                  <span className="font-medium">Download as PNG</span>
-                  <span className="text-xs text-muted-foreground ml-2">(Image)</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <div className="flex items-center gap-2">
+            {renderedDiagram && !isLoading && (
+              <>
+                {/* Zoom Controls */}
+                <div className="flex items-center gap-1 border border-border rounded-lg p-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleZoomOut}
+                    className="h-7 w-7 p-0"
+                    title="Zoom Out"
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </Button>
+                  <span className="text-xs font-medium px-2 min-w-[3rem] text-center">
+                    {zoom}%
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleZoomIn}
+                    className="h-7 w-7 p-0"
+                    title="Zoom In"
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleResetZoom}
+                    className="h-7 w-7 p-0"
+                    title="Reset Zoom"
+                  >
+                    <Maximize2 className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                {/* Export Button */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="sm"
+                      className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onExport('svg')}>
+                      <span className="font-medium">Download as SVG</span>
+                      <span className="text-xs text-muted-foreground ml-2">(Vector)</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onExport('png')}>
+                      <span className="font-medium">Download as PNG</span>
+                      <span className="text-xs text-muted-foreground ml-2">(Image)</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
+          </div>
         </div>
       </CardHeader>
       
