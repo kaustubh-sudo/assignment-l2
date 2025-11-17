@@ -187,8 +187,11 @@ async def generate_diagram(request: DiagramGenerationRequest):
             # Look for entities (capitalized words or quoted text)
             words = description.split()
             for word in words:
-                if word[0].isupper() and len(word) > 2 and word not in participants:
-                    participants.append(word)
+                # Clean punctuation
+                word_clean = word.strip('.,;:!?')
+                if word_clean and len(word_clean) > 2 and word_clean[0].isupper() and word_clean.lower() not in FILLER_WORDS:
+                    if word_clean not in participants:
+                        participants.append(word_clean)
             
             # If no participants found, use generic ones
             if not participants:
@@ -199,7 +202,9 @@ async def generate_diagram(request: DiagramGenerationRequest):
             for part in parts:
                 part = part.strip()
                 if part and len(part) > 5:
-                    interactions.append(part[:50])
+                    cleaned = clean_step(part)
+                    if cleaned:
+                        interactions.append(cleaned[:50])
             
             # Build sequence diagram
             code = 'sequenceDiagram\n'
