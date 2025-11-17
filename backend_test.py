@@ -104,6 +104,15 @@ def test_api_endpoint(description: str, diagram_type: str, test_name: str, expec
                     status = "✅" if passed else "❌"
                     print(f"     {status} {feature}")
                 
+                # Test Kroki rendering
+                kroki_result = test_kroki_rendering(generated_code, diagram_type)
+                result.update(kroki_result)
+                
+                kroki_status = "✅" if kroki_result["kroki_success"] else "❌"
+                print(f"   Kroki render: {kroki_status} (HTTP {kroki_result.get('kroki_status', 'N/A')})")
+                if not kroki_result["kroki_success"] and kroki_result.get("kroki_error"):
+                    print(f"     Error: {kroki_result['kroki_error'][:100]}...")
+                
                 # Show code preview for analysis
                 print(f"   Generated code preview:\n{generated_code[:300]}...")
                 
