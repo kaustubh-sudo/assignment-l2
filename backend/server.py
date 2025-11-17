@@ -144,14 +144,14 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 # Fallback to simple version
                 code = None
             
-            # If advanced generator succeeded, we're done with GraphViz
+            # If advanced generator succeeded, return immediately
             if code is not None:
-                # Advanced generator succeeded, skip to the end
-                pass
-            else:
-                # Use simple fallback
-                logger.info("Using simple GraphViz fallback")
-                desc_lower = description.lower()
+                logger.info("Advanced GraphViz generator succeeded, returning result")
+                return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
+            
+            # Use simple fallback
+            logger.info("Using simple GraphViz fallback")
+            desc_lower = description.lower()
             
                 # Detect layout preference
                 rankdir = 'LR' if 'left to right' in desc_lower or 'horizontal' in desc_lower else 'TB'
