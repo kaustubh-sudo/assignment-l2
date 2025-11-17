@@ -369,14 +369,14 @@ async def generate_diagram(request: DiagramGenerationRequest):
 }}'''
         
         elif request.diagram_type == 'mermaid':
-            # Use enhanced Mermaid generator with styling and conditionals
+            # Use v3 generator for clean, properly labeled diagrams
             try:
-                logger.info(f"Using enhanced Mermaid generator for description length: {len(description)}")
-                code = generate_mermaid_diagram(description)
-                logger.info(f"Enhanced Mermaid generator succeeded, code length: {len(code)}")
+                logger.info(f"Using Mermaid v3 generator for description length: {len(description)}")
+                code = generate_mermaid_v3(description)
+                logger.info(f"Mermaid v3 generator succeeded, code length: {len(code)}")
                 return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
             except Exception as e:
-                logger.error(f"Enhanced Mermaid generator failed: {str(e)}, using fallback")
+                logger.error(f"Mermaid v3 generator failed: {str(e)}, using fallback")
                 # Fallback to old logic
                 desc_lower = description.lower()
             
