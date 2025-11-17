@@ -573,14 +573,14 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 code = json.dumps(excalidraw_data)
         
         elif request.diagram_type == 'plantuml':
-            # Use enhanced PlantUML generator with partitions and advanced styling
+            # Use v3 generator for clean, properly labeled diagrams
             try:
-                logger.info(f"Using enhanced PlantUML generator for description length: {len(description)}")
-                code = generate_plantuml_diagram(description)
-                logger.info(f"Enhanced PlantUML generator succeeded, code length: {len(code)}")
+                logger.info(f"Using PlantUML v3 generator for description length: {len(description)}")
+                code = generate_plantuml_v3(description)
+                logger.info(f"PlantUML v3 generator succeeded, code length: {len(code)}")
                 return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
             except Exception as e:
-                logger.error(f"Enhanced PlantUML generator failed: {str(e)}, using fallback")
+                logger.error(f"PlantUML v3 generator failed: {str(e)}, using fallback")
                 # Fallback to old logic
                 desc_lower = description.lower()
                 
