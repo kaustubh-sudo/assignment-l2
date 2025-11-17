@@ -338,43 +338,115 @@ async def generate_diagram(request: DiagramGenerationRequest):
 }}'''
         
         elif request.diagram_type == 'mermaid':
-            # Extract participants and interactions
-            participants = []
-            interactions = []
+            # Generate Mermaid flowchart (not sequence diagram)
+            # Detect if it's better as flowchart or sequence
+            desc_lower = description.lower()
             
-            # Look for entities (capitalized words or quoted text)
-            words = description.split()
-            for word in words:
-                # Clean punctuation
-                word_clean = word.strip('.,;:!?')
-                if word_clean and len(word_clean) > 2 and word_clean[0].isupper() and word_clean.lower() not in FILLER_WORDS:
-                    if word_clean not in participants:
-                        participants.append(word_clean)
+            # Check for sequence diagram indicators
+            is_sequence = any(word in desc_lower for word in ['participant', 'actor', 'request', 'response', 'message', 'call', 'reply'])
             
-            # If no participants found, use generic ones
-            if not participants:
-                participants = ['User', 'System', 'Database']
-            
-            # Extract interactions
-            parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
-            for part in parts:
-                part = part.strip()
-                if part and len(part) > 5:
-                    cleaned = clean_step(part)
-                    if cleaned:
-                        interactions.append(cleaned[:50])
-            
-            # Build sequence diagram
-            code = 'sequenceDiagram\n'
-            for p in participants[:6]:  # Limit to 6 participants
-                code += f'    participant {p}\n'
-            code += '\n'
-            
-            # Generate interactions between participants
-            for i, interaction in enumerate(interactions[:8]):  # Limit interactions
-                sender = participants[i % len(participants)]
-                receiver = participants[(i + 1) % len(participants)]
-                code += f'    {sender}->>{receiver}: {interaction}\n'
+            if is_sequence:
+                # Generate sequence diagram
+                participants = []
+                interactions = []
+                
+                # Look for entities (capitalized words)
+                words = description.split()
+                for word in words:
+                    word_clean = word.strip('.,;:!?')
+                    if word_clean and len(word_clean) > 2 and word_clean[0].isupper() and word_clean.lower() not in FILLER_WORDS:
+                        if word_clean not in participants:
+                            participants.append(word_clean)
+                
+                if not participants:
+                    participants = ['User', 'System', 'Database']
+                
+                # Extract interactions
+                parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
+                for part in parts:
+                    part = part.strip()
+                    if part and len(part) > 5:
+                        cleaned = clean_step(part)
+                        if cleaned:
+                            interactions.append(cleaned[:50])
+                
+                # Build sequence diagram
+                code = 'sequenceDiagram\n'
+                for p in participants[:6]:
+                    code += f'    participant {p}\n'
+                code += '\n'
+                
+                for i, interaction in enumerate(interactions[:8]):
+                    sender = participants[i % len(participants)]
+                    receiver = participants[(i + 1) % len(participants)]
+                    code += f'    {sender}->>{receiver}: {interaction}\n'
+            else:
+                # Generate flowchart with conditional logic
+                code = 'flowchart TD\n'
+                
+                # Parse steps and conditions similar to GraphViz
+                parts = re.split(r'[,;]|\bthen\b|\bnext\b', description, flags=re.IGNORECASE)
+                node_id = ord('A')
+                nodes = []
+                edges = []
+                prev_node = None
+                
+                # Look for conditionals
+                conditional_match = re.search(r'\b(if|when)\s+(.+?)\s+(else|otherwise)\s+(.+?)(?:[,;.]|$)', description, re.IGNORECASE)
+                
+                for part in parts:
+                    part = part.strip()
+                    
+                    # Skip if part of conditional
+                    if conditional_match and part in conditional_match.group(0):
+                        continue
+                    
+                    if part and len(part) > 3:
+                        cleaned = clean_step(part)
+                        if cleaned and len(cleaned) > 1:
+                            current = chr(node_id)
+                            node_id += 1
+                            
+                            # Determine node type
+                            if 'login' in cleaned.lower() or 'start' in cleaned.lower():
+                                nodes.append(f'    {current}(["{cleaned}"])')
+                            elif 'validate' in cleaned.lower() or 'check' in cleaned.lower():
+                                nodes.append(f'    {current}{{{{{cleaned}}}}}')  # Diamond
+                            elif 'logout' in cleaned.lower() or 'end' in cleaned.lower():
+                                nodes.append(f'    {current}(["{cleaned}"])')
+                            else:
+                                nodes.append(f'    {current}["{cleaned}"]')
+                            
+                            if prev_node:
+                                edges.append(f'    {prev_node} --> {current}')
+                            prev_node = current
+                
+                # Add conditional if found
+                if conditional_match:
+                    condition = clean_step(conditional_match.group(2))
+                    yes_action = clean_step(conditional_match.group(4))
+                    no_action = yes_action  # Extract from else part
+                    
+                    # Try to find the actual else action
+                    else_text = conditional_match.group(0).split('else')[1] if 'else' in conditional_match.group(0) else conditional_match.group(0).split('otherwise')[1]
+                    else_action = clean_step(else_text)
+                    
+                    decision_node = chr(node_id)
+                    node_id += 1
+                    yes_node = chr(node_id)
+                    node_id += 1
+                    no_node = chr(node_id)
+                    
+                    nodes.append(f'    {decision_node}{{{{{condition}?}}}}')
+                    nodes.append(f'    {yes_node}["{yes_action}"]')
+                    nodes.append(f'    {no_node}["{else_action}"]')
+                    
+                    if prev_node:
+                        edges.append(f'    {prev_node} --> {decision_node}')
+                    edges.append(f'    {decision_node} -->|Yes| {yes_node}')
+                    edges.append(f'    {decision_node} -->|No| {no_node}')
+                
+                code += '\n'.join(nodes) + '\n' + '\n'.join(edges)
         
         elif request.diagram_type == 'excalidraw':
             # Generate Excalidraw JSON format
