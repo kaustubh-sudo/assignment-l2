@@ -12,6 +12,12 @@ from datetime import datetime, timezone
 from openai import OpenAI
 from diagram_generator import generate_graphviz_advanced
 
+# Configure logging early
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
