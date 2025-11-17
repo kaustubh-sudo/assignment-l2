@@ -102,7 +102,21 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the Kroki Diagram Renderer application comprehensively - A diagram-as-code visualization tool that renders diagrams using the Kroki API with split-screen interface, theme toggle, multiple diagram types, and both POST/GET methods"
+user_problem_statement: "Fix critical backend bug causing 500 Internal Server Error when generating complex diagrams. The bug was caused by improper control flow where successful advanced diagram generation would fall through to simple generator code that referenced uninitialized variables."
+
+backend:
+  - task: "Fix 500 Error - Control Flow Bug"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed logical flow bug where advanced generator success would fall through to simple generator code. Added return statement after successful advanced generation. Also fixed logger initialization order by moving logger config to top of file before first use."
+
 
 frontend:
   - task: "Initial Load & UI Elements"
