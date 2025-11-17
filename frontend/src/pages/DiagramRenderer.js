@@ -95,6 +95,13 @@ const DiagramRenderer = () => {
       return;
     }
 
+    // Prevent duplicate calls
+    if (renderingRef.current) {
+      console.log('Already rendering, skipping duplicate call');
+      return;
+    }
+
+    renderingRef.current = true;
     setIsGenerating(true);
     setError(null);
 
@@ -109,15 +116,18 @@ const DiagramRenderer = () => {
       toast.info('Creating your diagram...');
       const krokiType = getKrokiType(diagramType);
       const diagram = await renderDiagram(code, krokiType);
-      setRenderedDiagram(diagram);
       
-      toast.success('Your diagram is ready!');
+      if (diagram) {
+        setRenderedDiagram(diagram);
+        toast.success('Your diagram is ready!');
+      }
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
     } finally {
       setIsGenerating(false);
       setIsRendering(false);
+      renderingRef.current = false;
     }
   };
 
