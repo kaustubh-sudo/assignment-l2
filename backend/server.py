@@ -38,6 +38,14 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+class DiagramGenerationRequest(BaseModel):
+    description: str
+    diagram_type: str
+
+class DiagramGenerationResponse(BaseModel):
+    code: str
+    kroki_type: str
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
