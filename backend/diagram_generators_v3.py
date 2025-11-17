@@ -491,8 +491,10 @@ def generate_excalidraw_v3(description):
             "#f59e0b"
         )
         
-        # Arrow to decision with proper binding
-        make_arrow(last_x, last_y, dec_x + dec_width // 2, current_y, None, "#64748b", last_id, dec_id)
+        # Arrow to decision with proper binding (to center top of diamond)
+        dec_center_x = center_x
+        dec_top_y = current_y
+        make_arrow(last_x, last_y, dec_center_x, dec_top_y, None, "#64748b", last_id, dec_id)
         
         current_y += dec_height + vertical_spacing
         
