@@ -29,7 +29,7 @@ const InputPanel = ({
   const selectedType = DIAGRAM_TYPES.find(t => t.value === diagramType);
 
   return (
-    <Card className="h-full flex flex-col shadow-lg border-border/50 bg-card/95 backdrop-blur-sm">
+    <Card className="h-full flex flex-col shadow-xl border-border/50 bg-card/95 backdrop-blur-sm rounded-2xl">
       <CardHeader className="pb-4 border-b border-border/50">
         <CardTitle className="text-lg md:text-xl font-semibold">
           Describe Your Diagram
@@ -45,15 +45,15 @@ const InputPanel = ({
             What type of diagram?
           </Label>
           <Select value={diagramType} onValueChange={setDiagramType}>
-            <SelectTrigger id="diagram-type" className="h-12">
+            <SelectTrigger id="diagram-type" className="h-12 bg-background/50">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background border-border shadow-xl">
               {DIAGRAM_TYPES.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  <div className="flex flex-col items-start gap-1">
+                <SelectItem key={type.value} value={type.value} className="cursor-pointer">
+                  <div className="flex flex-col items-start gap-0.5 py-1">
                     <span className="font-medium text-sm">{type.label}</span>
-                    <span className="text-sm text-muted-foreground">{type.description}</span>
+                    <span className="text-xs text-muted-foreground">{type.description}</span>
                   </div>
                 </SelectItem>
               ))}
@@ -70,7 +70,7 @@ const InputPanel = ({
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             placeholder="Example: Create a flowchart showing the customer support process from ticket creation to resolution..."
-            className="flex-1 text-base leading-relaxed custom-scrollbar resize-none min-h-[150px] md:min-h-[200px]"
+            className="flex-1 text-base leading-relaxed custom-scrollbar resize-none min-h-[150px] md:min-h-[200px] bg-background/50"
           />
         </div>
 
@@ -103,7 +103,7 @@ const InputPanel = ({
           <Button
             onClick={onGenerate}
             disabled={isGenerating || isRendering || !userInput.trim()}
-            className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg h-12 text-base font-medium"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl h-12 text-base font-medium rounded-xl"
           >
             <Sparkles className="w-5 h-5 mr-2" />
             {isGenerating ? 'Thinking...' : isRendering ? 'Creating...' : 'Generate Diagram'}
@@ -111,7 +111,7 @@ const InputPanel = ({
           <Button
             onClick={onClear}
             variant="outline"
-            className="border-border hover:bg-muted h-12 px-4"
+            className="border-border hover:bg-muted h-12 px-4 rounded-xl"
           >
             <RotateCcw className="w-5 h-5" />
           </Button>

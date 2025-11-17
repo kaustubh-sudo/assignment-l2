@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { Sparkles } from 'lucide-react';
 
 const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
   const [zoom, setZoom] = useState(100);
@@ -25,8 +26,9 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
   const handleResetZoom = () => {
     setZoom(100);
   };
+  
   return (
-    <Card className="h-full flex flex-col shadow-lg border-border/50 bg-card/95 backdrop-blur-sm">
+    <Card className="h-full flex flex-col shadow-xl border-border/50 bg-card/95 backdrop-blur-sm rounded-2xl">
       <CardHeader className="flex-none pb-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <CardTitle className="text-lg md:text-xl font-semibold">
@@ -37,17 +39,17 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
             {renderedDiagram && (
               <>
                 {/* Zoom Controls - Compact on mobile */}
-                <div className="flex items-center gap-0.5 md:gap-1 border border-border rounded-lg p-0.5 md:p-1">
+                <div className="flex items-center gap-0.5 md:gap-1 border border-border rounded-xl p-0.5 md:p-1 bg-background/50">
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={handleZoomOut}
-                    className="h-6 w-6 md:h-7 md:w-7 p-0"
+                    className="h-7 w-7 md:h-8 md:w-8 p-0 hover:bg-muted rounded-lg"
                   >
-                    <ZoomOut className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    <ZoomOut className="w-4 h-4" />
                   </Button>
                   
-                  <span className="text-xs font-medium px-1 md:px-2 min-w-[40px] md:min-w-[50px] text-center">
+                  <span className="text-xs font-medium px-2 md:px-3 min-w-[50px] text-center">
                     {Math.round(zoom)}%
                   </span>
                   
@@ -55,18 +57,18 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
                     size="sm"
                     variant="ghost"
                     onClick={handleZoomIn}
-                    className="h-6 w-6 md:h-7 md:w-7 p-0"
+                    className="h-7 w-7 md:h-8 md:w-8 p-0 hover:bg-muted rounded-lg"
                   >
-                    <ZoomIn className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    <ZoomIn className="w-4 h-4" />
                   </Button>
                   
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={handleResetZoom}
-                    className="h-6 w-6 md:h-7 md:w-7 p-0"
+                    className="h-7 w-7 md:h-8 md:w-8 p-0 hover:bg-muted rounded-lg"
                   >
-                    <Maximize2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    <Maximize2 className="w-4 h-4" />
                   </Button>
                 </div>
                 
@@ -75,18 +77,18 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       size="sm"
-                      className="bg-accent hover:bg-accent/90 text-accent-foreground h-6 md:h-8 px-2 md:px-3 text-xs md:text-sm"
+                      className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white h-8 md:h-9 px-3 md:px-4 text-xs md:text-sm rounded-xl shadow-lg"
                     >
-                      <Download className="w-3.5 h-3.5 md:w-4 md:h-4 md:mr-2" />
+                      <Download className="w-4 h-4 md:mr-2" />
                       <span className="hidden md:inline">Export</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onExport('svg')}>
+                  <DropdownMenuContent align="end" className="bg-background border-border shadow-xl">
+                    <DropdownMenuItem onClick={() => onExport('svg')} className="cursor-pointer">
                       <span className="font-medium text-sm">SVG</span>
                       <span className="text-xs text-muted-foreground ml-2">(Vector)</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onExport('png')}>
+                    <DropdownMenuItem onClick={() => onExport('png')} className="cursor-pointer">
                       <span className="font-medium text-sm">PNG</span>
                       <span className="text-xs text-muted-foreground ml-2">(Image)</span>
                     </DropdownMenuItem>
@@ -98,8 +100,8 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
         </div>
       </CardHeader>
       
-      <CardContent className="flex-1 p-2 md:p-3 lg:p-4 overflow-hidden">
-        <div className="h-full flex items-center justify-center bg-muted/30 rounded-lg border border-border/50 overflow-auto custom-scrollbar">
+      <CardContent className="flex-1 p-3 md:p-4 lg:p-5 overflow-hidden">
+        <div className="h-full flex items-center justify-center bg-muted/20 rounded-xl border border-border/50 overflow-auto custom-scrollbar">
           {isLoading ? (
             <div className="w-full h-full p-6 space-y-4">
               <Skeleton className="w-full h-8 bg-muted" />
@@ -108,11 +110,11 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
               <Skeleton className="w-5/6 h-8 bg-muted" />
               <div className="flex justify-center items-center py-8">
                 <div className="relative">
-                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent" />
-                  <Sparkles className="w-6 h-6 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                  <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
+                  <Sparkles className="w-8 h-8 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                 </div>
               </div>
-              <p className="text-center text-base text-muted-foreground">Creating your diagram...</p>
+              <p className="text-center text-base text-muted-foreground font-medium">Creating your diagram...</p>
             </div>
           ) : error ? (
             <Alert variant="destructive" className="m-6 max-w-2xl">
@@ -140,9 +142,9 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
             </div>
           ) : (
             <div className="text-center text-muted-foreground space-y-4 p-8">
-              <ImageIcon className="w-20 h-20 md:w-24 md:h-24 mx-auto opacity-30" />
-              <p className="text-lg md:text-xl font-medium">Ready to create something amazing?</p>
-              <p className="text-base">Describe your diagram on the left and click "Generate Diagram"</p>
+              <ImageIcon className="w-20 h-20 md:w-24 md:h-24 mx-auto opacity-20" />
+              <p className="text-lg md:text-xl font-semibold">Ready to create something amazing?</p>
+              <p className="text-base text-muted-foreground/80">Describe your diagram on the left and click "Generate Diagram"</p>
             </div>
           )}
         </div>
@@ -150,8 +152,5 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
     </Card>
   );
 };
-
-// Import Sparkles for loading animation
-import { Sparkles } from 'lucide-react';
 
 export default PreviewPanel;

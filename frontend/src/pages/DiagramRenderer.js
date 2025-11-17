@@ -198,10 +198,10 @@ const DiagramRenderer = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-background to-muted">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-muted/30">
       <Header />
       
-      <div className="flex-1 flex flex-col lg:flex-row gap-4 md:gap-5 lg:gap-6 p-4 md:p-5 lg:p-6 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row gap-4 md:gap-5 lg:gap-6 p-4 md:p-5 lg:p-6 max-w-[1800px] w-full mx-auto overflow-hidden">
         {/* Left Side - Input */}
         <div className="flex-none lg:flex-1 lg:min-h-0 lg:max-w-[50%]">
           <InputPanel
