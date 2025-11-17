@@ -417,7 +417,7 @@ def generate_mermaid_diagram(description):
         yes_id = f"Y{i}"
         no_id = f"No{i}"
         
-        code += f"    {cond_id}{{{{{cond['condition']}?}}}}:::decisionStyle\n"
+        code += f"    {cond_id}{{{cond['condition']}?}}:::decisionStyle\n"
         code += f"    {yes_id}[{cond['yes']}]:::processStyle\n"
         code += f"    {no_id}[{cond['no']}]:::errorStyle\n"
         
