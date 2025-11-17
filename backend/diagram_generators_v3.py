@@ -379,25 +379,30 @@ def generate_excalidraw_v3(description):
             text_id = f"label-{element_id}"
             element_id += 1
             
-            # Position label closer to the source for better readability
-            label_offset = 30  # Distance from decision node
-            mid_x = from_x + (to_x - from_x) // 4
-            mid_y = from_y + (to_y - from_y) // 4
+            # Position label near the start of the arrow for better visibility
+            label_offset_x = 60
+            label_offset_y = 30
+            label_x = from_x + label_offset_x
+            label_y = from_y + label_offset_y
+            
+            # Larger, more visible label
+            label_width = 60
+            label_height = 30
             
             label_elem = {
                 "id": text_id,
                 "type": "text",
-                "x": mid_x - 25,
-                "y": mid_y - 12,
-                "width": 50,
-                "height": 24,
+                "x": label_x,
+                "y": label_y,
+                "width": label_width,
+                "height": label_height,
                 "text": label,
-                "fontSize": 16,
+                "fontSize": 20,  # Bigger font
                 "fontFamily": 1,
                 "textAlign": "center",
                 "verticalAlign": "middle",
                 "strokeColor": color,
-                "backgroundColor": "transparent",
+                "backgroundColor": "#ffffff",  # White background for visibility
                 "fillStyle": "solid",
                 "strokeWidth": 0,
                 "strokeStyle": "solid",
@@ -413,7 +418,7 @@ def generate_excalidraw_v3(description):
                 "link": None,
                 "locked": False,
                 "lineHeight": 1.25,
-                "baseline": 16
+                "baseline": 18
             }
             
             elements.append(label_elem)
