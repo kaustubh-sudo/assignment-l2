@@ -53,39 +53,31 @@ const DiagramRenderer = () => {
     }
   };
 
-  // Render the diagram using Kroki API
+  // Render the diagram using Kroki API  
   const renderDiagram = async (code, krokiType) => {
     const krokiUrl = `https://kroki.io/${krokiType}/svg`;
     
-    try {
-      const response = await fetch(krokiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-        body: code,
-      });
+    const response = await fetch(krokiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+      body: code,
+    });
 
-      // Store status/ok before reading body to avoid clone issues
-      const { status, ok, statusText } = response;
-      
-      // Read body only once
-      const svgText = await response.text();
-      
-      // Check status after reading
-      if (!ok) {
-        throw new Error(`Kroki API error ${status}: ${statusText}`);
-      }
-
-      return { type: 'svg', content: svgText };
-    } catch (error) {
-      // Avoid re-throwing response clone errors
-      if (error.message && error.message.includes('Response body is already used')) {
-        console.warn('Response clone error caught and ignored');
-        return null;
-      }
-      throw error;
+    // Store status before reading body
+    const { status, ok } = response;
+    
+    // Read body only once
+    const svgText = await response.text();
+    
+    // Check status after reading
+    if (!ok) {
+      console.error('Kroki error response:', svgText);
+      throw new Error(`Kroki API returned ${status}. Check diagram syntax.`);
     }
+
+    return { type: 'svg', content: svgText };
   };
 
   // Main function to generate and render diagram
