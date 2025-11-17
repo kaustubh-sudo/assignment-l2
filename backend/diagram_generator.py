@@ -46,8 +46,8 @@ def generate_graphviz_advanced(description):
     
     def add_edge(from_id, to_id, label='', color='#64748b', style=''):
         style_attr = f', style={style}' if style else ''
-        label_attr = f', label="{label}"' if label else ''
-        edges.append(f'{from_id} -> {to_id} [{label_attr} color="{color}"{style_attr}]')
+        label_attr = f'label="{label}", ' if label else ''
+        edges.append(f'{from_id} -> {to_id} [{label_attr}color="{color}"{style_attr}]')
     
     # Parse description into logical components
     desc_lower = description.lower()
