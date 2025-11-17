@@ -250,7 +250,9 @@ def main():
                 # Check sophistication
                 is_sophisticated = result.get('is_sophisticated', False)
                 soph_status = "✅" if is_sophisticated else "❌"
-                print(f"      Sophisticated: {soph_status} (>= 600 chars)")
+                expected_min = result.get('expected_length_min', 600)
+                expected_max = result.get('expected_length_max', 10000)
+                print(f"      Sophisticated: {soph_status} ({expected_min}-{expected_max} chars expected)")
                 
                 # Check features
                 features_passed = result.get('features_passed', 0)
