@@ -42,20 +42,29 @@ digraph G {
         print(f"Code: {code}")
         
         try:
-            # Encode the diagram code
-            encoded = base64.urlsafe_b64encode(code.encode('utf-8')).decode('ascii')
+            # Try POST method instead
+            kroki_url = f"https://kroki.io/{diagram_type}/svg"
             
-            # Test with Kroki API
-            kroki_url = f"https://kroki.io/{diagram_type}/svg/{encoded}"
-            print(f"URL: {kroki_url}")
+            response = requests.post(kroki_url, data=code, headers={'Content-Type': 'text/plain'}, timeout=10)
             
-            response = requests.get(kroki_url, timeout=10)
-            
-            print(f"Status: {response.status_code}")
+            print(f"POST Status: {response.status_code}")
             if response.status_code != 200:
-                print(f"Error: {response.text[:200]}...")
+                print(f"POST Error: {response.text[:200]}...")
             else:
-                print("✅ Success - Kroki rendered successfully")
+                print("✅ POST Success - Kroki rendered successfully")
+                continue
+                
+            # Also try GET method with encoding
+            encoded = base64.urlsafe_b64encode(code.encode('utf-8')).decode('ascii')
+            kroki_url_get = f"https://kroki.io/{diagram_type}/svg/{encoded}"
+            
+            response_get = requests.get(kroki_url_get, timeout=10)
+            
+            print(f"GET Status: {response_get.status_code}")
+            if response_get.status_code != 200:
+                print(f"GET Error: {response_get.text[:200]}...")
+            else:
+                print("✅ GET Success - Kroki rendered successfully")
                 
         except Exception as e:
             print(f"❌ Exception: {e}")
