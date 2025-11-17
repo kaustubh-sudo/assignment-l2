@@ -106,7 +106,7 @@ async def generate_diagram(request: DiagramGenerationRequest):
                         steps.append(part.strip())
             
             # Generate flowchart
-            rankdir = 'LR' if request.diagram_type == 'process' else 'TB'
+            rankdir = 'TB'
             nodes = []
             edges = []
             
