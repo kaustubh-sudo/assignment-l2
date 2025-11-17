@@ -6,9 +6,9 @@ import { toast } from 'sonner';
 
 const DiagramRenderer = () => {
   const [userInput, setUserInput] = useState(
-    "Create a simple workflow showing: Start → Review Document → Approve or Reject → If approved go to Complete, if rejected go back to Review → End"
+    "Create a workflow: User logs in, System validates credentials, If valid show dashboard else show error, User can logout"
   );
-  const [diagramType, setDiagramType] = useState('flowchart');
+  const [diagramType, setDiagramType] = useState('graphviz');
   const [generatedCode, setGeneratedCode] = useState('');
   const [renderedDiagram, setRenderedDiagram] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
