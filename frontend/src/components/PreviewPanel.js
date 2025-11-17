@@ -99,7 +99,7 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
         </div>
       </CardHeader>
       
-      <CardContent className="flex-1 p-4 overflow-hidden">
+      <CardContent className="flex-1 p-2 md:p-3 lg:p-4 overflow-hidden">
         <div className="h-full flex items-center justify-center bg-muted/30 rounded-lg border border-border/50 overflow-auto custom-scrollbar">
           {isLoading ? (
             <div className="w-full h-full p-6 space-y-4">
