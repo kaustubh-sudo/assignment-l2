@@ -570,17 +570,24 @@ async def generate_diagram(request: DiagramGenerationRequest):
             code = json.dumps(excalidraw_data)
         
         elif request.diagram_type == 'plantuml':
-            # Generate sophisticated PlantUML diagram
-            desc_lower = description.lower()
-            
-            parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
-            steps = []
-            for p in parts:
-                p = p.strip()
-                if p and len(p) > 2:
-                    cleaned = clean_step(p)
-                    if cleaned:
-                        steps.append(cleaned)
+            # Use enhanced PlantUML generator with partitions and advanced styling
+            try:
+                logger.info(f"Using enhanced PlantUML generator for description length: {len(description)}")
+                code = generate_plantuml_diagram(description)
+                logger.info(f"Enhanced PlantUML generator succeeded, code length: {len(code)}")
+            except Exception as e:
+                logger.error(f"Enhanced PlantUML generator failed: {str(e)}, using fallback")
+                # Fallback to old logic
+                desc_lower = description.lower()
+                
+                parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
+                steps = []
+                for p in parts:
+                    p = p.strip()
+                    if p and len(p) > 2:
+                        cleaned = clean_step(p)
+                        if cleaned:
+                            steps.append(cleaned)
             
             code = '@startuml\n'
             code += 'skinparam backgroundColor transparent\n'
