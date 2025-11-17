@@ -151,24 +151,52 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 node_counter += 1
                 return base
             
-            # Parse description into sentences/clauses
-            sentences = re.split(r'[.;]\s*|\.\s+', description)
+            # Extract all steps/entities more intelligently
+            # Split by multiple delimiters
+            parts = re.split(r'[,;]|\bthen\b|\bnext\b|\bafter\b|\bfinally\b|\band then\b', description, flags=re.IGNORECASE)
             
-            # Detect special patterns
-            has_parallel = any(word in desc_lower for word in ['parallel', 'concurrent', 'simultaneously', 'multiple workers'])
-            has_error_handling = any(word in desc_lower for word in ['error', 'retry', 'fail', 'exception', 'timeout', 'fallback'])
-            has_routing = any(word in desc_lower for word in ['route', 'fast-path', 'slow-path', 'either', 'or', 'branch'])
-            has_approval = any(word in desc_lower for word in ['approval', 'approve', 'review', 'authorize'])
-            
-            # Extract all steps/entities
-            parts = re.split(r'[,;]|then|next|after|finally', description, flags=re.IGNORECASE)
             steps = []
             for part in parts:
                 part = part.strip()
-                if part and len(part) > 3:
-                    cleaned = clean_step(part)
-                    if cleaned and len(cleaned) > 1:
-                        steps.append(cleaned)
+                # Further split long sentences by "which" or relative clauses
+                sub_parts = re.split(r'\bwhich\b|\bthat\b', part, maxsplit=1, flags=re.IGNORECASE)
+                
+                for sub in sub_parts:
+                    sub = sub.strip()
+                    if sub and len(sub) > 3:
+                        # Extract key phrases (subject + verb + object pattern)
+                        # Look for action verbs
+                        words = sub.split()
+                        if len(words) > 10:
+                            # For long text, try to extract key phrases
+                            # Look for verb patterns
+                            verb_idx = -1
+                            for i, word in enumerate(words):
+                                if word.lower() in ['submit', 'submits', 'validate', 'validates', 'enrich', 'enriched', 
+                                                     'route', 'routed', 'routes', 'perform', 'performs', 'enqueue', 'enqueues',
+                                                     'trigger', 'triggers', 'retry', 'retries', 'require', 'requires',
+                                                     'check', 'checks', 'record', 'records', 'notify', 'notifies',
+                                                     'send', 'sends', 'raise', 'raises', 'archive', 'archives']:
+                                    verb_idx = i
+                                    break
+                            
+                            if verb_idx >= 0:
+                                # Extract phrase around verb
+                                start = max(0, verb_idx - 2)
+                                end = min(len(words), verb_idx + 5)
+                                phrase = ' '.join(words[start:end])
+                                cleaned = clean_step(phrase)
+                                if cleaned and len(cleaned) > 1:
+                                    steps.append(cleaned)
+                            else:
+                                # Take first meaningful chunk
+                                cleaned = clean_step(' '.join(words[:6]))
+                                if cleaned and len(cleaned) > 1:
+                                    steps.append(cleaned)
+                        else:
+                            cleaned = clean_step(sub)
+                            if cleaned and len(cleaned) > 1:
+                                steps.append(cleaned)
             
             if not steps:
                 steps = ['Process', 'Complete']
