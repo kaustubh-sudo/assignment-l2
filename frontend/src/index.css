@@ -15,6 +15,18 @@ code, pre {
     font-family: 'JetBrains Mono', source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
+/* Ensure Pikchr and other diagram SVGs are visible */
+svg.pikchr {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+svg {
+    max-width: 100%;
+    height: auto;
+}
+
 @layer base {
     :root {
         /* Professional Developer Tool Palette - Slate Blue & Teal */
