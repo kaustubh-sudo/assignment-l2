@@ -286,14 +286,23 @@ def generate_excalidraw_v3(description):
         
         elements.append(elem)
         
+        # Calculate text metrics
+        # Excalidraw uses the container's center as reference
+        text_width = len(text) * 8  # Approximate width
+        text_height = 20
+        
+        # Position text at container center (text will be centered within container)
+        text_x = x + (width - text_width) / 2
+        text_y = y + (height - text_height) / 2
+        
         # Add text element bound to container
         text_elem = {
             "id": text_id,
             "type": "text",
-            "x": x + width // 2,
-            "y": y + height // 2,
-            "width": width - 20,
-            "height": 25,
+            "x": text_x,
+            "y": text_y,
+            "width": text_width,
+            "height": text_height,
             "angle": 0,
             "strokeColor": stroke_color,
             "backgroundColor": "transparent",
@@ -315,7 +324,7 @@ def generate_excalidraw_v3(description):
             "fontFamily": 1,
             "textAlign": "center",
             "verticalAlign": "middle",
-            "baseline": 18,
+            "baseline": 16,
             "containerId": elem_id,
             "originalText": text,
             "lineHeight": 1.25
