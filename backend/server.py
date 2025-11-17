@@ -75,6 +75,111 @@ async def get_status_checks():
     
     return status_checks
 
+@api_router.post("/generate-diagram", response_model=DiagramGenerationResponse)
+async def generate_diagram(request: DiagramGenerationRequest):
+    """
+    Convert natural language description to diagram code using AI
+    """
+    try:
+        # Initialize OpenAI client with Emergent LLM endpoint
+        client = OpenAI(
+            api_key=os.environ.get('OPENAI_API_KEY'),
+            base_url="https://api.openai.com/v1"
+        )
+        
+        # Map user-friendly diagram type to Kroki type
+        kroki_type_mapping = {
+            'flowchart': 'graphviz',
+            'sequence': 'mermaid',
+            'mindmap': 'mermaid',
+            'process': 'graphviz',
+            'organization': 'graphviz',
+        }
+        
+        kroki_type = kroki_type_mapping.get(request.diagram_type, 'graphviz')
+        
+        # Create prompts based on diagram type
+        prompts = {
+            'flowchart': f"""Convert this description into GraphViz DOT code for a flowchart. Use these styling rules:
+- Set bgcolor="transparent"
+- Use rounded rectangles for process steps: shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"
+- Use diamonds for decisions: shape=diamond, style=filled, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#78350f"
+- Use ovals for start/end: shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"
+- Use simple edge colors: color="#64748b"
+- Add fontname="Arial" and fontsize=12 to nodes
+- Use rankdir=TB for top-to-bottom flow
+
+Description: {request.description}
+
+Return ONLY the GraphViz DOT code, no explanations or markdown blocks.""",
+            
+            'sequence': f"""Convert this description into Mermaid sequence diagram code.
+
+Description: {request.description}
+
+Return ONLY the Mermaid code starting with 'sequenceDiagram', no explanations or markdown blocks.""",
+            
+            'mindmap': f"""Convert this description into a Mermaid graph diagram (not mindmap syntax, use 'graph TD' instead).
+
+Description: {request.description}
+
+Return ONLY the Mermaid code starting with 'graph TD', no explanations or markdown blocks.""",
+            
+            'process': f"""Convert this description into GraphViz DOT code for a process diagram. Use these styling rules:
+- Set bgcolor="transparent"
+- Use boxes for steps: shape=box, style=filled, fillcolor="#ddd6fe", color="#7c3aed", fontcolor="#4c1d95"
+- Use arrows for flow: color="#64748b"
+- Add fontname="Arial" and fontsize=12 to nodes
+- Use rankdir=LR for left-to-right flow
+
+Description: {request.description}
+
+Return ONLY the GraphViz DOT code, no explanations or markdown blocks.""",
+            
+            'organization': f"""Convert this description into GraphViz DOT code for an organization chart. Use these styling rules:
+- Set bgcolor="transparent"
+- Use rounded boxes: shape=box, style="rounded,filled", fillcolor="#fce7f3", color="#db2777", fontcolor="#831843"
+- Add fontname="Arial" and fontsize=12 to nodes
+- Use rankdir=TB for top-to-bottom hierarchy
+
+Description: {request.description}
+
+Return ONLY the GraphViz DOT code, no explanations or markdown blocks.""",
+        }
+        
+        prompt = prompts.get(request.diagram_type, prompts['flowchart'])
+        
+        # Call OpenAI API
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a diagram code generator. Generate clean, valid diagram code based on user descriptions. Return ONLY the code without any markdown formatting, code blocks, or explanations. Never include ```dot or ``` markers."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.7,
+            max_tokens=1500,
+        )
+        
+        # Extract the generated code
+        code = response.choices[0].message.content.strip()
+        
+        # Clean up any markdown artifacts
+        code = code.replace('```dot', '').replace('```graphviz', '').replace('```mermaid', '').replace('```', '').strip()
+        
+        logger.info(f"Generated diagram code for type: {request.diagram_type}")
+        
+        return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
+        
+    except Exception as e:
+        logger.error(f"Error generating diagram: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate diagram: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
