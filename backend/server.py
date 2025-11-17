@@ -328,7 +328,14 @@ async def generate_diagram(request: DiagramGenerationRequest):
         elif request.diagram_type == 'blockdiag':
             # Generate BlockDiag diagram
             parts = re.split(r'[,;→\n]|->|then', description, flags=re.IGNORECASE)
-            nodes = [p.strip().replace('"', '')[:20] for p in parts if p.strip() and len(p.strip()) > 2][:8]
+            nodes = []
+            for p in parts:
+                p = p.strip()
+                if p and len(p) > 2:
+                    cleaned = clean_step(p).replace('"', '')
+                    if cleaned:
+                        nodes.append(cleaned[:20])
+            nodes = nodes[:8]
             
             code = 'blockdiag {\n'
             for i, node in enumerate(nodes):
