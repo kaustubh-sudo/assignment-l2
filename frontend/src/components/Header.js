@@ -5,9 +5,9 @@ import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   return (
-    <header className="border-b border-border/40 bg-background sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-1.5">
-        <div className="flex items-center justify-between">
+    <header className="border-b border-border/40 bg-background sticky top-0 z-50 h-8">
+      <div className="container mx-auto px-4 h-full">
+        <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-1.5">
             <div className="bg-gradient-to-b from-blue-500 to-teal-500 w-0.5 h-4 rounded-full" />
             <div className="bg-gradient-to-br from-blue-500 to-teal-500 p-0.5 rounded">
