@@ -333,23 +333,27 @@ def generate_excalidraw_v3(description):
         elements.append(text_elem)
         return elem_id, x + width // 2, y + height
     
-    def make_arrow(from_x, from_y, to_x, to_y, label=None, color="#64748b"):
+    def make_arrow(from_x, from_y, to_x, to_y, label=None, color="#64748b", from_elem_id=None, to_elem_id=None):
         nonlocal element_id
         arrow_id = f"arrow-{element_id}"
         element_id += 1
+        
+        # Calculate arrow path
+        dx = to_x - from_x
+        dy = to_y - from_y
         
         arrow = {
             "id": arrow_id,
             "type": "arrow",
             "x": from_x,
             "y": from_y,
-            "width": to_x - from_x,
-            "height": to_y - from_y,
+            "width": dx,
+            "height": dy,
             "angle": 0,
             "strokeColor": color,
             "backgroundColor": "transparent",
             "fillStyle": "solid",
-            "strokeWidth": 2,
+            "strokeWidth": 3,  # Thicker arrows
             "strokeStyle": "solid",
             "roughness": 1,
             "opacity": 100,
@@ -361,10 +365,10 @@ def generate_excalidraw_v3(description):
             "updated": 1,
             "link": None,
             "locked": False,
-            "points": [[0, 0], [to_x - from_x, to_y - from_y]],
+            "points": [[0, 0], [dx, dy]],
             "lastCommittedPoint": None,
-            "startBinding": None,
-            "endBinding": None,
+            "startBinding": {"elementId": from_elem_id, "focus": 0, "gap": 8} if from_elem_id else None,
+            "endBinding": {"elementId": to_elem_id, "focus": 0, "gap": 8} if to_elem_id else None,
             "startArrowhead": None,
             "endArrowhead": "arrow"
         }
