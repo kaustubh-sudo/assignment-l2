@@ -79,7 +79,7 @@ Return ONLY the GraphViz DOT code, no explanations or markdown.`,
     const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
     
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('https://llm.emergent.sh/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
