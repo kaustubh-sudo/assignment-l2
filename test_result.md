@@ -276,9 +276,10 @@ frontend:
         comment: "Need to test split-screen layout, scrolling behavior, and custom scrollbar styling"
 
 metadata:
-  created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 1
+  created_by: "main_agent"
+  version: "1.1"
+  test_sequence: 2
+  last_updated: "Bug fix for 500 error"
 
 test_plan:
   current_focus:
