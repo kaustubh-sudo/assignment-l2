@@ -558,11 +558,19 @@ def generate_excalidraw_v3(description):
     
     # Arrow from last element to END with proper binding
     if decision:
-        # From YES branch to END
+        # From YES branch to END (from bottom of YES box to top of END)
+        yes_bottom_x = yes_cx
+        yes_bottom_y = current_y - vertical_spacing + yes_height
         end_center_x = end_x + end_width // 2
-        make_arrow(yes_cx, yes_cy, end_center_x, current_y, None, "#64748b", yes_id, end_id)
-        # From NO branch to END  
-        make_arrow(no_cx, no_cy, end_center_x, current_y, None, "#64748b", no_id, end_id)
+        end_top_y = current_y
+        
+        make_arrow(yes_bottom_x, yes_bottom_y, end_center_x, end_top_y, None, "#64748b", yes_id, end_id)
+        
+        # From NO branch to END (from bottom of NO box to top of END)
+        no_bottom_x = no_cx  
+        no_bottom_y = current_y - vertical_spacing + no_height
+        
+        make_arrow(no_bottom_x, no_bottom_y, end_center_x, end_top_y, None, "#64748b", no_id, end_id)
     else:
         make_arrow(last_x, last_y, end_x + end_width // 2, current_y, None, "#64748b", last_id, end_id)
     
