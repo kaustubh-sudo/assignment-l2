@@ -89,7 +89,7 @@ const InputPanel = ({
                 className="w-full justify-between text-xs text-muted-foreground hover:text-foreground"
               >
                 <span className="flex items-center gap-2">
-                  <Code2 className="w-3.5 h-3.5" />
+                  <Code2 className="w-3.5 h-3.5 flex-shrink-0" style={{marginTop: '-1px'}} />
                   Generated Code
                 </span>
                 {showCode ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
