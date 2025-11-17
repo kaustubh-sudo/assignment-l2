@@ -80,18 +80,18 @@ const InputPanel = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full justify-between text-xs text-muted-foreground hover:text-foreground"
+                className="w-full justify-between text-sm text-muted-foreground hover:text-foreground"
               >
                 <span className="flex items-center gap-2">
-                  <Code2 className="w-3.5 h-3.5 flex-shrink-0" style={{marginTop: '-1px'}} />
+                  <Code2 className="w-4 h-4 flex-shrink-0" />
                   Generated Code
                 </span>
                 {showCode ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-2">
-              <div className="rounded-lg bg-[hsl(var(--editor-bg))] p-3 max-h-32 overflow-auto custom-scrollbar">
-                <pre className="text-xs text-[hsl(var(--editor-foreground))] font-mono whitespace-pre-wrap break-all">
+              <div className="rounded-lg bg-[hsl(var(--editor-bg))] p-4 max-h-40 overflow-auto custom-scrollbar">
+                <pre className="text-sm text-[hsl(var(--editor-foreground))] font-mono whitespace-pre-wrap break-all">
                   {generatedCode}
                 </pre>
               </div>
