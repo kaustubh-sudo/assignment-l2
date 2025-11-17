@@ -126,53 +126,152 @@ async def generate_diagram(request: DiagramGenerationRequest):
             return result if result else text  # Fallback to original if nothing left
         
         if request.diagram_type == 'graphviz':
-            # Generate GraphViz diagram - flowchart/network style
-            # Extract steps from description
+            # Generate sophisticated GraphViz diagram with complex flows
+            desc_lower = description.lower()
+            
+            # Detect layout preference
+            rankdir = 'LR' if 'left to right' in desc_lower or 'horizontal' in desc_lower else 'TB'
+            if 'top to bottom' in desc_lower or 'vertical' in desc_lower:
+                rankdir = 'TB'
+            
+            # Initialize structures
+            nodes = []
+            edges = []
+            node_counter = 0
+            node_map = {}
+            
+            # Helper to create node ID
+            def make_node_id(text):
+                nonlocal node_counter
+                # Use meaningful names from text
+                words = text.split()[:2]
+                base = ''.join(w.capitalize() for w in words if w.lower() not in FILLER_WORDS)
+                if not base:
+                    base = f'Node{node_counter}'
+                node_counter += 1
+                return base
+            
+            # Parse description into sentences/clauses
+            sentences = re.split(r'[.;]\s*|\.\s+', description)
+            
+            # Detect special patterns
+            has_parallel = any(word in desc_lower for word in ['parallel', 'concurrent', 'simultaneously', 'multiple workers'])
+            has_error_handling = any(word in desc_lower for word in ['error', 'retry', 'fail', 'exception', 'timeout', 'fallback'])
+            has_routing = any(word in desc_lower for word in ['route', 'fast-path', 'slow-path', 'either', 'or', 'branch'])
+            has_approval = any(word in desc_lower for word in ['approval', 'approve', 'review', 'authorize'])
+            
+            # Extract all steps/entities
+            parts = re.split(r'[,;]|then|next|after|finally', description, flags=re.IGNORECASE)
             steps = []
-            
-            # Split by common delimiters
-            parts = re.split(r'[,;→\n]|->|then|next|after that|finally', description, flags=re.IGNORECASE)
-            
             for part in parts:
                 part = part.strip()
-                if part and len(part) > 2:
+                if part and len(part) > 3:
                     cleaned = clean_step(part)
                     if cleaned and len(cleaned) > 1:
                         steps.append(cleaned)
             
-            # Generate flowchart
-            rankdir = 'TB'
-            nodes = []
-            edges = []
+            if not steps:
+                steps = ['Process', 'Complete']
             
-            # Add start node
-            nodes.append('start [label="Start", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]')
-            
-            prev_node = 'start'
+            # Build nodes with sophisticated types
             for i, step in enumerate(steps):
-                node_id = f'step{i+1}'
-                # Detect if it's a decision
-                is_decision = any(word in step.lower() for word in ['if', '?', 'decide', 'choice', 'check', 'approve', 'reject'])
+                node_id = make_node_id(step)
+                step_lower = step.lower()
+                label = step.replace('"', '\\"')
                 
-                if is_decision:
-                    label = step.replace('"', '\\"')[:40]  # Limit label length
-                    nodes.append(f'{node_id} [label="{label}", shape=diamond, style=filled, fillcolor="#fef3c7", color="#f59e0b", fontcolor="#78350f"]')
+                # Determine node type and styling
+                if any(word in step_lower for word in ['submit', 'start', 'begin', 'input', 'request']):
+                    shape = 'ellipse'
+                    style = 'filled'
+                    fillcolor = '#dcfce7'
+                    color = '#16a34a'
+                elif any(word in step_lower for word in ['route', 'decide', 'check', 'validate', 'if', '?']):
+                    shape = 'diamond'
+                    style = 'filled'
+                    fillcolor = '#fef3c7'
+                    color = '#f59e0b'
+                elif any(word in step_lower for word in ['worker', 'parallel', 'process', 'executor']):
+                    shape = 'folder'
+                    style = 'filled'
+                    fillcolor = '#ddd6fe'
+                    color = '#7c3aed'
+                elif any(word in step_lower for word in ['queue', 'enqueue', 'buffer']):
+                    shape = 'cylinder'
+                    style = 'filled'
+                    fillcolor = '#fce7f3'
+                    color = '#db2777'
+                elif any(word in step_lower for word in ['error', 'fail', 'dlq', 'dead-letter']):
+                    shape = 'box'
+                    style = 'filled,rounded'
+                    fillcolor = '#fee2e2'
+                    color = '#dc2626'
+                elif any(word in step_lower for word in ['alert', 'notify', 'webhook']):
+                    shape = 'box'
+                    style = 'filled,rounded'
+                    fillcolor = '#fff7ed'
+                    color = '#ea580c'
+                elif any(word in step_lower for word in ['archive', 'store', 'save', 's3', 'database']):
+                    shape = 'box3d'
+                    style = 'filled'
+                    fillcolor = '#e0e7ff'
+                    color = '#4f46e5'
                 else:
-                    label = step.replace('"', '\\"')[:40]
-                    nodes.append(f'{node_id} [label="{label}", shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0284c7", fontcolor="#0c4a6e"]')
+                    shape = 'box'
+                    style = 'filled,rounded'
+                    fillcolor = '#e0f2fe'
+                    color = '#0284c7'
                 
-                edges.append(f'{prev_node} -> {node_id}')
-                prev_node = node_id
+                nodes.append(f'{node_id} [label="{label}", shape={shape}, style="{style}", fillcolor="{fillcolor}", color="{color}"]')
+                node_map[step] = node_id
             
-            # Add end node
-            nodes.append('end [label="End", shape=oval, style=filled, fillcolor="#dcfce7", color="#16a34a", fontcolor="#14532d"]')
-            edges.append(f'{prev_node} -> end')
+            # Build edges with logic
+            if len(steps) > 1:
+                for i in range(len(steps) - 1):
+                    from_node = node_map[steps[i]]
+                    to_node = node_map[steps[i + 1]]
+                    
+                    # Detect edge labels and styles
+                    step_text = steps[i].lower()
+                    next_text = steps[i + 1].lower()
+                    
+                    edge_label = ''
+                    edge_style = ''
+                    edge_color = '#64748b'
+                    
+                    # Check for branching/routing
+                    if 'route' in step_text or 'decide' in step_text:
+                        if 'fast' in next_text or 'sync' in next_text:
+                            edge_label = 'low-cost'
+                            edge_color = '#16a34a'
+                        elif 'slow' in next_text or 'queue' in next_text:
+                            edge_label = 'heavy'
+                            edge_color = '#ea580c'
+                    
+                    # Check for error paths
+                    if 'error' in next_text or 'fail' in next_text or 'dlq' in next_text:
+                        edge_label = 'error'
+                        edge_color = '#dc2626'
+                    elif 'retry' in next_text:
+                        edge_label = 'retry'
+                        edge_style = ', style=dashed'
+                    elif 'timeout' in next_text:
+                        edge_label = 'timeout'
+                        edge_color = '#ea580c'
+                    elif 'approve' in step_text or 'review' in step_text:
+                        edge_label = 'approved'
+                        edge_color = '#16a34a'
+                    
+                    if edge_label:
+                        edges.append(f'{from_node} -> {to_node} [label="{edge_label}", color="{edge_color}"{edge_style}]')
+                    else:
+                        edges.append(f'{from_node} -> {to_node} [color="{edge_color}"]')
             
-            code = f'''digraph G {{
+            # Generate final code
+            code = f'''digraph ComplexFlow {{
   bgcolor="transparent"
   rankdir={rankdir}
-  node [fontname="Arial", fontsize=12]
-  edge [fontname="Arial", fontsize=10, color="#64748b"]
+  node [fontname="Arial", fontsize=11]
+  edge [fontname="Arial", fontsize=9]
   
   {chr(10).join(f"  {node}" for node in nodes)}
   
