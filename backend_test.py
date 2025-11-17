@@ -222,7 +222,9 @@ def main():
             scenario["description"],
             scenario["diagram_type"], 
             scenario["test_name"],
-            scenario.get("expected_features", [])
+            scenario.get("expected_features", []),
+            scenario.get("expected_length_min", 600),
+            scenario.get("expected_length_max", 10000)
         )
         results.append(result)
     
