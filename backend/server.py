@@ -620,22 +620,29 @@ async def generate_diagram(request: DiagramGenerationRequest):
             code += '\nstop\n@enduml'
         
         elif request.diagram_type == 'blockdiag':
-            # Generate BlockDiag diagram
-            parts = re.split(r'[,;→\n]|->|then', description, flags=re.IGNORECASE)
-            nodes = []
-            for p in parts:
-                p = p.strip()
-                if p and len(p) > 2:
-                    cleaned = clean_step(p).replace('"', '')
-                    if cleaned:
-                        nodes.append(cleaned[:20])
-            nodes = nodes[:8]
-            
-            code = 'blockdiag {\n'
-            for i, node in enumerate(nodes):
-                if i > 0:
-                    code += f'  {nodes[i-1].replace(" ", "_")} -> {node.replace(" ", "_")};\n'
-            code += '}'
+            # Use enhanced BlockDiag generator with colors, groups, and styling
+            try:
+                logger.info(f"Using enhanced BlockDiag generator for description length: {len(description)}")
+                code = generate_blockdiag_diagram(description)
+                logger.info(f"Enhanced BlockDiag generator succeeded, code length: {len(code)}")
+            except Exception as e:
+                logger.error(f"Enhanced BlockDiag generator failed: {str(e)}, using simple fallback")
+                # Simple fallback
+                parts = re.split(r'[,;→\n]|->|then', description, flags=re.IGNORECASE)
+                nodes = []
+                for p in parts:
+                    p = p.strip()
+                    if p and len(p) > 2:
+                        cleaned = clean_step(p).replace('"', '')
+                        if cleaned:
+                            nodes.append(cleaned[:20])
+                nodes = nodes[:8]
+                
+                code = 'blockdiag {\n'
+                for i, node in enumerate(nodes):
+                    if i > 0:
+                        code += f'  {nodes[i-1].replace(" ", "_")} -> {node.replace(" ", "_")};\n'
+                code += '}'
         
         elif request.diagram_type == 'd2':
             # Use enhanced D2 generator with classes, shapes, and conditionals
