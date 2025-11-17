@@ -488,88 +488,90 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 code += '\n'.join(nodes) + '\n' + '\n'.join(edges)
         
         elif request.diagram_type == 'excalidraw':
-            # Generate Excalidraw JSON format
-            import json
-            
-            # Extract steps
-            parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
-            steps = []
-            for p in parts:
-                p = p.strip()
-                if p and len(p) > 2:
-                    cleaned = clean_step(p)
-                    if cleaned:
-                        steps.append(cleaned.replace('"', '')[:30])
-            steps = steps[:6]
-            
-            # Build Excalidraw elements
-            elements = []
-            y_pos = 100
-            
-            for i, step in enumerate(steps):
-                # Add rectangle element
-                element_id = f"element-{i}"
-                elements.append({
-                    "id": element_id,
-                    "type": "rectangle",
-                    "x": 100,
-                    "y": y_pos,
-                    "width": 200,
-                    "height": 60,
-                    "strokeColor": "#0284c7",
-                    "backgroundColor": "#e0f2fe",
-                    "fillStyle": "hachure",
-                    "strokeWidth": 2,
-                    "roughness": 1,
-                    "opacity": 100
-                })
+            # Use enhanced Excalidraw generator with better layout and styling
+            try:
+                logger.info(f"Using enhanced Excalidraw generator for description length: {len(description)}")
+                code = generate_excalidraw_diagram(description)
+                logger.info(f"Enhanced Excalidraw generator succeeded, code length: {len(code)}")
+                return DiagramGenerationResponse(code=code, kroki_type=kroki_type)
+            except Exception as e:
+                logger.error(f"Enhanced Excalidraw generator failed: {str(e)}, using simple fallback")
+                # Simple fallback
+                import json
                 
-                # Add text element
-                elements.append({
-                    "id": f"text-{i}",
-                    "type": "text",
-                    "x": 110,
-                    "y": y_pos + 20,
-                    "width": 180,
-                    "height": 20,
-                    "text": step,
-                    "fontSize": 16,
-                    "fontFamily": 1,
-                    "textAlign": "center",
-                    "verticalAlign": "middle"
-                })
+                parts = re.split(r'[,;.\n]|then|next|after', description, flags=re.IGNORECASE)
+                steps = []
+                for p in parts:
+                    p = p.strip()
+                    if p and len(p) > 2:
+                        cleaned = clean_step(p)
+                        if cleaned:
+                            steps.append(cleaned.replace('"', '')[:30])
+                steps = steps[:6]
                 
-                # Add arrow to next element
-                if i < len(steps) - 1:
+                elements = []
+                y_pos = 100
+                
+                for i, step in enumerate(steps):
+                    element_id = f"element-{i}"
                     elements.append({
-                        "id": f"arrow-{i}",
-                        "type": "arrow",
-                        "x": 200,
-                        "y": y_pos + 60,
-                        "width": 0,
-                        "height": 40,
-                        "points": [[0, 0], [0, 40]],
-                        "strokeColor": "#64748b",
-                        "backgroundColor": "transparent",
+                        "id": element_id,
+                        "type": "rectangle",
+                        "x": 100,
+                        "y": y_pos,
+                        "width": 200,
+                        "height": 60,
+                        "strokeColor": "#0284c7",
+                        "backgroundColor": "#e0f2fe",
                         "fillStyle": "solid",
                         "strokeWidth": 2,
-                        "roughness": 1
+                        "roughness": 1,
+                        "opacity": 100
                     })
+                    
+                    elements.append({
+                        "id": f"text-{i}",
+                        "type": "text",
+                        "x": 110,
+                        "y": y_pos + 20,
+                        "width": 180,
+                        "height": 20,
+                        "text": step,
+                        "fontSize": 16,
+                        "fontFamily": 1,
+                        "textAlign": "center",
+                        "verticalAlign": "middle"
+                    })
+                    
+                    if i < len(steps) - 1:
+                        elements.append({
+                            "id": f"arrow-{i}",
+                            "type": "arrow",
+                            "x": 200,
+                            "y": y_pos + 60,
+                            "width": 0,
+                            "height": 40,
+                            "points": [[0, 0], [0, 40]],
+                            "strokeColor": "#64748b",
+                            "backgroundColor": "transparent",
+                            "fillStyle": "solid",
+                            "strokeWidth": 2,
+                            "roughness": 1
+                        })
+                    
+                    y_pos += 120
                 
-                y_pos += 120
-            
-            # Create Excalidraw JSON
-            excalidraw_data = {
-                "type": "excalidraw",
-                "version": 2,
-                "source": "diagram-maker",
-                "elements": elements,
-                "appState": {
-                    "viewBackgroundColor": "#ffffff"
+                excalidraw_data = {
+                    "type": "excalidraw",
+                    "version": 2,
+                    "source": "diagram-maker",
+                    "elements": elements,
+                    "appState": {
+                        "viewBackgroundColor": "#ffffff"
+                    }
                 }
-            }
-            
-            code = json.dumps(excalidraw_data)
+                
+                code = json.dumps(excalidraw_data)
         
         elif request.diagram_type == 'plantuml':
             # Use enhanced PlantUML generator with partitions and advanced styling
