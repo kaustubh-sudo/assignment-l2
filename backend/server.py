@@ -126,7 +126,7 @@ async def generate_diagram(request: DiagramGenerationRequest):
             return result if result else text  # Fallback to original if nothing left
         
         if request.diagram_type == 'graphviz':
-            # Generate sophisticated GraphViz diagram with complex flows
+            # Generate sophisticated GraphViz diagram with proper branching logic
             desc_lower = description.lower()
             
             # Detect layout preference
@@ -147,58 +147,69 @@ async def generate_diagram(request: DiagramGenerationRequest):
                 words = text.split()[:2]
                 base = ''.join(w.capitalize() for w in words if w.lower() not in FILLER_WORDS)
                 # Remove invalid characters for GraphViz IDs
-                base = base.replace(':', '').replace('-', '').replace('.', '').replace(',', '')
+                base = base.replace(':', '').replace('-', '').replace('.', '').replace(',', '').replace('(', '').replace(')', '')
                 if not base or len(base) < 2:
                     base = f'Node{node_counter}'
                 node_counter += 1
                 return base
             
-            # Extract all steps/entities more intelligently
-            # Split by multiple delimiters
-            parts = re.split(r'[,;]|\bthen\b|\bnext\b|\bafter\b|\bfinally\b|\band then\b', description, flags=re.IGNORECASE)
+            # Parse description into logical segments
+            # Look for conditional patterns (if/else, either/or)
+            conditional_pattern = r'\b(if|when|either)\b.*?\b(else|otherwise|or)\b.*?(?=[,;.]|$)'
+            conditionals = list(re.finditer(conditional_pattern, description, re.IGNORECASE | re.DOTALL))
             
+            # Extract all steps including conditional branches
             steps = []
+            conditions = []
+            
+            if conditionals:
+                # Handle conditional logic
+                for match in conditionals:
+                    full_text = match.group(0)
+                    
+                    # Split on else/or/otherwise
+                    if_part = re.split(r'\b(else|otherwise|or)\b', full_text, maxsplit=1, flags=re.IGNORECASE)
+                    
+                    # Extract condition
+                    condition_text = if_part[0].strip()
+                    condition_text = re.sub(r'^(if|when|either)\s+', '', condition_text, flags=re.IGNORECASE)
+                    condition_text = clean_step(condition_text)
+                    
+                    if len(if_part) >= 3:
+                        # Extract yes and no branches
+                        yes_branch = if_part[0]
+                        yes_branch = re.sub(r'^(if|when|either)\s+', '', yes_branch, flags=re.IGNORECASE)
+                        # Extract what happens in yes case
+                        yes_actions = re.findall(r'\b(show|display|go to|proceed to|execute|perform)\s+(\w+(?:\s+\w+){0,2})', yes_branch, re.IGNORECASE)
+                        
+                        no_branch = if_part[2]
+                        no_actions = re.findall(r'\b(show|display|go to|proceed to|execute|perform)\s+(\w+(?:\s+\w+){0,2})', no_branch, re.IGNORECASE)
+                        
+                        conditions.append({
+                            'condition': condition_text,
+                            'yes': [clean_step(action[1]) for action in yes_actions] if yes_actions else [clean_step(yes_branch)],
+                            'no': [clean_step(action[1]) for action in no_actions] if no_actions else [clean_step(no_branch)]
+                        })
+            
+            # Extract regular steps (not part of conditionals)
+            # Split by delimiters
+            parts = re.split(r'[,;]|\bthen\b|\bnext\b|\bafter\b', description, flags=re.IGNORECASE)
+            
             for part in parts:
                 part = part.strip()
-                # Further split long sentences by "which" or relative clauses
-                sub_parts = re.split(r'\bwhich\b|\bthat\b', part, maxsplit=1, flags=re.IGNORECASE)
+                # Skip if this part is inside a conditional we already processed
+                is_conditional_part = False
+                for cond_match in conditionals:
+                    if part in cond_match.group(0):
+                        is_conditional_part = True
+                        break
                 
-                for sub in sub_parts:
-                    sub = sub.strip()
-                    if sub and len(sub) > 3:
-                        # Extract key phrases (subject + verb + object pattern)
-                        # Look for action verbs
-                        words = sub.split()
-                        if len(words) > 10:
-                            # For long text, try to extract key phrases
-                            # Look for verb patterns
-                            verb_idx = -1
-                            for i, word in enumerate(words):
-                                if word.lower() in ['submit', 'submits', 'validate', 'validates', 'enrich', 'enriched', 
-                                                     'route', 'routed', 'routes', 'perform', 'performs', 'enqueue', 'enqueues',
-                                                     'trigger', 'triggers', 'retry', 'retries', 'require', 'requires',
-                                                     'check', 'checks', 'record', 'records', 'notify', 'notifies',
-                                                     'send', 'sends', 'raise', 'raises', 'archive', 'archives']:
-                                    verb_idx = i
-                                    break
-                            
-                            if verb_idx >= 0:
-                                # Extract phrase around verb
-                                start = max(0, verb_idx - 2)
-                                end = min(len(words), verb_idx + 5)
-                                phrase = ' '.join(words[start:end])
-                                cleaned = clean_step(phrase)
-                                if cleaned and len(cleaned) > 1:
-                                    steps.append(cleaned)
-                            else:
-                                # Take first meaningful chunk
-                                cleaned = clean_step(' '.join(words[:6]))
-                                if cleaned and len(cleaned) > 1:
-                                    steps.append(cleaned)
-                        else:
-                            cleaned = clean_step(sub)
-                            if cleaned and len(cleaned) > 1:
-                                steps.append(cleaned)
+                if not is_conditional_part and part and len(part) > 3:
+                    cleaned = clean_step(part)
+                    if cleaned and len(cleaned) > 1:
+                        # Don't add if it's just a fragment
+                        if not any(cleaned.lower().startswith(frag) for frag in ['if', 'else', 'when', 'or']):
+                            steps.append({'type': 'step', 'text': cleaned})
             
             if not steps:
                 steps = ['Process', 'Complete']
