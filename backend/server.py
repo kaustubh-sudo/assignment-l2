@@ -11,7 +11,13 @@ import uuid
 from datetime import datetime, timezone
 from openai import OpenAI
 from diagram_generator import generate_graphviz_advanced
-from diagram_generators_enhanced import generate_d2_diagram, generate_blockdiag_diagram, generate_graphviz_enhanced
+from diagram_generators_enhanced import (
+    generate_d2_diagram, 
+    generate_blockdiag_diagram, 
+    generate_graphviz_enhanced,
+    generate_mermaid_diagram,
+    generate_plantuml_diagram
+)
 
 # Configure logging early
 logging.basicConfig(
