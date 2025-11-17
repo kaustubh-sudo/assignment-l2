@@ -137,6 +137,18 @@ backend:
       - working: true
         agent: "main"
         comment: "✅ E2E VERIFIED: Frontend successfully renders complex GraphViz diagram. Tested with workflow 'A user submits a request, system validates it, if valid route to fast processing else send to slow queue with retry'. Diagram displays correctly with proper nodes, edges, and conditional branching. No 'Response body is already used' errors. Zoom controls and Export button working."
+  
+  - task: "Enhance D2, BlockDiag, and GraphViz Generators"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/diagram_generators_enhanced.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created enhanced generators with advanced features: D2 now uses classes, shapes (oval/diamond/rectangle/cylinder), styling with colors and borders, and conditional branching. BlockDiag uses colors, groups, node attributes (shape/color/textcolor), and proper connections. GraphViz enhanced parser captures all workflow elements with typed nodes (start/end/decision/error/database/process) and proper styling. All tested working with Kroki (200 OK)."
 
 
 frontend:
