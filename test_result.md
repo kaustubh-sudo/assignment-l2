@@ -101,3 +101,183 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Test the Kroki Diagram Renderer application comprehensively - A diagram-as-code visualization tool that renders diagrams using the Kroki API with split-screen interface, theme toggle, multiple diagram types, and both POST/GET methods"
+
+frontend:
+  - task: "Initial Load & UI Elements"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Header.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to verify header with logo 'Kroki Renderer', 'Powered by Kroki' link, theme toggle button, Editor Panel, Preview Panel, Options & Configuration panel, and default GraphViz code"
+
+  - task: "Theme Toggle Functionality"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/ThemeToggle.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test theme toggle button functionality - dark/light mode switching"
+
+  - task: "Diagram Type Selection"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/EditorPanel.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test diagram type dropdown with multiple options (GraphViz, PlantUML, Mermaid, etc.)"
+
+  - task: "Output Format Selection"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/EditorPanel.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test output format dropdown with SVG, PNG, PDF, JPEG options"
+
+  - task: "Editor Functionality"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/EditorPanel.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test code editor textarea functionality - clearing, typing, monospace font, dark background"
+
+  - task: "POST Method Rendering"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DiagramRenderer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test POST method rendering - loading state, success toast, diagram rendering in preview panel"
+
+  - task: "GET Method Toggle"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DiagramRenderer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test GET method tab selection and encoded URL generation"
+
+  - task: "Options Panel - Add/Remove Options"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/OptionsPanel.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test adding key-value options, displaying as badges, and removing options"
+
+  - task: "Copy Encoded URL"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/OptionsPanel.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test copy URL functionality with checkmark state and success toast"
+
+  - task: "Clear Diagram"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DiagramRenderer.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test clear/refresh button functionality"
+
+  - task: "Error Handling"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DiagramRenderer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test error handling with invalid diagram syntax"
+
+  - task: "Different Diagram Types"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DiagramRenderer.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test rendering with different diagram types like Mermaid"
+
+  - task: "Responsive Behavior"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DiagramRenderer.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test split-screen layout, scrolling behavior, and custom scrollbar styling"
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+
+test_plan:
+  current_focus:
+    - "Initial Load & UI Elements"
+    - "Theme Toggle Functionality"
+    - "POST Method Rendering"
+    - "GET Method Toggle"
+    - "Options Panel - Add/Remove Options"
+    - "Error Handling"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "Starting comprehensive testing of Kroki Diagram Renderer application. Will test all UI elements, functionality, and integration with Kroki API using Playwright automation."
