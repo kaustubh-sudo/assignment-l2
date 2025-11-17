@@ -8,6 +8,7 @@ import requests
 import json
 import sys
 import os
+import base64
 from typing import Dict, Any
 
 # Get backend URL from frontend .env file
