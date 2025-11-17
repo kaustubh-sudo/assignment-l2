@@ -36,12 +36,13 @@ const DiagramRenderer = () => {
         }),
       });
 
+      // Read response body only once
+      const data = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `Failed to generate diagram code: ${response.status}`);
+        throw new Error(data.detail || `Failed to generate diagram code: ${response.status}`);
       }
 
-      const data = await response.json();
       return data.code;
     } catch (error) {
       console.error('Error generating diagram code:', error);
