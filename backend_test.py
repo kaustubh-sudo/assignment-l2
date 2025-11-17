@@ -70,23 +70,28 @@ def test_api_endpoint(description: str, diagram_type: str, test_name: str, expec
                 result["generated_code"] = generated_code
                 result["is_sophisticated"] = len(generated_code) >= 600  # Critical check
                 
-                # Feature analysis
+                # Feature analysis for final 4 diagram types
                 feature_checks = {}
-                if diagram_type == "d2":
-                    feature_checks["has_classes"] = "classes:" in generated_code
-                    feature_checks["has_shapes"] = any(shape in generated_code for shape in ["oval", "diamond", "rectangle", "cylinder"])
-                    feature_checks["has_styling"] = "style:" in generated_code and "fill:" in generated_code
-                    feature_checks["has_conditionals"] = "Yes" in generated_code and "No" in generated_code
-                elif diagram_type == "blockdiag":
-                    feature_checks["has_colors"] = "color =" in generated_code
-                    feature_checks["has_node_attributes"] = "textcolor" in generated_code
-                    feature_checks["has_shapes"] = "roundedbox" in generated_code or "diamond" in generated_code
-                    feature_checks["has_conditionals"] = "Yes" in generated_code and "No" in generated_code
-                elif diagram_type == "graphviz":
+                if diagram_type == "graphviz":
                     feature_checks["has_typed_nodes"] = any(shape in generated_code for shape in ["ellipse", "diamond", "box", "cylinder"])
                     feature_checks["has_colors"] = "fillcolor=" in generated_code and "color=" in generated_code
                     feature_checks["has_conditionals"] = "Yes" in generated_code and "No" in generated_code
                     feature_checks["has_styling"] = "style=" in generated_code
+                elif diagram_type == "mermaid":
+                    feature_checks["has_flowchart"] = "flowchart" in generated_code
+                    feature_checks["has_styled_nodes"] = any(style in generated_code for style in ["[", "(", "{", "((", "{{"])
+                    feature_checks["has_conditionals"] = ("Yes" in generated_code and "No" in generated_code) or ("|Yes|" in generated_code and "|No|" in generated_code)
+                    feature_checks["has_arrows"] = "-->" in generated_code
+                elif diagram_type == "plantuml":
+                    feature_checks["has_activity_diagram"] = "@startuml" in generated_code and "@enduml" in generated_code
+                    feature_checks["has_skinparam"] = "skinparam" in generated_code
+                    feature_checks["has_conditionals"] = "if (" in generated_code and "then" in generated_code and "else" in generated_code
+                    feature_checks["has_partitions"] = "partition" in generated_code or ":" in generated_code
+                elif diagram_type == "excalidraw":
+                    feature_checks["has_json_format"] = generated_code.startswith("{") and generated_code.endswith("}")
+                    feature_checks["has_rectangles"] = '"type": "rectangle"' in generated_code
+                    feature_checks["has_arrows"] = '"type": "arrow"' in generated_code
+                    feature_checks["has_elements"] = '"elements":' in generated_code
                 
                 result["feature_checks"] = feature_checks
                 result["features_passed"] = sum(feature_checks.values())
