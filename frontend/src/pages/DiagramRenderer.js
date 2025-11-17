@@ -115,6 +115,11 @@ const DiagramRenderer = () => {
       return;
     }
 
+    if (!generatedCode) {
+      toast.error('No diagram code available to export');
+      return;
+    }
+
     try {
       if (format === 'svg') {
         // Export as SVG
@@ -122,7 +127,7 @@ const DiagramRenderer = () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `diagram-${Date.now()}.svg`;
+        a.download = `${diagramType}-diagram-${Date.now()}.svg`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -132,6 +137,9 @@ const DiagramRenderer = () => {
         // Render as PNG using Kroki
         const krokiType = getKrokiType(diagramType);
         const krokiUrl = `https://kroki.io/${krokiType}/png`;
+        
+        console.log('Exporting PNG:', { krokiType, codeLength: generatedCode.length });
+        
         const response = await fetch(krokiUrl, {
           method: 'POST',
           headers: {
@@ -141,14 +149,16 @@ const DiagramRenderer = () => {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to export as PNG');
+          const errorText = await response.text();
+          console.error('Kroki PNG error:', errorText);
+          throw new Error(`Failed to export as PNG: ${response.status}`);
         }
 
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `diagram-${Date.now()}.png`;
+        a.download = `${diagramType}-diagram-${Date.now()}.png`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -156,7 +166,7 @@ const DiagramRenderer = () => {
         toast.success('Diagram exported as PNG!');
       }
     } catch (err) {
-      toast.error('Failed to export diagram');
+      toast.error(`Failed to export diagram: ${err.message}`);
       console.error('Export error:', err);
     }
   };
