@@ -417,7 +417,7 @@ const DiagramRenderer = () => {
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            <p className="text-muted-foreground">Loading diagram...</p>
+            <p className="text-slate-500">Loading diagram...</p>
           </div>
         </div>
       </div>
@@ -425,28 +425,28 @@ const DiagramRenderer = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-muted/30">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <Header />
       
       {/* Editing Banner */}
       {savedDiagram && (
-        <div className="bg-blue-500/10 border-b border-blue-500/20 px-4 py-2">
+        <div className="bg-blue-50 border-b border-blue-200 px-3 sm:px-4 py-2">
           <div className="max-w-[1800px] mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-blue-400 font-medium">Editing:</span>
-              <span className="text-white">{savedDiagram.title}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-blue-600 font-medium text-sm sm:text-base">Editing:</span>
+              <span className="text-slate-800 truncate text-sm sm:text-base">{savedDiagram.title}</span>
             </div>
             <button
               onClick={() => navigate('/')}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-sm text-slate-500 hover:text-blue-600 transition-colors whitespace-nowrap ml-2"
             >
-              ← Back to My Diagrams
+              ← Back
             </button>
           </div>
         </div>
       )}
       
-      <div className="flex-1 flex flex-col lg:flex-row gap-4 md:gap-5 lg:gap-6 p-4 md:p-5 lg:p-6 max-w-[1800px] w-full mx-auto overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-6 p-3 sm:p-4 lg:p-6 max-w-[1800px] w-full mx-auto overflow-hidden">
         {/* Left Side - Input */}
         <div className="flex-none lg:flex-1 lg:min-h-0 lg:max-w-[50%]">
           <InputPanel
