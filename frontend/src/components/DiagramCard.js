@@ -1,5 +1,6 @@
 import React from 'react';
-import { Trash2, Edit, Calendar, FileType } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Trash2, Edit, Calendar, ExternalLink } from 'lucide-react';
 import { Button } from './ui/button';
 
 const DIAGRAM_TYPE_LABELS = {
@@ -11,7 +12,9 @@ const DIAGRAM_TYPE_LABELS = {
   pikchr: { label: 'Pikchr', emoji: '✏️', color: 'bg-pink-500/20 text-pink-400' },
 };
 
-const DiagramCard = ({ diagram, onEdit, onDelete }) => {
+const DiagramCard = ({ diagram, onDelete }) => {
+  const navigate = useNavigate();
+  
   const typeInfo = DIAGRAM_TYPE_LABELS[diagram.diagram_type] || {
     label: diagram.diagram_type,
     emoji: '📄',
@@ -27,13 +30,32 @@ const DiagramCard = ({ diagram, onEdit, onDelete }) => {
     });
   };
 
+  // Navigate to /diagrams/{id} to edit
+  const handleCardClick = () => {
+    navigate(`/diagrams/${diagram.id}`);
+  };
+
+  const handleEditClick = (e) => {
+    e.stopPropagation(); // Prevent card click
+    navigate(`/diagrams/${diagram.id}`);
+  };
+
+  const handleDeleteClick = (e) => {
+    e.stopPropagation(); // Prevent card click
+    onDelete(diagram);
+  };
+
   return (
-    <div className="group bg-gray-800/50 border border-gray-700 rounded-xl p-5 hover:border-gray-600 hover:bg-gray-800/80 transition-all duration-200">
+    <div 
+      onClick={handleCardClick}
+      className="group bg-gray-800/50 border border-gray-700 rounded-xl p-5 hover:border-blue-500/50 hover:bg-gray-800/80 transition-all duration-200 cursor-pointer"
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-white truncate group-hover:text-blue-400 transition-colors">
+          <h3 className="text-lg font-semibold text-white truncate group-hover:text-blue-400 transition-colors flex items-center gap-2">
             {diagram.title}
+            <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
           </h3>
           {diagram.description && (
             <p className="text-sm text-gray-400 mt-1 line-clamp-2">
@@ -58,7 +80,7 @@ const DiagramCard = ({ diagram, onEdit, onDelete }) => {
       {/* Actions */}
       <div className="flex items-center gap-2 pt-3 border-t border-gray-700/50">
         <Button
-          onClick={() => onEdit(diagram)}
+          onClick={handleEditClick}
           variant="ghost"
           size="sm"
           className="flex-1 h-9 text-gray-300 hover:text-white hover:bg-blue-500/20"
@@ -67,7 +89,7 @@ const DiagramCard = ({ diagram, onEdit, onDelete }) => {
           Edit
         </Button>
         <Button
-          onClick={() => onDelete(diagram)}
+          onClick={handleDeleteClick}
           variant="ghost"
           size="sm"
           className="h-9 px-3 text-gray-400 hover:text-red-400 hover:bg-red-500/20"
