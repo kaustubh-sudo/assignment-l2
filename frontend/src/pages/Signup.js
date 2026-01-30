@@ -32,11 +32,10 @@ const Signup = () => {
     setLoading(true);
     try {
       await signup(email, password);
-      toast.success('Account created successfully!');
+      toast.success('Account created successfully! Please sign in.');
       
-      // Auto login after signup
-      await login(email, password);
-      navigate('/', { replace: true });
+      // Redirect to login page after successful signup
+      navigate('/login', { replace: true });
     } catch (error) {
       toast.error(error.message || 'Signup failed');
     } finally {
