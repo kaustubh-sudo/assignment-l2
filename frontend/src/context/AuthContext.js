@@ -51,27 +51,37 @@ export const AuthProvider = ({ children }) => {
   }, [token, BACKEND_URL]);
 
   const login = async (email, password) => {
-    const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
-    });
-
-    // Store response status before reading body (body can only be read once)
-    const responseOk = response.ok;
-    const responseStatus = response.status;
-    
-    let data;
+    let response;
     try {
-      data = await response.json();
-    } catch (parseError) {
-      throw new Error(`Login failed (status ${responseStatus})`);
+      response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+    } catch (networkError) {
+      throw new Error('Network error. Please check your connection.');
+    }
+
+    // Get response text first (more reliable than json() for error handling)
+    let responseText;
+    try {
+      responseText = await response.text();
+    } catch (readError) {
+      throw new Error('Failed to read server response');
     }
     
-    if (!responseOk) {
-      throw new Error(data.detail || 'Login failed');
+    // Parse the JSON from text
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      throw new Error(`Login failed (status ${response.status})`);
+    }
+    
+    if (!response.ok) {
+      throw new Error(data.detail || 'Invalid credentials');
     }
 
     localStorage.setItem('token', data.access_token);
