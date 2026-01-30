@@ -434,35 +434,25 @@ async def create_diagram(
         "difficulty": "Easy",
         "points": 5,
         "time_estimate": "1 min",
-        "original": '''    // Filter by search query
-    if (debouncedSearchQuery.trim()) {
-      const query = debouncedSearchQuery.toLowerCase().trim();
+        "original": '''      const query = debouncedSearchQuery.toLowerCase().trim();
       result = result.filter(diagram => 
         diagram.title.toLowerCase().includes(query) ||
         (diagram.description && diagram.description.toLowerCase().includes(query))
-      );
-    }''',
-        "buggy": '''    // Filter by search query (BUG: case-sensitive)
-    if (debouncedSearchQuery.trim()) {
-      const query = debouncedSearchQuery.trim();
+      );''',
+        "buggy": '''      const query = debouncedSearchQuery.trim();  // BUG: case-sensitive
       result = result.filter(diagram => 
         diagram.title.includes(query) ||
         (diagram.description && diagram.description.includes(query))
-      );
-    }''',
+      );''',
     },
     "SEARCH-002": {
         "file": "/app/frontend/src/pages/DiagramsList.js",
-        "description": "Search doesn't filter by folder - shows all matching diagrams ignoring folder selection",
+        "description": "Search ignores folder filter - shows results from all folders",
         "category": "Search",
         "difficulty": "Medium",
         "points": 10,
         "time_estimate": "2 min",
-        "original": '''  // Filter diagrams based on search query and selected folder
-  const filteredDiagrams = useMemo(() => {
-    let result = diagrams;
-    
-    // Filter by folder
+        "original": '''    // Filter by folder
     if (selectedFolderId === 'none') {
       result = result.filter(d => !d.folder_id);
     } else if (selectedFolderId) {
@@ -471,13 +461,8 @@ async def create_diagram(
     
     // Filter by search query
     if (debouncedSearchQuery.trim()) {''',
-        "buggy": '''  // Filter diagrams based on search query and selected folder
-  const filteredDiagrams = useMemo(() => {
-    let result = diagrams;
-    
-    // BUG: Folder filter disabled when searching - shows all matching diagrams
+        "buggy": '''    // BUG: Only apply folder filter when not searching
     if (!debouncedSearchQuery.trim()) {
-      // Filter by folder only when not searching
       if (selectedFolderId === 'none') {
         result = result.filter(d => !d.folder_id);
       } else if (selectedFolderId) {
@@ -490,7 +475,7 @@ async def create_diagram(
     },
     "SEARCH-003": {
         "file": "/app/frontend/src/pages/DiagramsList.js",
-        "description": "Search results don't clear when input cleared - stale results shown",
+        "description": "Clear search button doesn't work - search state not cleared",
         "category": "Search",
         "difficulty": "Medium",
         "points": 10,
@@ -499,15 +484,14 @@ async def create_diagram(
   const handleClearSearch = () => {
     setSearchQuery('');
   };''',
-        "buggy": '''  // Clear search - BUG: doesn't actually clear the search state
+        "buggy": '''  // Clear search - BUG: doesn't actually clear
   const handleClearSearch = () => {
-    // setSearchQuery('');  // This line is missing
-    console.log('Clear search clicked');
+    console.log('Clear search clicked');  // Missing setSearchQuery('')
   };''',
     },
     "SEARCH-004": {
         "file": "/app/frontend/src/pages/DiagramsList.js",
-        "description": "Search input doesn't debounce - causes excessive filtering on every keystroke",
+        "description": "Search input doesn't debounce - causes lag on every keystroke",
         "category": "Search",
         "difficulty": "Easy",
         "points": 5,
@@ -515,7 +499,7 @@ async def create_diagram(
         "original": '''  // Search state
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);''',
-        "buggy": '''  // Search state - BUG: not using debounce, causes lag
+        "buggy": '''  // Search state - BUG: not using debounce
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = searchQuery;  // Should use useDebounce''',
     },
