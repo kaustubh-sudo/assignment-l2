@@ -67,10 +67,12 @@ diagrams: { id, user_id, title, description, diagram_type, diagram_code, created
 
 ## Known Issues
 
-### P1: Login Error Toast
-- **Status**: Code fix applied, needs cache verification
-- **Issue**: Technical error shown instead of "Invalid email or password"
-- **File**: `/app/frontend/src/context/AuthContext.js`
+### ~~P1: Login Error Toast~~ ✅ FIXED (Jan 30, 2026)
+- **Status**: RESOLVED
+- **Issue**: Technical error was shown instead of "Invalid email or password"
+- **Root Cause**: React StrictMode causing double renders which consumed the response body twice
+- **Fix**: Updated `AuthContext.js` to read response as text first, added fallback in `Login.js`
+- **Files Changed**: `/app/frontend/src/context/AuthContext.js`, `/app/frontend/src/pages/Login.js`
 
 ### P2: Test Coverage
 - **Status**: Not started
