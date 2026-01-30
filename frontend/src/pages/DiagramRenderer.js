@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import InputPanel from '../components/InputPanel';
 import PreviewPanel from '../components/PreviewPanel';
@@ -8,6 +9,12 @@ import { toast } from 'sonner';
 
 const DiagramRenderer = () => {
   const { token } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Check if editing existing diagram
+  const editingDiagram = location.state?.diagram;
+  
   const [userInput, setUserInput] = useState(
     "A user presses a button. The system checks if the user is logged in. If the user is logged in, it shows the dashboard. If the user is not logged in, it shows the login page."
   );
@@ -28,6 +35,45 @@ const DiagramRenderer = () => {
   const renderingRef = React.useRef(false);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
+  // Load diagram data when editing
+  useEffect(() => {
+    if (editingDiagram) {
+      // Fetch full diagram data including code
+      const fetchDiagram = async () => {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/diagrams/${editingDiagram.id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setDiagramType(data.diagram_type);
+            setGeneratedCode(data.diagram_code);
+            setSavedDiagram({
+              id: data.id,
+              title: data.title,
+              description: data.description,
+              updated_at: data.updated_at
+            });
+            
+            // Render the diagram
+            if (data.diagram_code) {
+              renderDiagramWithKroki(data.diagram_code, data.diagram_type);
+            }
+            
+            toast.info(`Editing: ${data.title}`);
+          }
+        } catch (err) {
+          toast.error('Failed to load diagram');
+        }
+      };
+      
+      fetchDiagram();
+    }
+  }, [editingDiagram, token]);
 
   // Kroki type is now directly the diagram type selected by user
   const getKrokiType = (type) => {
