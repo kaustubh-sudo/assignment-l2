@@ -24,7 +24,8 @@ Build an enhanced Kroki diagram renderer application with user authentication an
 | US-6 | Update Diagram - Users can update existing diagrams | ✅ DONE |
 | US-7 | List Diagrams - Users can view their saved diagrams sorted by date | ✅ DONE |
 | US-8 | Delete Diagram - Users can delete diagrams with confirmation | ✅ DONE |
-| US-9 | Load for Editing - Users can click saved diagram to open in editor | ✅ DONE (Jan 30, 2026) |
+| US-9 | Load for Editing - Users can click saved diagram to open in editor | ✅ DONE |
+| US-10 | Export Diagram - Users can export diagrams as PNG/SVG | ✅ DONE (Jan 30, 2026) |
 
 ### 3. Testing
 | ID | Requirement | Status |
