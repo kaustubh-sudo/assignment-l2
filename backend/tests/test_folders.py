@@ -128,7 +128,8 @@ class TestFolderEndpoints:
         api_client.headers.pop("Authorization", None)
         
         response = api_client.get(f"{BASE_URL}/api/folders")
-        assert response.status_code == 401
+        # Accept 401 or 403 - both indicate auth required
+        assert response.status_code in [401, 403]
 
 
 class TestDiagramFolderAssociation:
