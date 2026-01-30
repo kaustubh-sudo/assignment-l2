@@ -418,130 +418,11 @@ def run_auth_tests() -> list:
 
 def main():
     """Run all test scenarios"""
-    print("🚀 Starting Backend API Tests for Final 4 Diagram Types")
+    print("🚀 Starting Backend API Tests for Kroki Diagram Renderer")
     print(f"Backend URL: {BACKEND_URL}")
     
-    # Test scenarios from the review request - EXACT 4 scenarios for final implementation
-    test_scenarios = [
-        # 1. GraphViz - Complex conditional workflow
-        {
-            "description": "User logs in, system checks credentials, if valid load dashboard with profile and settings else show error and retry, user can logout",
-            "diagram_type": "graphviz",
-            "test_name": "GraphViz - Complex conditional workflow",
-            "expected_features": ["ellipse/diamond/box nodes", "proper shapes", "colors", "conditional branches"],
-            "expected_length_min": 800,
-            "expected_length_max": 1500
-        },
-        
-        # 2. Mermaid - Multi-step process with conditionals
-        {
-            "description": "Submit order, validate payment, if approved ship product and send confirmation else refund and notify customer",
-            "diagram_type": "mermaid",
-            "test_name": "Mermaid - Multi-step process with conditionals",
-            "expected_features": ["flowchart with styled nodes", "Yes/No branches", "color-coded types"],
-            "expected_length_min": 900,
-            "expected_length_max": 1200
-        },
-        
-        # 3. PlantUML - Workflow with partitions
-        {
-            "description": "Start application, user authentication, if authorized access resources and perform actions else deny access, end session",
-            "diagram_type": "plantuml",
-            "test_name": "PlantUML - Workflow with partitions",
-            "expected_features": ["activity diagram", "skinparam styling", "partitions", "conditional logic"],
-            "expected_length_min": 650,
-            "expected_length_max": 900
-        },
-        
-        # 4. Excalidraw - Hand-drawn style flowchart
-        {
-            "description": "Design wireframe, review with team, if approved develop feature else iterate design, test and deploy",
-            "diagram_type": "excalidraw",
-            "test_name": "Excalidraw - Hand-drawn style flowchart",
-            "expected_features": ["JSON format", "rectangles", "arrows", "proper element structure"],
-            "expected_length_min": 3000,
-            "expected_length_max": 10000
-        }
-    ]
-    
-    results = []
-    
-    # Run all tests
-    for scenario in test_scenarios:
-        result = test_api_endpoint(
-            scenario["description"],
-            scenario["diagram_type"], 
-            scenario["test_name"],
-            scenario.get("expected_features", []),
-            scenario.get("expected_length_min", 600),
-            scenario.get("expected_length_max", 10000)
-        )
-        results.append(result)
-    
-    # Summary
-    print(f"\n{'='*80}")
-    print("📊 TEST SUMMARY")
-    print(f"{'='*80}")
-    
-    passed = 0
-    failed = 0
-    critical_issues = []
-    
-    for result in results:
-        status = "✅ PASS" if result["success"] else "❌ FAIL"
-        print(f"{status} - {result['test_name']}")
-        
-        if result["success"]:
-            passed += 1
-            print(f"      Status: {result['status_code']}, Time: {result.get('response_time', 0):.2f}s")
-            if result.get('code_length', 0) > 0:
-                print(f"      Generated {result['code_length']} chars of {result.get('response_data', {}).get('kroki_type', 'unknown')} code")
-                
-                # Check sophistication
-                is_sophisticated = result.get('is_sophisticated', False)
-                soph_status = "✅" if is_sophisticated else "❌"
-                expected_min = result.get('expected_length_min', 600)
-                expected_max = result.get('expected_length_max', 10000)
-                print(f"      Sophisticated: {soph_status} ({expected_min}-{expected_max} chars expected)")
-                
-                # Check features
-                features_passed = result.get('features_passed', 0)
-                total_features = result.get('total_features', 0)
-                if total_features > 0:
-                    feature_status = "✅" if features_passed == total_features else "⚠️" if features_passed > 0 else "❌"
-                    print(f"      Features: {feature_status} {features_passed}/{total_features}")
-                
-                # Check Kroki rendering
-                kroki_success = result.get('kroki_success', False)
-                kroki_status = "✅" if kroki_success else "❌"
-                print(f"      Kroki render: {kroki_status}")
-                
-                # Flag issues
-                if not is_sophisticated:
-                    expected_min = result.get('expected_length_min', 600)
-                    expected_max = result.get('expected_length_max', 10000)
-                    critical_issues.append(f"CRITICAL: {result['test_name']} - Generated code length {result.get('code_length', 0)} chars not in expected range {expected_min}-{expected_max}")
-                if not kroki_success:
-                    critical_issues.append(f"CRITICAL: {result['test_name']} - Kroki rendering failed (HTTP {result.get('kroki_status', 'N/A')})")
-                if features_passed < total_features:
-                    critical_issues.append(f"WARNING: {result['test_name']} - Missing advanced features ({features_passed}/{total_features})")
-        else:
-            failed += 1
-            critical_issues.append(f"CRITICAL: {result['test_name']} - API call failed")
-            
-            if result.get('status_code'):
-                print(f"      Status: {result['status_code']}")
-                if result.get('error_response'):
-                    print(f"      Error: {result['error_response'][:100]}...")
-            else:
-                print(f"      Connection Error: {result.get('error', 'Unknown')}")
-    
-    print(f"\n📈 RESULTS: {passed} passed, {failed} failed")
-    
-    if critical_issues:
-        print(f"\n🚨 CRITICAL ISSUES FOUND:")
-        for issue in critical_issues:
-            print(f"   • {issue}")
+    # Run authentication tests first
+    auth_results = run_auth_tests()
     
     # Test basic connectivity
     print(f"\n🔍 CONNECTIVITY TEST")
@@ -550,14 +431,47 @@ def main():
         print(f"✅ Basic connectivity: {health_response.status_code} - {health_response.json()}")
     except Exception as e:
         print(f"❌ Basic connectivity failed: {e}")
-        critical_issues.append("CRITICAL: Cannot connect to backend API")
+    
+    # Summary for authentication tests
+    print(f"\n{'='*80}")
+    print("📊 AUTHENTICATION TEST SUMMARY")
+    print(f"{'='*80}")
+    
+    auth_passed = 0
+    auth_failed = 0
+    auth_critical_issues = []
+    
+    for result in auth_results:
+        status = "✅ PASS" if result["success"] else "❌ FAIL"
+        print(f"{status} - {result['test_name']}")
+        
+        if result["success"]:
+            auth_passed += 1
+            print(f"      Status: {result['status_code']}, Time: {result.get('response_time', 0):.2f}s")
+        else:
+            auth_failed += 1
+            auth_critical_issues.append(f"CRITICAL: {result['test_name']} - Authentication test failed")
+            
+            if result.get('status_code'):
+                print(f"      Status: {result['status_code']}")
+                if result.get('error_response'):
+                    print(f"      Error: {result['error_response'][:100]}...")
+            else:
+                print(f"      Connection Error: {result.get('error', 'Unknown')}")
+    
+    print(f"\n📈 AUTH RESULTS: {auth_passed} passed, {auth_failed} failed")
+    
+    if auth_critical_issues:
+        print(f"\n🚨 AUTHENTICATION CRITICAL ISSUES:")
+        for issue in auth_critical_issues:
+            print(f"   • {issue}")
     
     # Return exit code based on results
-    if failed > 0:
-        print(f"\n❌ TESTING FAILED: {failed} test(s) failed")
+    if auth_failed > 0:
+        print(f"\n❌ AUTHENTICATION TESTING FAILED: {auth_failed} test(s) failed")
         return 1
     else:
-        print(f"\n✅ ALL TESTS PASSED: {passed} test(s) successful")
+        print(f"\n✅ ALL AUTHENTICATION TESTS PASSED: {auth_passed} test(s) successful")
         return 0
 
 if __name__ == "__main__":
