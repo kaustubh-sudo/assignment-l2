@@ -912,7 +912,8 @@ class TestIntegration:
     def test_full_auth_flow(self, client):
         """Test complete authentication flow"""
         import uuid
-        email = f"fullflow_{uuid.uuid4().hex[:8]}@example.com"
+        import time
+        email = f"fullflow_{uuid.uuid4().hex[:8]}_{int(time.time())}@example.com"
         password = "securepassword123"
         
         # 1. Sign up
