@@ -4,9 +4,18 @@
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
+
+// Mock react-router-dom
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => jest.fn(),
+  useLocation: () => ({ pathname: '/', state: null }),
+  BrowserRouter: ({ children }) => <div>{children}</div>,
+  MemoryRouter: ({ children }) => <div>{children}</div>,
+  Link: ({ children, to }) => <a href={to}>{children}</a>,
+  Navigate: () => null,
+}));
 
 // Mock fetch globally
 global.fetch = jest.fn();
