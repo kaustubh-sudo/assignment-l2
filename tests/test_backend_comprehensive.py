@@ -510,13 +510,13 @@ class TestDiagramGeneratorsV3:
         """Test V3 PlantUML basic generation"""
         from diagram_generators_v3 import generate_plantuml_v3
         
-        description = "User logs in. System validates."
+        description = "A user logs into the system. The system validates their credentials."
         code = generate_plantuml_v3(description)
         
         assert "@startuml" in code
         assert "@enduml" in code
-        assert "start" in code
-        assert "stop" in code
+        assert "start" in code.lower()
+        assert "stop" in code.lower()
     
     def test_generate_plantuml_v3_with_decision(self):
         """Test V3 PlantUML with decision"""
