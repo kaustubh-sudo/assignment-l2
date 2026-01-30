@@ -36,7 +36,7 @@ const webpackConfig = {
         '^@/(.*)$': '<rootDir>/src/$1',
       },
       transformIgnorePatterns: [
-        '/node_modules/(?!(react-router|react-router-dom|@testing-library)/)',
+        'node_modules/(?!(react-router|react-router-dom|@remix-run)/)',
       ],
       testEnvironment: 'jsdom',
       setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
