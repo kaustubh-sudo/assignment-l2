@@ -207,6 +207,7 @@ const DiagramsList = () => {
 
   useEffect(() => {
     fetchDiagrams();
+    fetchFolders();
   }, [token]);
 
   // Handle edit - navigate to editor with diagram data
