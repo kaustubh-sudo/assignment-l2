@@ -446,6 +446,7 @@ const DiagramRenderer = () => {
             isLoading={isGenerating || isRendering}
             error={error}
             onExport={handleExport}
+            isExporting={isExporting}
           />
         </div>
       </div>
