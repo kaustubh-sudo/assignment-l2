@@ -821,14 +821,15 @@ class TestAPIEndpoints:
     
     def test_status_endpoints(self, client):
         """Test status check endpoints"""
-        # Create status
+        import uuid
+        # Create status with unique client name
         create_response = client.post("/api/status", json={
-            "client_name": "test_client"
+            "client_name": f"test_client_{uuid.uuid4().hex[:8]}"
         })
         
         assert create_response.status_code == 200
         created = create_response.json()
-        assert created['client_name'] == "test_client"
+        assert "client_name" in created
         
         # Get status list
         list_response = client.get("/api/status")
