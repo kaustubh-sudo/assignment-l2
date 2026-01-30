@@ -425,6 +425,100 @@ async def create_diagram(
                       data-testid="export-button"
                     >''',
     },
+    
+    # ============== SEARCH BUGS ==============
+    "SEARCH-001": {
+        "file": "/app/frontend/src/pages/DiagramsList.js",
+        "description": "Search is case-sensitive - should be case-insensitive",
+        "category": "Search",
+        "difficulty": "Easy",
+        "points": 5,
+        "time_estimate": "1 min",
+        "original": '''    // Filter by search query
+    if (debouncedSearchQuery.trim()) {
+      const query = debouncedSearchQuery.toLowerCase().trim();
+      result = result.filter(diagram => 
+        diagram.title.toLowerCase().includes(query) ||
+        (diagram.description && diagram.description.toLowerCase().includes(query))
+      );
+    }''',
+        "buggy": '''    // Filter by search query (BUG: case-sensitive)
+    if (debouncedSearchQuery.trim()) {
+      const query = debouncedSearchQuery.trim();
+      result = result.filter(diagram => 
+        diagram.title.includes(query) ||
+        (diagram.description && diagram.description.includes(query))
+      );
+    }''',
+    },
+    "SEARCH-002": {
+        "file": "/app/frontend/src/pages/DiagramsList.js",
+        "description": "Search doesn't filter by folder - shows all matching diagrams ignoring folder selection",
+        "category": "Search",
+        "difficulty": "Medium",
+        "points": 10,
+        "time_estimate": "2 min",
+        "original": '''  // Filter diagrams based on search query and selected folder
+  const filteredDiagrams = useMemo(() => {
+    let result = diagrams;
+    
+    // Filter by folder
+    if (selectedFolderId === 'none') {
+      result = result.filter(d => !d.folder_id);
+    } else if (selectedFolderId) {
+      result = result.filter(d => d.folder_id === selectedFolderId);
+    }
+    
+    // Filter by search query
+    if (debouncedSearchQuery.trim()) {''',
+        "buggy": '''  // Filter diagrams based on search query and selected folder
+  const filteredDiagrams = useMemo(() => {
+    let result = diagrams;
+    
+    // BUG: Folder filter disabled when searching - shows all matching diagrams
+    if (!debouncedSearchQuery.trim()) {
+      // Filter by folder only when not searching
+      if (selectedFolderId === 'none') {
+        result = result.filter(d => !d.folder_id);
+      } else if (selectedFolderId) {
+        result = result.filter(d => d.folder_id === selectedFolderId);
+      }
+    }
+    
+    // Filter by search query
+    if (debouncedSearchQuery.trim()) {''',
+    },
+    "SEARCH-003": {
+        "file": "/app/frontend/src/pages/DiagramsList.js",
+        "description": "Search results don't clear when input cleared - stale results shown",
+        "category": "Search",
+        "difficulty": "Medium",
+        "points": 10,
+        "time_estimate": "1.5 min",
+        "original": '''  // Clear search
+  const handleClearSearch = () => {
+    setSearchQuery('');
+  };''',
+        "buggy": '''  // Clear search - BUG: doesn't actually clear the search state
+  const handleClearSearch = () => {
+    // setSearchQuery('');  // This line is missing
+    console.log('Clear search clicked');
+  };''',
+    },
+    "SEARCH-004": {
+        "file": "/app/frontend/src/pages/DiagramsList.js",
+        "description": "Search input doesn't debounce - causes excessive filtering on every keystroke",
+        "category": "Search",
+        "difficulty": "Easy",
+        "points": 5,
+        "time_estimate": "1.5 min",
+        "original": '''  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);''',
+        "buggy": '''  // Search state - BUG: not using debounce, causes lag
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = searchQuery;  // Should use useDebounce''',
+    },
 }
 
 
