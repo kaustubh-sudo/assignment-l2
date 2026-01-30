@@ -203,6 +203,66 @@ backend:
 
 
 frontend:
+  - task: "Login Page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Login.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created Login page with email/password form, styled with Tailwind, redirects to dashboard on success. Links to signup page."
+
+  - task: "Signup Page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Signup.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created Signup page with email/password/confirm password form, validates 6 char minimum, auto-login after signup. Links to login page."
+
+  - task: "Protected Routes"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/ProtectedRoute.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created ProtectedRoute component that redirects to login if not authenticated. DiagramRenderer is now protected."
+
+  - task: "Auth Context and State Management"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/context/AuthContext.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created AuthContext with login, signup, logout functions. Stores JWT in localStorage. Validates token on mount."
+
+  - task: "Header with Logout"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Header.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Updated Header to show user email and logout button when authenticated."
+
   - task: "Initial Load & UI Elements"
     implemented: true
     working: "NA"
