@@ -34,6 +34,14 @@ function App() {
               } 
             />
             <Route 
+              path="/diagrams/:diagramId" 
+              element={
+                <ProtectedRoute>
+                  <DiagramRenderer />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/editor" 
               element={
                 <ProtectedRoute>
