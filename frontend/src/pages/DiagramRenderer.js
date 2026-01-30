@@ -353,9 +353,42 @@ const DiagramRenderer = () => {
     return date.toLocaleString();
   };
 
+  // Show loading state while fetching diagram
+  if (isLoadingDiagram) {
+    return (
+      <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-muted/30">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <p className="text-muted-foreground">Loading diagram...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-muted/30">
       <Header />
+      
+      {/* Editing Banner */}
+      {savedDiagram && (
+        <div className="bg-blue-500/10 border-b border-blue-500/20 px-4 py-2">
+          <div className="max-w-[1800px] mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-blue-400 font-medium">Editing:</span>
+              <span className="text-white">{savedDiagram.title}</span>
+            </div>
+            <button
+              onClick={() => navigate('/')}
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              ← Back to My Diagrams
+            </button>
+          </div>
+        </div>
+      )}
       
       <div className="flex-1 flex flex-col lg:flex-row gap-4 md:gap-5 lg:gap-6 p-4 md:p-5 lg:p-6 max-w-[1800px] w-full mx-auto overflow-hidden">
         {/* Left Side - Input */}
