@@ -430,9 +430,56 @@ async def get_diagram(
         description=diagram.get('description', ''),
         diagram_type=diagram['diagram_type'],
         diagram_code=diagram['diagram_code'],
+        folder_id=diagram.get('folder_id'),
         created_at=created_at,
         updated_at=updated_at
     )
+
+# ============== Diagram Folder Update ==============
+
+@api_router.put("/diagrams/{diagram_id}/folder", response_model=dict)
+async def update_diagram_folder(
+    diagram_id: str,
+    folder_data: DiagramFolderUpdate,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """
+    Move a diagram to a different folder or remove from folder.
+    """
+    # Find the diagram
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    
+    if not diagram:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Diagram not found"
+        )
+    
+    # Check ownership
+    if diagram['user_id'] != current_user.user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to update this diagram"
+        )
+    
+    # Validate folder_id if provided
+    if folder_data.folder_id:
+        folder = await db.folders.find_one({"id": folder_data.folder_id, "user_id": current_user.user_id})
+        if not folder:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Folder not found"
+            )
+    
+    # Update the folder_id
+    await db.diagrams.update_one(
+        {"id": diagram_id},
+        {"$set": {"folder_id": folder_data.folder_id, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    logger.info(f"Diagram {diagram_id} moved to folder {folder_data.folder_id}")
+    
+    return {"message": "Updated"}
 
 @api_router.delete("/diagrams/{diagram_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_diagram(
