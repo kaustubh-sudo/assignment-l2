@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -8,9 +8,13 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from openai import OpenAI
 from diagram_generator import generate_graphviz_advanced
+from auth import (
+    UserCreate, UserLogin, User, UserResponse, Token, TokenData,
+    verify_password, get_password_hash, create_access_token, get_current_user
+)
 from diagram_generators_enhanced import (
     generate_d2_diagram, 
     generate_blockdiag_diagram, 
