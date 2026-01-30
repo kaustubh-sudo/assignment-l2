@@ -251,6 +251,15 @@ async def create_diagram(
     Save a new diagram for the authenticated user.
     Requires valid JWT token in Authorization header.
     """
+    # Validate folder_id if provided
+    if diagram_data.folder_id:
+        folder = await db.folders.find_one({"id": diagram_data.folder_id, "user_id": current_user.user_id})
+        if not folder:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Folder not found"
+            )
+    
     now = datetime.now(timezone.utc)
     
     diagram = {
@@ -260,6 +269,7 @@ async def create_diagram(
         "description": diagram_data.description,
         "diagram_type": diagram_data.diagram_type,
         "diagram_code": diagram_data.diagram_code,
+        "folder_id": diagram_data.folder_id,
         "created_at": now.isoformat(),
         "updated_at": now.isoformat()
     }
