@@ -904,7 +904,7 @@ class TestEdgeCases:
 class TestIntegration:
     """Integration tests for complete workflows"""
     
-    @pytest.fixture(scope="class")
+    @pytest.fixture(scope="function")
     def client(self):
         from fastapi.testclient import TestClient
         from server import app
