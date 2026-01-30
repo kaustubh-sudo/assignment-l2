@@ -32,6 +32,7 @@ const DiagramRenderer = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedDiagram, setSavedDiagram] = useState(null); // { id, title, description, updated_at }
+  const [isExporting, setIsExporting] = useState(false);
   
   // Use ref to prevent duplicate renders
   const renderingRef = React.useRef(false);
