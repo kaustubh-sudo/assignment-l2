@@ -66,11 +66,20 @@ const DiagramCard = ({ diagram, onDelete, folderName }) => {
       </div>
 
       {/* Meta info */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center flex-wrap gap-2 mb-4">
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${typeInfo.color}`}>
           <span>{typeInfo.emoji}</span>
           {typeInfo.label}
         </span>
+        {folderName && (
+          <span 
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400"
+            data-testid={`diagram-folder-badge-${diagram.id}`}
+          >
+            <Folder className="w-3 h-3" />
+            {folderName}
+          </span>
+        )}
         <span className="flex items-center gap-1.5 text-xs text-gray-500">
           <Calendar className="w-3.5 h-3.5" />
           {formatDate(diagram.created_at)}
