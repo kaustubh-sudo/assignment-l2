@@ -435,9 +435,10 @@ metadata:
   last_updated: "Added user authentication (signup/login with JWT)"
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Full Regression Test - All Features"
   stuck_tasks: []
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
