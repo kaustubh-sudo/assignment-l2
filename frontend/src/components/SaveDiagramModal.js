@@ -43,6 +43,11 @@ const SaveDiagramModal = ({
       description: description.trim(),
       folder_id: folderId || null
     });
+    // Reset form after save
+    if (!existingTitle) {
+      setTitle('');
+      setDescription('');
+    }
   };
 
   const handleClose = () => {
