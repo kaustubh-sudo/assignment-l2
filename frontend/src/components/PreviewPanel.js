@@ -77,18 +77,34 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport, isExporting
                   <DropdownMenuTrigger asChild>
                     <Button
                       size="sm"
-                      className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white h-8 md:h-9 px-3 md:px-4 text-xs md:text-sm rounded-xl shadow-lg"
+                      disabled={isExporting}
+                      className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white h-8 md:h-9 px-3 md:px-4 text-xs md:text-sm rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      data-testid="export-button"
                     >
-                      <Download className="w-4 h-4 md:mr-2" />
-                      <span className="hidden md:inline">Export</span>
+                      {isExporting ? (
+                        <Loader2 className="w-4 h-4 animate-spin md:mr-2" />
+                      ) : (
+                        <Download className="w-4 h-4 md:mr-2" />
+                      )}
+                      <span className="hidden md:inline">{isExporting ? 'Exporting...' : 'Export'}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-background border-border shadow-xl">
-                    <DropdownMenuItem onClick={() => onExport('svg')} className="cursor-pointer">
+                    <DropdownMenuItem 
+                      onClick={() => onExport('svg')} 
+                      className="cursor-pointer"
+                      disabled={isExporting}
+                      data-testid="export-svg-option"
+                    >
                       <span className="font-medium text-sm">SVG</span>
                       <span className="text-xs text-muted-foreground ml-2">(Vector)</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onExport('png')} className="cursor-pointer">
+                    <DropdownMenuItem 
+                      onClick={() => onExport('png')} 
+                      className="cursor-pointer"
+                      disabled={isExporting}
+                      data-testid="export-png-option"
+                    >
                       <span className="font-medium text-sm">PNG</span>
                       <span className="text-xs text-muted-foreground ml-2">(Image)</span>
                     </DropdownMenuItem>
