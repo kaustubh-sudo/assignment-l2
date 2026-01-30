@@ -89,6 +89,7 @@ const DiagramRenderer = () => {
               id: data.id,
               title: data.title,
               description: data.description,
+              folder_id: data.folder_id,
               updated_at: data.updated_at
             });
             
