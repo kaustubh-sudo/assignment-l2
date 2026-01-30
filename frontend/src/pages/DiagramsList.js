@@ -34,9 +34,9 @@ const DiagramsList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Search state
+  // Search state - BUG: not using debounce, causes lag
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const debouncedSearchQuery = searchQuery;  // Should use useDebounce
   
   // Folder state
   const [folders, setFolders] = useState([]);
@@ -71,21 +71,22 @@ const DiagramsList = () => {
       result = result.filter(d => d.folder_id === selectedFolderId);
     }
     
-    // Filter by search query
+    // Filter by search query (BUG: case-sensitive)
     if (debouncedSearchQuery.trim()) {
-      const query = debouncedSearchQuery.toLowerCase().trim();
+      const query = debouncedSearchQuery.trim();
       result = result.filter(diagram => 
-        diagram.title.toLowerCase().includes(query) ||
-        (diagram.description && diagram.description.toLowerCase().includes(query))
+        diagram.title.includes(query) ||
+        (diagram.description && diagram.description.includes(query))
       );
     }
     
     return result;
   }, [diagrams, debouncedSearchQuery, selectedFolderId]);
 
-  // Clear search
+  // Clear search - BUG: doesn't actually clear the search state
   const handleClearSearch = () => {
-    setSearchQuery('');
+    // setSearchQuery('');  // This line is missing
+    console.log('Clear search clicked');
   };
 
   // Fetch folders
@@ -238,8 +239,7 @@ const DiagramsList = () => {
         throw new Error(data.detail || 'Failed to delete diagram');
       }
 
-      // Remove from local state
-      setDiagrams(prevDiagrams => prevDiagrams.filter(d => d.id !== deleteTarget.id));
+      // Remove from local state - BUG: Not updating state correctly
       toast.success('Diagram deleted successfully');
       setDeleteTarget(null);
     } catch (err) {

@@ -78,8 +78,7 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport, isExporting
                   <DropdownMenuTrigger asChild>
                     <Button
                       size="sm"
-                      disabled={isExporting}
-                      className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white h-8 px-3 text-xs rounded-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white h-8 px-3 text-xs rounded-lg shadow-md"
                       data-testid="export-button"
                     >
                       {isExporting ? (
