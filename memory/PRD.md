@@ -96,6 +96,12 @@ Password: password123
 - `frontend/src/components/DiagramCard.js` - Diagram card component
 
 ## Changelog
+- **Jan 30, 2026**: US-11 Search Diagrams - VERIFIED ✅
+  - Search input above diagram list with debounced search (300ms)
+  - Case-insensitive search on title and description
+  - "No results found" state with search query display
+  - Clear button (X) to reset search
+  - Frontend filtering (no API needed)
 - **Jan 30, 2026**: US-10 Export Diagram - VERIFIED ✅
   - Export button in preview panel with SVG/PNG dropdown options
   - Filename uses sanitized diagram title (or 'diagram-{timestamp}' if untitled)
