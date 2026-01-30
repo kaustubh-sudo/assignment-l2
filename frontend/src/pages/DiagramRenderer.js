@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import InputPanel from '../components/InputPanel';
 import PreviewPanel from '../components/PreviewPanel';
+import SaveDiagramModal from '../components/SaveDiagramModal';
+import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
 const DiagramRenderer = () => {
+  const { token } = useAuth();
   const [userInput, setUserInput] = useState(
     "A user presses a button. The system checks if the user is logged in. If the user is logged in, it shows the dashboard. If the user is not logged in, it shows the login page."
   );
@@ -16,8 +19,15 @@ const DiagramRenderer = () => {
   const [error, setError] = useState(null);
   const [showCode, setShowCode] = useState(false);
   
+  // Save diagram state
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedDiagram, setSavedDiagram] = useState(null); // { id, title, description, updated_at }
+  
   // Use ref to prevent duplicate renders
   const renderingRef = React.useRef(false);
+
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   // Kroki type is now directly the diagram type selected by user
   const getKrokiType = (type) => {
