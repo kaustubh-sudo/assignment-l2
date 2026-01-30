@@ -609,13 +609,15 @@ class TestAPIEndpoints:
     def test_signup_duplicate_email(self, client):
         """Test signup with duplicate email fails"""
         import uuid
-        email = f"duplicate_{uuid.uuid4().hex[:8]}@example.com"
+        import time
+        email = f"duplicate_{uuid.uuid4().hex[:8]}_{int(time.time())}@example.com"
         
         # First signup
-        client.post("/api/auth/signup", json={
+        response1 = client.post("/api/auth/signup", json={
             "email": email,
             "password": "password123"
         })
+        assert response1.status_code == 201
         
         # Second signup with same email
         response = client.post("/api/auth/signup", json={
