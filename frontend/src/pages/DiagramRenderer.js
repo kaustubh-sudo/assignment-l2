@@ -204,7 +204,78 @@ const DiagramRenderer = () => {
     setGeneratedCode('');
     setRenderedDiagram(null);
     setError(null);
+    setSavedDiagram(null); // Clear saved diagram state
     toast.info('Cleared');
+  };
+
+  // Save or update diagram
+  const handleSaveDiagram = async ({ title, description }) => {
+    if (!generatedCode) {
+      toast.error('Please generate a diagram first');
+      return;
+    }
+
+    setIsSaving(true);
+    
+    try {
+      const diagramData = {
+        title,
+        description,
+        diagram_type: diagramType,
+        diagram_code: generatedCode
+      };
+
+      let response;
+      
+      if (savedDiagram?.id) {
+        // Update existing diagram
+        response = await fetch(`${BACKEND_URL}/api/diagrams/${savedDiagram.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(diagramData)
+        });
+      } else {
+        // Create new diagram
+        response = await fetch(`${BACKEND_URL}/api/diagrams`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(diagramData)
+        });
+      }
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to save diagram');
+      }
+
+      setSavedDiagram({
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        updated_at: data.updated_at
+      });
+
+      setShowSaveModal(false);
+      toast.success(savedDiagram?.id ? 'Diagram updated!' : 'Diagram saved!');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Format last saved time
+  const formatLastSaved = (isoString) => {
+    if (!isoString) return null;
+    const date = new Date(isoString);
+    return date.toLocaleString();
   };
 
   return (
