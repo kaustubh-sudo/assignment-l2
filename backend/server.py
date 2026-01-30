@@ -385,6 +385,7 @@ async def get_user_diagrams(current_user: TokenData = Depends(get_current_user))
             title=d['title'],
             description=d.get('description', ''),
             diagram_type=d['diagram_type'],
+            folder_id=d.get('folder_id'),
             created_at=created_at,
             updated_at=updated_at
         ))
