@@ -282,6 +282,93 @@ async def create_diagram(
     diagram_code: str
     folder_id: str | None = None''',
     },
+    
+    # ============== LIST/DISPLAY BUGS ==============
+    "LIST-001": {
+        "file": "/app/backend/server.py",
+        "description": "My Diagrams shows everyone's diagrams - Missing user_id filter",
+        "category": "List/Display",
+        "difficulty": "Hard",
+        "points": 15,
+        "time_estimate": "4 min",
+        "original": '''@api_router.get("/diagrams", response_model=List[DiagramListResponse])
+async def get_user_diagrams(current_user: TokenData = Depends(get_current_user)):
+    """
+    Get all diagrams for the authenticated user.
+    """
+    # Filter by user_id to show only user's diagrams
+    query_filter = {"user_id": current_user.user_id}
+    diagrams = await db.diagrams.find(
+        query_filter,
+        {"_id": 0}
+    ).sort("updated_at", -1).to_list(100)''',
+        "buggy": '''@api_router.get("/diagrams", response_model=List[DiagramListResponse])
+async def get_user_diagrams(current_user: TokenData = Depends(get_current_user)):
+    """
+    Get all diagrams for the authenticated user.
+    """
+    # BUG: Missing user_id filter - shows all diagrams
+    query_filter = {}
+    diagrams = await db.diagrams.find(
+        query_filter,
+        {"_id": 0}
+    ).sort("updated_at", -1).to_list(100)''',
+    },
+    "LIST-002": {
+        "file": "/app/frontend/src/components/DiagramCard.js",
+        "description": "Delete removes wrong diagram - passing wrong diagram to handler",
+        "category": "List/Display",
+        "difficulty": "Medium",
+        "points": 10,
+        "time_estimate": "2.5 min",
+        "original": '''  const handleDeleteClick = (e) => {
+    e.stopPropagation(); // Prevent card click
+    onDelete(diagram);
+  };''',
+        "buggy": '''  const handleDeleteClick = (e) => {
+    e.stopPropagation(); // Prevent card click
+    onDelete({ ...diagram, id: diagram.id + '_wrong' });  // BUG: Corrupted ID
+  };''',
+    },
+    "LIST-003": {
+        "file": "/app/backend/server.py",
+        "description": "Diagram list sorted oldest first - should show newest first",
+        "category": "List/Display",
+        "difficulty": "Easy",
+        "points": 5,
+        "time_estimate": "1.5 min",
+        "original": '''    ).sort("updated_at", -1).to_list(100)''',
+        "buggy": '''    ).sort("updated_at", 1).to_list(100)''',
+    },
+    "LIST-004": {
+        "file": "/app/frontend/src/pages/DiagramsList.js",
+        "description": "Diagram count doesn't update after delete",
+        "category": "List/Display",
+        "difficulty": "Medium",
+        "points": 10,
+        "time_estimate": "2 min",
+        "original": '''      // Remove from local state
+      setDiagrams(prevDiagrams => prevDiagrams.filter(d => d.id !== deleteTarget.id));
+      toast.success('Diagram deleted successfully');''',
+        "buggy": '''      // Remove from local state - BUG: Not updating state correctly
+      toast.success('Diagram deleted successfully');''',
+    },
+    "LIST-005": {
+        "file": "/app/frontend/src/components/DiagramCard.js",
+        "description": "Created date shows raw ISO format instead of readable date",
+        "category": "List/Display",
+        "difficulty": "Easy",
+        "points": 5,
+        "time_estimate": "1 min",
+        "original": '''        <span className="flex items-center gap-1.5 text-xs text-slate-400">
+          <Calendar className="w-3.5 h-3.5" />
+          {formatDate(diagram.created_at)}
+        </span>''',
+        "buggy": '''        <span className="flex items-center gap-1.5 text-xs text-slate-400">
+          <Calendar className="w-3.5 h-3.5" />
+          {diagram.created_at}
+        </span>''',
+    },
 }
 
 
