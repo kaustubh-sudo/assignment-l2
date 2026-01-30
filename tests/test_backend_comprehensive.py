@@ -665,13 +665,15 @@ class TestAPIEndpoints:
     def test_login_wrong_password(self, client):
         """Test login with wrong password fails"""
         import uuid
-        email = f"wrongpw_{uuid.uuid4().hex[:8]}@example.com"
+        import time
+        email = f"wrongpw_{uuid.uuid4().hex[:8]}_{int(time.time())}@example.com"
         
         # Create user
-        client.post("/api/auth/signup", json={
+        signup_resp = client.post("/api/auth/signup", json={
             "email": email,
             "password": "correctpassword"
         })
+        assert signup_resp.status_code == 201
         
         # Login with wrong password
         response = client.post("/api/auth/login", json={
