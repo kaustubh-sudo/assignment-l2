@@ -51,33 +51,23 @@ export const AuthProvider = ({ children }) => {
   }, [token, BACKEND_URL]);
 
   const login = async (email, password) => {
-    let response;
-    try {
-      response = await fetch(`${BACKEND_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
-    } catch (networkError) {
-      throw new Error('Network error. Please check your connection.');
-    }
+    const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
 
-    // Get response text first (more reliable than json() for error handling)
-    let responseText;
-    try {
-      responseText = await response.text();
-    } catch (readError) {
-      throw new Error('Failed to read server response');
-    }
+    // Read response as text first (more reliable for error handling)
+    const responseText = await response.text();
     
     // Parse the JSON from text
     let data;
     try {
       data = JSON.parse(responseText);
     } catch (parseError) {
-      throw new Error(`Login failed (status ${response.status})`);
+      throw new Error('Invalid server response');
     }
     
     if (!response.ok) {
