@@ -114,6 +114,14 @@ Password: password123
 - `frontend/src/components/SaveDiagramModal.js` - Save modal with folder dropdown
 
 ## Changelog
+- **Jan 30, 2026**: Light Theme & Responsiveness Update
+  - Converted entire app from dark to light theme
+  - Improved mobile responsiveness across all pages
+  - Login/Signup pages: Clean white cards with blue gradient background
+  - Diagrams list: Light sidebar, white cards, improved spacing
+  - Editor: Light panels with proper mobile stacking
+  - Mobile-friendly folder filters (horizontal scroll)
+  - Compact buttons on smaller screens
 - **Jan 30, 2026**: US-12 & US-13 Folder Organization - VERIFIED ✅
   - "New Folder" button opens create folder modal
   - Folder sidebar with All Diagrams, No Folder, and user folders with counts
