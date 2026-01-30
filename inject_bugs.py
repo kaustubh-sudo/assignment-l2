@@ -291,28 +291,10 @@ async def create_diagram(
         "difficulty": "Hard",
         "points": 15,
         "time_estimate": "4 min",
-        "original": '''@api_router.get("/diagrams", response_model=List[DiagramListResponse])
-async def get_user_diagrams(current_user: TokenData = Depends(get_current_user)):
-    """
-    Get all diagrams for the authenticated user.
-    """
-    # Filter by user_id to show only user's diagrams
-    query_filter = {"user_id": current_user.user_id}
-    diagrams = await db.diagrams.find(
-        query_filter,
-        {"_id": 0}
-    ).sort("updated_at", -1).to_list(100)''',
-        "buggy": '''@api_router.get("/diagrams", response_model=List[DiagramListResponse])
-async def get_user_diagrams(current_user: TokenData = Depends(get_current_user)):
-    """
-    Get all diagrams for the authenticated user.
-    """
-    # BUG: Missing user_id filter - shows all diagrams
-    query_filter = {}
-    diagrams = await db.diagrams.find(
-        query_filter,
-        {"_id": 0}
-    ).sort("updated_at", -1).to_list(100)''',
+        "original": '''    # Filter by user_id to show only user's diagrams
+    query_filter = {"user_id": current_user.user_id}''',
+        "buggy": '''    # BUG: Missing user_id filter - shows all diagrams
+    query_filter = {}''',
     },
     "LIST-002": {
         "file": "/app/frontend/src/components/DiagramCard.js",
@@ -337,8 +319,10 @@ async def get_user_diagrams(current_user: TokenData = Depends(get_current_user))
         "difficulty": "Easy",
         "points": 5,
         "time_estimate": "1.5 min",
-        "original": '''    ).sort("updated_at", -1).to_list(100)''',
-        "buggy": '''    ).sort("updated_at", 1).to_list(100)''',
+        "original": '''    # Sort by updated_at descending (newest first)
+    sort_direction = -1''',
+        "buggy": '''    # Sort by updated_at (BUG: ascending shows oldest first)
+    sort_direction = 1''',
     },
     "LIST-004": {
         "file": "/app/frontend/src/pages/DiagramsList.js",
