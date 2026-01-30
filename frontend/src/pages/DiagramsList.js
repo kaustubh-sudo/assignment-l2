@@ -142,7 +142,7 @@ const DiagramsList = () => {
       
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">My Diagrams</h1>
             <p className="text-gray-400">
@@ -169,6 +169,40 @@ const DiagramsList = () => {
             </Button>
           </div>
         </div>
+
+        {/* Search Section */}
+        {diagrams.length > 0 && (
+          <div className="mb-6">
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search diagrams by title or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
+                data-testid="search-input"
+              />
+              {searchQuery && (
+                <button
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  data-testid="search-clear-button"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            {debouncedSearchQuery && (
+              <p className="text-sm text-gray-400 mt-2">
+                {filteredDiagrams.length === 0 
+                  ? 'No diagrams found' 
+                  : `Found ${filteredDiagrams.length} diagram${filteredDiagrams.length !== 1 ? 's' : ''}`
+                }
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Content */}
         {isLoading ? (
