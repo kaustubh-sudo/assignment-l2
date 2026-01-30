@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderOpen, RefreshCw, Search, X } from 'lucide-react';
+import { Plus, FolderOpen, RefreshCw, Search, X, FolderPlus, Folder, Trash2 } from 'lucide-react';
 import Header from '../components/Header';
 import DiagramCard from '../components/DiagramCard';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
+import CreateFolderModal from '../components/CreateFolderModal';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useAuth } from '../context/AuthContext';
