@@ -2,7 +2,15 @@ import React from 'react';
 import { X, AlertTriangle } from 'lucide-react';
 import { Button } from './ui/button';
 
-const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, isLoading, diagramTitle }) => {
+const DeleteConfirmModal = ({ 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  isLoading, 
+  diagramTitle,
+  customTitle,
+  customMessage 
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -22,7 +30,7 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, isLoading, diagramTitl
               <AlertTriangle className="w-5 h-5 text-red-500" />
             </div>
             <h2 className="text-xl font-semibold text-white">
-              Delete Diagram
+              {customTitle || 'Delete Diagram'}
             </h2>
           </div>
           <button
@@ -35,9 +43,13 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, isLoading, diagramTitl
         
         {/* Content */}
         <div className="mb-6">
-          <p className="text-gray-300">
-            Are you sure you want to delete <span className="font-semibold text-white">"{diagramTitle}"</span>?
-          </p>
+          {customMessage ? (
+            <p className="text-gray-300">{customMessage}</p>
+          ) : (
+            <p className="text-gray-300">
+              Are you sure you want to delete <span className="font-semibold text-white">"{diagramTitle}"</span>?
+            </p>
+          )}
           <p className="text-gray-400 text-sm mt-2">
             This action cannot be undone.
           </p>
