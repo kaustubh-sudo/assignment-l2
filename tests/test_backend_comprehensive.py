@@ -685,8 +685,9 @@ class TestAPIEndpoints:
     
     def test_login_nonexistent_user(self, client):
         """Test login with nonexistent email fails"""
+        import uuid
         response = client.post("/api/auth/login", json={
-            "email": "nonexistent@example.com",
+            "email": f"nonexistent_{uuid.uuid4().hex}@example.com",
             "password": "anypassword"
         })
         
