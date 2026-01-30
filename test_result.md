@@ -421,12 +421,15 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.1"
-  test_sequence: 2
-  last_updated: "Bug fix for 500 error"
+  version: "1.2"
+  test_sequence: 3
+  last_updated: "Added user authentication (signup/login with JWT)"
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "User Authentication - Signup"
+    - "User Authentication - Login"
+    - "User Authentication - Get Current User"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -448,3 +451,5 @@ agent_communication:
     message: "✅ ENHANCED DIAGRAM GENERATORS VERIFIED: Comprehensive testing of enhanced D2, BlockDiag, and GraphViz generators confirms they create sophisticated diagrams with proper advanced features. Tested 9 complex scenarios including conditional workflows, multi-step processes, and error handling. Results: D2 (1311-1349 chars) with classes, shapes, styling, conditionals; BlockDiag (528-852 chars) with colors, node attributes, shapes; GraphViz (821-1507 chars) with typed nodes, colors, styling. All diagrams render successfully with Kroki API (HTTP 200). Generators significantly more sophisticated than before - no longer simplistic. Only minor issue: One BlockDiag scenario slightly under 600 char threshold but still functional."
   - agent: "testing"
     message: "✅ FINAL 4 DIAGRAM TYPES TESTING COMPLETE: Comprehensive testing of the final implementation with only 4 diagram types (GraphViz, Mermaid, PlantUML, Excalidraw) confirms all are working perfectly with enhanced generators. Tested exact review request scenarios: 1) GraphViz complex conditional workflow (1430 chars) with proper nodes, shapes, colors, and conditional branches - Kroki 200 OK. 2) Mermaid multi-step process with conditionals (1006 chars) with styled nodes, Yes/No branches, color-coded types - Kroki 200 OK. 3) PlantUML workflow with partitions (851 chars) with skinparam styling, partitions, conditional logic - Kroki 200 OK. 4) Excalidraw hand-drawn flowchart (9547 chars) with JSON format, rectangles, arrows, proper element structure - Kroki 200 OK. All 4 types generate sophisticated diagrams with advanced features as specified. Enhanced conditional parsing now properly handles 'if/else' patterns. All tests passed with 100% success rate."
+  - agent: "main"
+    message: "Implemented user authentication with email/password. Backend: Created auth.py with JWT utilities, bcrypt password hashing. Added /api/auth/signup, /api/auth/login, /api/auth/me endpoints. Frontend: Created AuthContext, Login page, Signup page, ProtectedRoute component. Updated Header with logout button. DiagramRenderer is now protected - requires login to access. Need to test all auth endpoints and frontend auth flow."
