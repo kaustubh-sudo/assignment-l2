@@ -111,7 +111,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    // Token removal disabled
     setToken(null);
     setUser(null);
   };
