@@ -38,24 +38,50 @@ const DiagramsList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   
+  // Folder state
+  const [folders, setFolders] = useState([]);
+  const [selectedFolderId, setSelectedFolderId] = useState(null); // null = All, 'none' = No Folder
+  const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [deleteFolderTarget, setDeleteFolderTarget] = useState(null);
+  const [isDeletingFolder, setIsDeletingFolder] = useState(false);
+  
   // Delete state
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-  // Filter diagrams based on search query (case-insensitive)
+  // Create folder map for quick lookup
+  const folderMap = useMemo(() => {
+    return folders.reduce((acc, folder) => {
+      acc[folder.id] = folder.name;
+      return acc;
+    }, {});
+  }, [folders]);
+
+  // Filter diagrams based on search query and selected folder
   const filteredDiagrams = useMemo(() => {
-    if (!debouncedSearchQuery.trim()) {
-      return diagrams;
+    let result = diagrams;
+    
+    // Filter by folder
+    if (selectedFolderId === 'none') {
+      result = result.filter(d => !d.folder_id);
+    } else if (selectedFolderId) {
+      result = result.filter(d => d.folder_id === selectedFolderId);
     }
     
-    const query = debouncedSearchQuery.toLowerCase().trim();
-    return diagrams.filter(diagram => 
-      diagram.title.toLowerCase().includes(query) ||
-      (diagram.description && diagram.description.toLowerCase().includes(query))
-    );
-  }, [diagrams, debouncedSearchQuery]);
+    // Filter by search query
+    if (debouncedSearchQuery.trim()) {
+      const query = debouncedSearchQuery.toLowerCase().trim();
+      result = result.filter(diagram => 
+        diagram.title.toLowerCase().includes(query) ||
+        (diagram.description && diagram.description.toLowerCase().includes(query))
+      );
+    }
+    
+    return result;
+  }, [diagrams, debouncedSearchQuery, selectedFolderId]);
 
   // Clear search
   const handleClearSearch = () => {
