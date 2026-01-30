@@ -640,14 +640,16 @@ class TestAPIEndpoints:
     def test_login_success(self, client):
         """Test successful login"""
         import uuid
-        email = f"logintest_{uuid.uuid4().hex[:8]}@example.com"
+        import time
+        email = f"logintest_{uuid.uuid4().hex[:8]}_{int(time.time())}@example.com"
         password = "testpassword123"
         
         # Create user first
-        client.post("/api/auth/signup", json={
+        signup_resp = client.post("/api/auth/signup", json={
             "email": email,
             "password": password
         })
+        assert signup_resp.status_code == 201
         
         # Login
         response = client.post("/api/auth/login", json={
