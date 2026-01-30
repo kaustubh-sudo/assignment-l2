@@ -134,6 +134,21 @@ const DiagramRenderer = () => {
     return { type: 'svg', content: svgText };
   };
 
+  // Helper to render existing diagram code
+  const renderDiagramWithKroki = async (code, type) => {
+    setIsRendering(true);
+    try {
+      const krokiType = getKrokiType(type);
+      const diagram = await renderDiagram(code, krokiType);
+      setRenderedDiagram(diagram);
+    } catch (err) {
+      console.error('Render error:', err);
+      setError(err.message);
+    } finally {
+      setIsRendering(false);
+    }
+  };
+
   // Main function to generate and render diagram
   const handleGenerateDiagram = async () => {
     if (!userInput.trim()) {
