@@ -562,6 +562,381 @@ def test_root_endpoint() -> Dict[str, Any]:
     
     return result
 
+def test_diagram_crud(access_token: str, test_name: str, method: str, diagram_id: str = None, 
+                     payload: dict = None, expect_success: bool = True, expected_status: int = None) -> Dict[str, Any]:
+    """Test diagram CRUD operations"""
+    
+    # Determine URL and method
+    if method == "POST":
+        url = f"{API_BASE}/diagrams"
+        expected_status = expected_status or (201 if expect_success else 403)
+    elif method == "PUT":
+        url = f"{API_BASE}/diagrams/{diagram_id}"
+        expected_status = expected_status or (200 if expect_success else 404)
+    elif method == "GET" and diagram_id:
+        url = f"{API_BASE}/diagrams/{diagram_id}"
+        expected_status = expected_status or (200 if expect_success else 404)
+    elif method == "GET":
+        url = f"{API_BASE}/diagrams"
+        expected_status = expected_status or (200 if expect_success else 403)
+    elif method == "DELETE":
+        url = f"{API_BASE}/diagrams/{diagram_id}"
+        expected_status = expected_status or (204 if expect_success else 404)
+    else:
+        raise ValueError(f"Unsupported method: {method}")
+    
+    headers = {}
+    if access_token:
+        headers["Authorization"] = f"Bearer {access_token}"
+    
+    print(f"\n{'='*60}")
+    print(f"DIAGRAM CRUD TEST: {test_name}")
+    print(f"Method: {method}")
+    print(f"URL: {url}")
+    if payload:
+        print(f"Payload: {json.dumps(payload, indent=2)}")
+    print(f"Headers: Authorization: Bearer {access_token[:20] if access_token else 'None'}...")
+    print(f"{'='*60}")
+    
+    try:
+        if method == "POST":
+            response = requests.post(url, json=payload, headers=headers, timeout=30)
+        elif method == "PUT":
+            response = requests.put(url, json=payload, headers=headers, timeout=30)
+        elif method == "GET":
+            response = requests.get(url, headers=headers, timeout=30)
+        elif method == "DELETE":
+            response = requests.delete(url, headers=headers, timeout=30)
+        
+        result = {
+            "test_name": test_name,
+            "method": method,
+            "status_code": response.status_code,
+            "success": response.status_code == expected_status,
+            "response_time": response.elapsed.total_seconds(),
+            "content_type": response.headers.get('content-type', ''),
+            "expect_success": expect_success,
+            "expected_status": expected_status
+        }
+        
+        if response.status_code in [200, 201]:
+            try:
+                json_response = response.json()
+                result["response_data"] = json_response
+                
+                # Validate response structure based on method
+                if method == "POST" or (method == "PUT") or (method == "GET" and diagram_id):
+                    # Single diagram response
+                    result["has_id"] = "id" in json_response
+                    result["has_user_id"] = "user_id" in json_response
+                    result["has_title"] = "title" in json_response
+                    result["has_description"] = "description" in json_response
+                    result["has_diagram_type"] = "diagram_type" in json_response
+                    result["has_diagram_code"] = "diagram_code" in json_response
+                    result["has_created_at"] = "created_at" in json_response
+                    result["has_updated_at"] = "updated_at" in json_response
+                    
+                    if method == "POST":
+                        # For new diagrams, created_at should equal updated_at
+                        created_at = json_response.get("created_at")
+                        updated_at = json_response.get("updated_at")
+                        result["created_equals_updated"] = created_at == updated_at
+                    elif method == "PUT":
+                        # For updates, updated_at should be later than created_at
+                        created_at = json_response.get("created_at")
+                        updated_at = json_response.get("updated_at")
+                        result["updated_after_created"] = updated_at > created_at if created_at and updated_at else False
+                    
+                    result["diagram_id"] = json_response.get("id")
+                    
+                elif method == "GET" and not diagram_id:
+                    # List diagrams response
+                    result["is_list"] = isinstance(json_response, list)
+                    result["list_length"] = len(json_response) if isinstance(json_response, list) else 0
+                    
+                    # Check if sorted by updated_at (most recent first)
+                    if isinstance(json_response, list) and len(json_response) > 1:
+                        timestamps = [item.get("updated_at") for item in json_response if item.get("updated_at")]
+                        result["sorted_by_updated_at"] = timestamps == sorted(timestamps, reverse=True)
+                
+                print(f"✅ SUCCESS: Status {response.status_code}")
+                print(f"   Response time: {result['response_time']:.2f}s")
+                
+                if method in ["POST", "PUT"] or (method == "GET" and diagram_id):
+                    print(f"   Diagram ID: {json_response.get('id', 'N/A')}")
+                    print(f"   Title: {json_response.get('title', 'N/A')}")
+                    print(f"   Type: {json_response.get('diagram_type', 'N/A')}")
+                    if method == "POST":
+                        print(f"   Created=Updated: {'✅' if result.get('created_equals_updated') else '❌'}")
+                    elif method == "PUT":
+                        print(f"   Updated>Created: {'✅' if result.get('updated_after_created') else '❌'}")
+                elif method == "GET":
+                    print(f"   Diagrams count: {result['list_length']}")
+                    print(f"   Sorted correctly: {'✅' if result.get('sorted_by_updated_at', True) else '❌'}")
+                
+            except json.JSONDecodeError as e:
+                result["json_error"] = str(e)
+                result["raw_response"] = response.text[:500]
+                print(f"❌ JSON DECODE ERROR: {e}")
+        elif response.status_code == 204:
+            # DELETE success - no content
+            print(f"✅ SUCCESS: Status {response.status_code} (No Content)")
+        else:
+            result["error_response"] = response.text
+            if expect_success:
+                print(f"❌ FAILED: Status {response.status_code}")
+                print(f"   Error: {response.text}")
+            else:
+                print(f"✅ EXPECTED FAILURE: Status {response.status_code}")
+                print(f"   Error: {response.text}")
+                result["success"] = True  # Expected failure is success
+            
+    except requests.exceptions.RequestException as e:
+        result = {
+            "test_name": test_name,
+            "method": method,
+            "status_code": None,
+            "success": False,
+            "error": str(e)
+        }
+        print(f"❌ REQUEST ERROR: {e}")
+    
+    return result
+
+def run_diagram_crud_tests() -> list:
+    """Run comprehensive Diagram CRUD API tests"""
+    print("\n📋 Starting Diagram CRUD API Tests")
+    
+    # First, create a user and get JWT token
+    timestamp = int(time.time())
+    test_email = f"diagramuser_{timestamp}@example.com"
+    test_password = "testpass123"
+    
+    # Create user
+    signup_result = test_auth_signup(test_email, test_password, "CRUD Setup - Create User", expect_success=True)
+    if not signup_result.get("success"):
+        print("❌ Failed to create user for CRUD tests")
+        return []
+    
+    # Login to get token
+    login_result = test_auth_login(test_email, test_password, "CRUD Setup - Login User", expect_success=True)
+    if not login_result.get("success"):
+        print("❌ Failed to login user for CRUD tests")
+        return []
+    
+    access_token = login_result.get("access_token")
+    if not access_token:
+        print("❌ No access token received for CRUD tests")
+        return []
+    
+    print(f"✅ CRUD Setup complete - User created and logged in")
+    
+    crud_results = []
+    created_diagram_id = None
+    
+    # Test 1: POST /api/diagrams (Create Diagram) - Valid data
+    diagram_data = {
+        "title": "User Authentication Flow",
+        "description": "A comprehensive diagram showing user login and authentication process",
+        "diagram_type": "graphviz",
+        "diagram_code": "digraph G { A -> B -> C; }"
+    }
+    
+    result = test_diagram_crud(
+        access_token=access_token,
+        test_name="Create Diagram - Valid Data",
+        method="POST",
+        payload=diagram_data,
+        expect_success=True
+    )
+    crud_results.append(result)
+    
+    if result.get("success") and result.get("diagram_id"):
+        created_diagram_id = result["diagram_id"]
+    
+    # Test 2: POST /api/diagrams - Without token (should return 403)
+    result = test_diagram_crud(
+        access_token="",
+        test_name="Create Diagram - No Token",
+        method="POST",
+        payload=diagram_data,
+        expect_success=False,
+        expected_status=403
+    )
+    crud_results.append(result)
+    
+    # Test 3: POST /api/diagrams - Invalid token (should return 401)
+    result = test_diagram_crud(
+        access_token="invalid.jwt.token",
+        test_name="Create Diagram - Invalid Token",
+        method="POST",
+        payload=diagram_data,
+        expect_success=False,
+        expected_status=401
+    )
+    crud_results.append(result)
+    
+    # Test 4: POST /api/diagrams - Missing title (should return 422)
+    invalid_data = {
+        "description": "Missing title",
+        "diagram_type": "graphviz",
+        "diagram_code": "digraph G { A -> B; }"
+    }
+    
+    result = test_diagram_crud(
+        access_token=access_token,
+        test_name="Create Diagram - Missing Title",
+        method="POST",
+        payload=invalid_data,
+        expect_success=False,
+        expected_status=422
+    )
+    crud_results.append(result)
+    
+    # Test 5: PUT /api/diagrams/{id} (Update Diagram) - Valid update
+    if created_diagram_id:
+        update_data = {
+            "title": "Updated Authentication Flow",
+            "description": "Updated description with more details about the authentication process",
+            "diagram_type": "mermaid",
+            "diagram_code": "flowchart TD; A --> B --> C;"
+        }
+        
+        result = test_diagram_crud(
+            access_token=access_token,
+            test_name="Update Diagram - Valid Data",
+            method="PUT",
+            diagram_id=created_diagram_id,
+            payload=update_data,
+            expect_success=True
+        )
+        crud_results.append(result)
+    
+    # Test 6: PUT /api/diagrams/{id} - Non-existent diagram (should return 404)
+    result = test_diagram_crud(
+        access_token=access_token,
+        test_name="Update Diagram - Non-existent ID",
+        method="PUT",
+        diagram_id="non-existent-id",
+        payload=diagram_data,
+        expect_success=False,
+        expected_status=404
+    )
+    crud_results.append(result)
+    
+    # Test 7: Create another user to test ownership restrictions
+    other_email = f"otheruser_{timestamp}@example.com"
+    other_signup = test_auth_signup(other_email, test_password, "CRUD Setup - Create Other User", expect_success=True)
+    other_login = test_auth_login(other_email, test_password, "CRUD Setup - Login Other User", expect_success=True)
+    other_token = other_login.get("access_token") if other_login.get("success") else None
+    
+    # Test 8: PUT /api/diagrams/{id} - Update another user's diagram (should return 403)
+    if created_diagram_id and other_token:
+        result = test_diagram_crud(
+            access_token=other_token,
+            test_name="Update Diagram - Another User's Diagram",
+            method="PUT",
+            diagram_id=created_diagram_id,
+            payload=update_data,
+            expect_success=False,
+            expected_status=403
+        )
+        crud_results.append(result)
+    
+    # Test 9: GET /api/diagrams (List User Diagrams)
+    result = test_diagram_crud(
+        access_token=access_token,
+        test_name="List User Diagrams - Valid Token",
+        method="GET",
+        expect_success=True
+    )
+    crud_results.append(result)
+    
+    # Test 10: GET /api/diagrams/{id} (Get Single Diagram)
+    if created_diagram_id:
+        result = test_diagram_crud(
+            access_token=access_token,
+            test_name="Get Single Diagram - Valid ID",
+            method="GET",
+            diagram_id=created_diagram_id,
+            expect_success=True
+        )
+        crud_results.append(result)
+    
+    # Test 11: GET /api/diagrams/{id} - Non-existent diagram (should return 404)
+    result = test_diagram_crud(
+        access_token=access_token,
+        test_name="Get Single Diagram - Non-existent ID",
+        method="GET",
+        diagram_id="non-existent-id",
+        expect_success=False,
+        expected_status=404
+    )
+    crud_results.append(result)
+    
+    # Test 12: GET /api/diagrams/{id} - Another user's diagram (should return 403)
+    if created_diagram_id and other_token:
+        result = test_diagram_crud(
+            access_token=other_token,
+            test_name="Get Single Diagram - Another User's Diagram",
+            method="GET",
+            diagram_id=created_diagram_id,
+            expect_success=False,
+            expected_status=403
+        )
+        crud_results.append(result)
+    
+    # Test 13: DELETE /api/diagrams/{id} - Another user's diagram (should return 403)
+    if created_diagram_id and other_token:
+        result = test_diagram_crud(
+            access_token=other_token,
+            test_name="Delete Diagram - Another User's Diagram",
+            method="DELETE",
+            diagram_id=created_diagram_id,
+            expect_success=False,
+            expected_status=403
+        )
+        crud_results.append(result)
+    
+    # Test 14: DELETE /api/diagrams/{id} - Non-existent diagram (should return 404)
+    result = test_diagram_crud(
+        access_token=access_token,
+        test_name="Delete Diagram - Non-existent ID",
+        method="DELETE",
+        diagram_id="non-existent-id",
+        expect_success=False,
+        expected_status=404
+    )
+    crud_results.append(result)
+    
+    # Test 15: DELETE /api/diagrams/{id} (Delete Diagram) - Valid deletion
+    if created_diagram_id:
+        result = test_diagram_crud(
+            access_token=access_token,
+            test_name="Delete Diagram - Valid ID",
+            method="DELETE",
+            diagram_id=created_diagram_id,
+            expect_success=True
+        )
+        crud_results.append(result)
+        
+        # Test 16: Verify diagram is deleted - should not be in list anymore
+        result = test_diagram_crud(
+            access_token=access_token,
+            test_name="Verify Deletion - List After Delete",
+            method="GET",
+            expect_success=True
+        )
+        crud_results.append(result)
+        
+        # Check if the deleted diagram is no longer in the list
+        if result.get("success") and result.get("response_data"):
+            diagram_ids = [d.get("id") for d in result["response_data"]]
+            result["deleted_diagram_not_in_list"] = created_diagram_id not in diagram_ids
+            print(f"   Deleted diagram not in list: {'✅' if result['deleted_diagram_not_in_list'] else '❌'}")
+    
+    return crud_results
+
 def run_diagram_generation_tests() -> list:
     """Run comprehensive diagram generation tests"""
     print("\n🎨 Starting Diagram Generation Tests")
