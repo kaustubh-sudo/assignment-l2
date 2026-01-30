@@ -338,7 +338,7 @@ const DiagramRenderer = () => {
   };
 
   // Save or update diagram
-  const handleSaveDiagram = async ({ title, description }) => {
+  const handleSaveDiagram = async ({ title, description, folder_id }) => {
     if (!generatedCode) {
       toast.error('Please generate a diagram first');
       return;
@@ -351,7 +351,8 @@ const DiagramRenderer = () => {
         title,
         description,
         diagram_type: diagramType,
-        diagram_code: generatedCode
+        diagram_code: generatedCode,
+        folder_id: folder_id
       };
 
       let response;
@@ -388,6 +389,7 @@ const DiagramRenderer = () => {
         id: data.id,
         title: data.title,
         description: data.description,
+        folder_id: data.folder_id,
         updated_at: data.updated_at
       });
 
