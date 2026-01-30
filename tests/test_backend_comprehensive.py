@@ -696,19 +696,22 @@ class TestAPIEndpoints:
     def test_get_current_user_success(self, client):
         """Test getting current user with valid token"""
         import uuid
-        email = f"metest_{uuid.uuid4().hex[:8]}@example.com"
+        import time
+        email = f"metest_{uuid.uuid4().hex[:8]}_{int(time.time())}@example.com"
         password = "testpassword"
         
         # Create user and login
-        client.post("/api/auth/signup", json={
+        signup_resp = client.post("/api/auth/signup", json={
             "email": email,
             "password": password
         })
+        assert signup_resp.status_code == 201
         
         login_response = client.post("/api/auth/login", json={
             "email": email,
             "password": password
         })
+        assert login_response.status_code == 200
         
         token = login_response.json()['access_token']
         
