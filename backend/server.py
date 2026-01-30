@@ -258,6 +258,46 @@ async def create_diagram(
     Save a new diagram for the authenticated user.
     Requires valid JWT token in Authorization header.
     """
+    # Check for existing diagram with same title (prevent duplicates)
+    existing_diagram = await db.diagrams.find_one({
+        "user_id": current_user.user_id,
+        "title": diagram_data.title
+    })
+    
+    if existing_diagram:
+        # Update existing diagram instead of creating duplicate
+        now = datetime.now(timezone.utc)
+        update_data = {
+            "description": diagram_data.description,
+            "diagram_type": diagram_data.diagram_type,
+            "diagram_code": diagram_data.diagram_code,
+            "folder_id": diagram_data.folder_id,
+            "updated_at": now.isoformat()
+        }
+        
+        await db.diagrams.update_one(
+            {"id": existing_diagram["id"]},
+            {"$set": update_data}
+        )
+        
+        created_at = existing_diagram['created_at']
+        if isinstance(created_at, str):
+            created_at = datetime.fromisoformat(created_at)
+        
+        logger.info(f"Diagram updated (duplicate title): {existing_diagram['id']} by user {current_user.user_id}")
+        
+        return DiagramResponse(
+            id=existing_diagram['id'],
+            user_id=current_user.user_id,
+            title=diagram_data.title,
+            description=diagram_data.description,
+            diagram_type=diagram_data.diagram_type,
+            diagram_code=diagram_data.diagram_code,
+            folder_id=diagram_data.folder_id,
+            created_at=created_at,
+            updated_at=now
+        )
+    
     # Validate folder_id if provided
     if diagram_data.folder_id:
         folder = await db.folders.find_one({"id": diagram_data.folder_id, "user_id": current_user.user_id})
