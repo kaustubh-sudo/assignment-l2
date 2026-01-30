@@ -70,6 +70,37 @@ class DiagramGenerationResponse(BaseModel):
     code: str
     kroki_type: str
 
+# Diagram Save/Update Models
+class DiagramCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str = Field(default="", max_length=1000)
+    diagram_type: str
+    diagram_code: str
+
+class DiagramUpdate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str = Field(default="", max_length=1000)
+    diagram_type: str
+    diagram_code: str
+
+class DiagramResponse(BaseModel):
+    id: str
+    user_id: str
+    title: str
+    description: str
+    diagram_type: str
+    diagram_code: str
+    created_at: datetime
+    updated_at: datetime
+
+class DiagramListResponse(BaseModel):
+    id: str
+    title: str
+    description: str
+    diagram_type: str
+    created_at: datetime
+    updated_at: datetime
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
