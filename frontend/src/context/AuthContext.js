@@ -59,9 +59,18 @@ export const AuthProvider = ({ children }) => {
       body: JSON.stringify({ email, password })
     });
 
-    const data = await response.json();
+    // Store response status before reading body (body can only be read once)
+    const responseOk = response.ok;
+    const responseStatus = response.status;
     
-    if (!response.ok) {
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      throw new Error(`Login failed (status ${responseStatus})`);
+    }
+    
+    if (!responseOk) {
       throw new Error(data.detail || 'Login failed');
     }
 
