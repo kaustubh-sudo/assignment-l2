@@ -904,11 +904,12 @@ class TestEdgeCases:
 class TestIntegration:
     """Integration tests for complete workflows"""
     
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def client(self):
         from fastapi.testclient import TestClient
         from server import app
-        return TestClient(app)
+        with TestClient(app) as c:
+            yield c
     
     def test_full_auth_flow(self, client):
         """Test complete authentication flow"""
