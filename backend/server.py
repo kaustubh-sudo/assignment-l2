@@ -511,6 +511,109 @@ async def delete_diagram(
     
     return None
 
+# ============== Folder CRUD Endpoints ==============
+
+@api_router.post("/folders", response_model=FolderResponse, status_code=status.HTTP_201_CREATED)
+async def create_folder(
+    folder_data: FolderCreate,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """
+    Create a new folder for the authenticated user.
+    """
+    # Check if folder with same name already exists for user
+    existing_folder = await db.folders.find_one({
+        "user_id": current_user.user_id,
+        "name": folder_data.name
+    })
+    
+    if existing_folder:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A folder with this name already exists"
+        )
+    
+    now = datetime.now(timezone.utc)
+    
+    folder = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user.user_id,
+        "name": folder_data.name,
+        "created_at": now.isoformat()
+    }
+    
+    await db.folders.insert_one(folder)
+    
+    logger.info(f"Folder created: {folder['id']} by user {current_user.user_id}")
+    
+    return FolderResponse(
+        id=folder['id'],
+        user_id=folder['user_id'],
+        name=folder['name'],
+        created_at=now
+    )
+
+@api_router.get("/folders", response_model=FolderListResponse)
+async def get_user_folders(current_user: TokenData = Depends(get_current_user)):
+    """
+    Get all folders for the authenticated user.
+    """
+    folders = await db.folders.find(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("name", 1).to_list(100)
+    
+    result = []
+    for f in folders:
+        created_at = f['created_at']
+        if isinstance(created_at, str):
+            created_at = datetime.fromisoformat(created_at)
+        
+        result.append(FolderResponse(
+            id=f['id'],
+            user_id=f['user_id'],
+            name=f['name'],
+            created_at=created_at
+        ))
+    
+    return FolderListResponse(folders=result)
+
+@api_router.delete("/folders/{folder_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_folder(
+    folder_id: str,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """
+    Delete a folder by ID.
+    Diagrams in the folder will have their folder_id set to null.
+    """
+    folder = await db.folders.find_one({"id": folder_id})
+    
+    if not folder:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Folder not found"
+        )
+    
+    # Check ownership
+    if folder['user_id'] != current_user.user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to delete this folder"
+        )
+    
+    # Remove folder_id from all diagrams in this folder
+    await db.diagrams.update_many(
+        {"folder_id": folder_id},
+        {"$set": {"folder_id": None}}
+    )
+    
+    await db.folders.delete_one({"id": folder_id})
+    
+    logger.info(f"Folder deleted: {folder_id} by user {current_user.user_id}")
+    
+    return None
+
 @api_router.post("/generate-diagram", response_model=DiagramGenerationResponse)
 async def generate_diagram(request: DiagramGenerationRequest):
     """
