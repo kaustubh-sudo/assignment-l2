@@ -1068,12 +1068,14 @@ def main():
     
     # Categorize results
     auth_tests = [r for r in all_results if "auth" in r.get("test_name", "").lower() or "signup" in r.get("test_name", "").lower() or "login" in r.get("test_name", "").lower()]
-    diagram_tests = [r for r in all_results if any(dt in r.get("test_name", "").lower() for dt in ["graphviz", "mermaid", "plantuml", "pikchr"])]
+    crud_tests = [r for r in all_results if "diagram" in r.get("test_name", "").lower() and any(method in r.get("test_name", "").lower() for method in ["create", "update", "delete", "list", "get", "crud"])]
+    diagram_tests = [r for r in all_results if any(dt in r.get("test_name", "").lower() for dt in ["graphviz", "mermaid", "plantuml", "pikchr"]) and "crud" not in r.get("test_name", "").lower()]
     status_tests = [r for r in all_results if "status" in r.get("test_name", "").lower()]
     root_tests = [r for r in all_results if "root" in r.get("test_name", "").lower()]
     
     categories = [
         ("Authentication", auth_tests),
+        ("Diagram CRUD", crud_tests),
         ("Diagram Generation", diagram_tests), 
         ("Status Endpoints", status_tests),
         ("Root Endpoint", root_tests)
