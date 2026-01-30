@@ -636,60 +636,148 @@ def run_diagram_generation_tests() -> list:
 
 def main():
     """Run all test scenarios"""
-    print("🚀 Starting Backend API Tests for Kroki Diagram Renderer")
+    print("🚀 Starting COMPREHENSIVE REGRESSION TEST for Kroki Diagram Renderer")
     print(f"Backend URL: {BACKEND_URL}")
     
-    # Run authentication tests first
-    auth_results = run_auth_tests()
-    
-    # Test basic connectivity
+    # Test basic connectivity first
     print(f"\n🔍 CONNECTIVITY TEST")
     try:
         health_response = requests.get(f"{API_BASE}/", timeout=10)
         print(f"✅ Basic connectivity: {health_response.status_code} - {health_response.json()}")
     except Exception as e:
         print(f"❌ Basic connectivity failed: {e}")
+        return 1
     
-    # Summary for authentication tests
+    # Run all test categories
+    all_results = []
+    
+    # 1. Authentication Tests
     print(f"\n{'='*80}")
-    print("📊 AUTHENTICATION TEST SUMMARY")
+    print("🔐 AUTHENTICATION ENDPOINTS TESTING")
+    print(f"{'='*80}")
+    auth_results = run_auth_tests()
+    all_results.extend(auth_results)
+    
+    # 2. Diagram Generation Tests
+    print(f"\n{'='*80}")
+    print("🎨 DIAGRAM GENERATION TESTING")
+    print(f"{'='*80}")
+    diagram_results = run_diagram_generation_tests()
+    all_results.extend(diagram_results)
+    
+    # 3. Status Endpoints Tests
+    print(f"\n{'='*80}")
+    print("📊 STATUS ENDPOINTS TESTING")
+    print(f"{'='*80}")
+    status_results = test_status_endpoints()
+    all_results.extend(status_results)
+    
+    # 4. Root Endpoint Test
+    print(f"\n{'='*80}")
+    print("🏠 ROOT ENDPOINT TESTING")
+    print(f"{'='*80}")
+    root_result = test_root_endpoint()
+    all_results.append(root_result)
+    
+    # Comprehensive Summary
+    print(f"\n{'='*80}")
+    print("📊 COMPREHENSIVE REGRESSION TEST SUMMARY")
     print(f"{'='*80}")
     
-    auth_passed = 0
-    auth_failed = 0
-    auth_critical_issues = []
+    # Categorize results
+    auth_tests = [r for r in all_results if "auth" in r.get("test_name", "").lower() or "signup" in r.get("test_name", "").lower() or "login" in r.get("test_name", "").lower()]
+    diagram_tests = [r for r in all_results if any(dt in r.get("test_name", "").lower() for dt in ["graphviz", "mermaid", "plantuml", "pikchr"])]
+    status_tests = [r for r in all_results if "status" in r.get("test_name", "").lower()]
+    root_tests = [r for r in all_results if "root" in r.get("test_name", "").lower()]
     
-    for result in auth_results:
-        status = "✅ PASS" if result["success"] else "❌ FAIL"
-        print(f"{status} - {result['test_name']}")
-        
-        if result["success"]:
-            auth_passed += 1
-            print(f"      Status: {result['status_code']}, Time: {result.get('response_time', 0):.2f}s")
-        else:
-            auth_failed += 1
-            auth_critical_issues.append(f"CRITICAL: {result['test_name']} - Authentication test failed")
+    categories = [
+        ("Authentication", auth_tests),
+        ("Diagram Generation", diagram_tests), 
+        ("Status Endpoints", status_tests),
+        ("Root Endpoint", root_tests)
+    ]
+    
+    total_passed = 0
+    total_failed = 0
+    critical_issues = []
+    
+    for category_name, category_results in categories:
+        if not category_results:
+            continue
             
-            if result.get('status_code'):
-                print(f"      Status: {result['status_code']}")
-                if result.get('error_response'):
-                    print(f"      Error: {result['error_response'][:100]}...")
+        passed = sum(1 for r in category_results if r.get("success", False))
+        failed = len(category_results) - passed
+        
+        print(f"\n📋 {category_name.upper()} RESULTS:")
+        print(f"   ✅ Passed: {passed}")
+        print(f"   ❌ Failed: {failed}")
+        
+        # Show detailed results for each test
+        for result in category_results:
+            status = "✅ PASS" if result.get("success", False) else "❌ FAIL"
+            test_name = result.get("test_name", "Unknown Test")
+            print(f"   {status} - {test_name}")
+            
+            if result.get("success", False):
+                # Show success details
+                if result.get("response_time"):
+                    print(f"        Status: {result.get('status_code', 'N/A')}, Time: {result.get('response_time', 0):.2f}s")
+                if result.get("code_length"):
+                    print(f"        Code length: {result['code_length']} chars")
+                if result.get("kroki_success") is not None:
+                    kroki_status = "✅" if result["kroki_success"] else "❌"
+                    print(f"        Kroki render: {kroki_status}")
             else:
-                print(f"      Connection Error: {result.get('error', 'Unknown')}")
+                # Show failure details
+                if result.get("status_code"):
+                    print(f"        Status: {result['status_code']}")
+                    if result.get("error_response"):
+                        print(f"        Error: {result['error_response'][:100]}...")
+                elif result.get("error"):
+                    print(f"        Connection Error: {result['error']}")
+                
+                # Add to critical issues
+                if category_name in ["Authentication", "Diagram Generation"]:
+                    critical_issues.append(f"CRITICAL: {test_name} - {category_name} test failed")
+        
+        total_passed += passed
+        total_failed += failed
     
-    print(f"\n📈 AUTH RESULTS: {auth_passed} passed, {auth_failed} failed")
+    # Overall summary
+    print(f"\n🎯 OVERALL RESULTS:")
+    print(f"   Total Tests: {total_passed + total_failed}")
+    print(f"   ✅ Passed: {total_passed}")
+    print(f"   ❌ Failed: {total_failed}")
+    print(f"   Success Rate: {(total_passed / (total_passed + total_failed) * 100):.1f}%")
     
-    if auth_critical_issues:
-        print(f"\n🚨 AUTHENTICATION CRITICAL ISSUES:")
-        for issue in auth_critical_issues:
+    # Critical issues
+    if critical_issues:
+        print(f"\n🚨 CRITICAL ISSUES FOUND:")
+        for issue in critical_issues:
             print(f"   • {issue}")
     
+    # Backend service status check
+    print(f"\n🔧 BACKEND SERVICE STATUS:")
+    try:
+        backend_logs_cmd = "tail -n 20 /var/log/supervisor/backend.*.log"
+        import subprocess
+        logs = subprocess.run(backend_logs_cmd, shell=True, capture_output=True, text=True, timeout=10)
+        if logs.returncode == 0 and logs.stdout:
+            print("   Backend logs (last 20 lines):")
+            for line in logs.stdout.split('\n')[-10:]:  # Show last 10 lines
+                if line.strip():
+                    print(f"     {line}")
+        else:
+            print("   ⚠️  Could not retrieve backend logs")
+    except Exception as e:
+        print(f"   ⚠️  Error checking backend logs: {e}")
+    
     # Return exit code based on results
-    if auth_failed > 0:
-        print(f"\n❌ AUTHENTICATION TESTING FAILED: {auth_failed} test(s) failed")
+    if total_failed > 0:
+        print(f"\n❌ REGRESSION TEST FAILED: {total_failed} test(s) failed")
         return 1
     else:
-        print(f"\n✅ ALL AUTHENTICATION TESTS PASSED: {auth_passed} test(s) successful")
+        print(f"\n✅ ALL REGRESSION TESTS PASSED: {total_passed} test(s) successful")
         return 0
 
 if __name__ == "__main__":
