@@ -38,13 +38,8 @@ def evaluate_bug(bug_id: str) -> Dict:
     status = check_bug_status(bug_id)
     is_fixed = status == "FIXED"
     
-    # Points based on difficulty
-    difficulty_points = {
-        "Easy": 1,
-        "Medium": 2,
-        "Hard": 3
-    }
-    max_points = difficulty_points.get(bug["difficulty"], 1)
+    # Use points from bug definition
+    max_points = bug.get("points", 5)
     
     return {
         "bug_id": bug_id,
@@ -143,6 +138,7 @@ def generate_html_report(evaluation: Dict, candidate: str) -> str:
         .badge {{ padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; }}
         .badge-fixed {{ background: #dcfce7; color: #166534; }}
         .badge-broken {{ background: #fee2e2; color: #991b1b; }}
+        .badge-difficulty {{ background: #f1f5f9; color: #475569; margin-left: 0.5rem; }}
         .category-header {{ font-weight: 600; color: #475569; margin: 1rem 0 0.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }}
         .category-header:first-child {{ border-top: none; padding-top: 0; margin-top: 0; }}
     </style>
@@ -191,7 +187,8 @@ def generate_html_report(evaluation: Dict, candidate: str) -> str:
         bugs_by_category[cat].append(bug)
     
     for category, bugs in bugs_by_category.items():
-        html += f'<div class="category-header">{category}</div>'
+        cat_data = evaluation["categories"][category]
+        html += f'<div class="category-header">{category} ({cat_data["points"]}/{cat_data["max_points"]} pts)</div>'
         for bug in bugs:
             status_color = get_status_color(bug["fixed"])
             badge_class = "badge-fixed" if bug["fixed"] else "badge-broken"
@@ -201,10 +198,9 @@ def generate_html_report(evaluation: Dict, candidate: str) -> str:
                 <div class="bug-item">
                     <div class="bug-status" style="background: {status_color};"></div>
                     <div class="bug-info">
-                        <div class="bug-id">{bug['bug_id']}</div>
+                        <div class="bug-id">{bug['bug_id']} <span class="badge badge-difficulty">{bug['difficulty']}</span></div>
                         <div class="bug-desc">{bug['description']}</div>
                         <div class="bug-meta">
-                            <span>Difficulty: {bug['difficulty']}</span>
                             <span>Points: {bug['points']}/{bug['max_points']}</span>
                         </div>
                     </div>
@@ -251,7 +247,8 @@ def print_evaluation(evaluation: Dict, candidate: str) -> None:
     print("\n🐛 BUG DETAILS:")
     for bug in evaluation["details"]:
         icon = "✅" if bug["fixed"] else "❌"
-        print(f"   {icon} {bug['bug_id']}: {bug['description'][:50]}")
+        pts = f"[{bug['points']}/{bug['max_points']}pts]"
+        print(f"   {icon} {bug['bug_id']} {pts}: {bug['description'][:45]}...")
     
     print("\n" + "="*60 + "\n")
 
