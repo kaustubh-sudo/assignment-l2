@@ -99,6 +99,96 @@ async def get_status_checks():
     
     return status_checks
 
+# ============== Authentication Endpoints ==============
+
+@api_router.post("/auth/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def signup(user_data: UserCreate):
+    """
+    Register a new user with email and password.
+    Password must be at least 6 characters.
+    """
+    # Check if user already exists
+    existing_user = await db.users.find_one({"email": user_data.email})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Create new user
+    user = User(
+        email=user_data.email,
+        hashed_password=get_password_hash(user_data.password)
+    )
+    
+    # Save to database
+    user_dict = user.model_dump()
+    user_dict['created_at'] = user_dict['created_at'].isoformat()
+    await db.users.insert_one(user_dict)
+    
+    logger.info(f"New user registered: {user_data.email}")
+    
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        created_at=user.created_at
+    )
+
+@api_router.post("/auth/login", response_model=Token)
+async def login(credentials: UserLogin):
+    """
+    Authenticate user and return JWT access token.
+    """
+    # Find user by email
+    user_doc = await db.users.find_one({"email": credentials.email})
+    if not user_doc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Verify password
+    if not verify_password(credentials.password, user_doc['hashed_password']):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Create access token
+    access_token = create_access_token(
+        data={"sub": user_doc['id'], "email": user_doc['email']}
+    )
+    
+    logger.info(f"User logged in: {credentials.email}")
+    
+    return Token(access_token=access_token)
+
+@api_router.get("/auth/me", response_model=UserResponse)
+async def get_current_user_info(current_user: TokenData = Depends(get_current_user)):
+    """
+    Get current authenticated user's information.
+    Requires valid JWT token in Authorization header.
+    """
+    user_doc = await db.users.find_one({"id": current_user.user_id})
+    if not user_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Convert ISO string to datetime if needed
+    created_at = user_doc['created_at']
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at)
+    
+    return UserResponse(
+        id=user_doc['id'],
+        email=user_doc['email'],
+        created_at=created_at
+    )
+
 @api_router.post("/generate-diagram", response_model=DiagramGenerationResponse)
 async def generate_diagram(request: DiagramGenerationRequest):
     """
