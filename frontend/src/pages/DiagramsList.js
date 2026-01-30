@@ -446,7 +446,7 @@ const DiagramsList = () => {
                 </div>
                 <h2 className="text-2xl font-semibold text-white mb-2">No diagrams yet</h2>
                 <p className="text-gray-400 text-center max-w-md mb-8">
-                  You haven't created any diagrams yet. Start by creating your first diagram to visualize your ideas.
+                  You have not created any diagrams yet. Start by creating your first diagram to visualize your ideas.
                 </p>
                 <Button
                   onClick={handleCreateNew}
@@ -465,7 +465,7 @@ const DiagramsList = () => {
                 <h2 className="text-2xl font-semibold text-white mb-2">No results found</h2>
                 <p className="text-gray-400 text-center max-w-md mb-6">
                   {debouncedSearchQuery ? (
-                    <>No diagrams match "<span className="text-white font-medium">{debouncedSearchQuery}</span>"</>
+                    <>No diagrams match &quot;<span className="text-white font-medium">{debouncedSearchQuery}</span>&quot;</>
                   ) : (
                     <>No diagrams in this folder</>
                   )}
