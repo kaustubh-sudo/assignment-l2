@@ -92,12 +92,13 @@ export const AuthProvider = ({ children }) => {
       body: JSON.stringify({ email, password })
     });
 
+    const data = await response.json();
+    
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Signup failed');
+      throw new Error(data.detail || 'Signup failed');
     }
 
-    return await response.json();
+    return data;
   };
 
   const logout = () => {
