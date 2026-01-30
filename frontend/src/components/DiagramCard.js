@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Edit, Calendar, ExternalLink } from 'lucide-react';
+import { Trash2, Edit, Calendar, ExternalLink, Folder } from 'lucide-react';
 import { Button } from './ui/button';
 
 const DIAGRAM_TYPE_LABELS = {
@@ -12,7 +12,7 @@ const DIAGRAM_TYPE_LABELS = {
   pikchr: { label: 'Pikchr', emoji: '✏️', color: 'bg-pink-500/20 text-pink-400' },
 };
 
-const DiagramCard = ({ diagram, onDelete }) => {
+const DiagramCard = ({ diagram, onDelete, folderName }) => {
   const navigate = useNavigate();
   
   const typeInfo = DIAGRAM_TYPE_LABELS[diagram.diagram_type] || {
