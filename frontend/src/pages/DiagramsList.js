@@ -1,12 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderOpen, RefreshCw } from 'lucide-react';
+import { Plus, FolderOpen, RefreshCw, Search, X } from 'lucide-react';
 import Header from '../components/Header';
 import DiagramCard from '../components/DiagramCard';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
+
+// Custom hook for debouncing
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 
 const DiagramsList = () => {
   const navigate = useNavigate();
@@ -15,11 +33,33 @@ const DiagramsList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  
   // Delete state
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
+  // Filter diagrams based on search query (case-insensitive)
+  const filteredDiagrams = useMemo(() => {
+    if (!debouncedSearchQuery.trim()) {
+      return diagrams;
+    }
+    
+    const query = debouncedSearchQuery.toLowerCase().trim();
+    return diagrams.filter(diagram => 
+      diagram.title.toLowerCase().includes(query) ||
+      (diagram.description && diagram.description.toLowerCase().includes(query))
+    );
+  }, [diagrams, debouncedSearchQuery]);
+
+  // Clear search
+  const handleClearSearch = () => {
+    setSearchQuery('');
+  };
 
   // Fetch diagrams
   const fetchDiagrams = async () => {
