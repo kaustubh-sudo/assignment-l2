@@ -1,0 +1,145 @@
+{
+  "summary": "Full regression testing completed for Kroki Diagram Renderer. All 31 backend API tests passed (100%). All frontend features verified: Auth (signup, login, logout, protected routes), Diagram CRUD (create, read, update, delete), Diagram Generation (GraphViz, Mermaid, PlantUML), Export (SVG, PNG), Search with debounce, and Folder management (create, filter, delete).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "DiagramCard",
+        "issues": ["Visual artifact (brown/amber oval shape) appears on diagram cards with folder assignment - appears to be a rendering issue with the folder badge or icon"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_full_regression.py",
+    "/app/test_reports/pytest/pytest_results_regression.xml"
+  ],
+  "action_items": [
+    "Investigate the brown/amber oval visual artifact on DiagramCard component - may be related to folder badge styling or icon rendering"
+  ],
+  "critical_code_review_comments": [
+    "Login.js and Signup.js are missing data-testid attributes on form inputs - recommend adding for better testability",
+    "InputPanel.js is missing data-testid on Generate button and diagram type selector"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_full_regression.py"
+  ],
+  "success_rate": {
+    "backend": "100% (31/31 tests passed)",
+    "frontend": "100% (all user stories verified)"
+  },
+  "test_credentials": {
+    "existing_user": {"email": "foldertest@example.com", "password": "password123"},
+    "new_signup_test": {"email": "regression_test@example.com", "password": "testpass123"}
+  },
+  "seed_data_creation": "Used existing test data from previous iterations. Created test users during signup tests.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Full regression completed. All features working. Key data-testid selectors: search-input, search-clear-button, folder-filter-all, folder-filter-none, folder-filter-{id}, new-folder-btn, folder-name-input, create-folder-submit, diagram-title-input, diagram-description-input, diagram-folder-select, save-diagram-submit, export-button, export-svg-option, export-png-option, diagrams-grid.",
+  "features_tested": {
+    "US-1_Signup": {
+      "signup_page_loads": "PASS",
+      "email_input_present": "PASS",
+      "password_input_present": "PASS",
+      "confirm_password_input_present": "PASS",
+      "password_validation_short": "PASS - Shows 'at least 6 characters' error",
+      "password_mismatch_validation": "PASS - Shows 'Passwords do not match' error",
+      "signup_link_to_login": "PASS"
+    },
+    "US-2_Login": {
+      "login_page_loads": "PASS",
+      "invalid_credentials_error": "PASS - Shows 'Invalid email or password' toast",
+      "successful_login": "PASS - Redirects to diagrams list",
+      "jwt_token_stored": "PASS"
+    },
+    "US-3_Logout": {
+      "logout_button_visible": "PASS",
+      "logout_clears_session": "PASS",
+      "logout_redirects_to_login": "PASS - Shows 'Logged out successfully' toast"
+    },
+    "US-4_Protected_Routes": {
+      "editor_requires_auth": "PASS - Redirects to login",
+      "diagrams_list_requires_auth": "PASS",
+      "api_endpoints_require_auth": "PASS - Returns 401/403"
+    },
+    "US-5_Save_Diagram": {
+      "save_button_present": "PASS",
+      "save_modal_opens": "PASS",
+      "title_input_present": "PASS",
+      "description_input_present": "PASS",
+      "folder_dropdown_present": "PASS",
+      "api_creates_diagram": "PASS - 201 response"
+    },
+    "US-6_Update_Diagram": {
+      "edit_button_present": "PASS",
+      "edit_loads_diagram": "PASS",
+      "api_updates_diagram": "PASS - 200 response"
+    },
+    "US-7_List_Diagrams": {
+      "diagrams_grid_visible": "PASS",
+      "diagram_cards_show_title": "PASS",
+      "diagram_cards_show_type": "PASS",
+      "diagram_cards_show_date": "PASS",
+      "sorted_by_date": "PASS"
+    },
+    "US-8_Delete_Diagram": {
+      "delete_button_present": "PASS",
+      "confirmation_modal_opens": "PASS",
+      "cancel_button_works": "PASS",
+      "api_deletes_diagram": "PASS - 204 response"
+    },
+    "US-9_Load_for_Editing": {
+      "edit_navigates_to_editor": "PASS",
+      "diagram_data_loaded": "PASS",
+      "textarea_has_content": "PASS"
+    },
+    "US-10_Export_Diagram": {
+      "export_button_present": "PASS",
+      "svg_option_present": "PASS",
+      "png_option_present": "PASS"
+    },
+    "US-11_Search_Diagrams": {
+      "search_input_present": "PASS",
+      "search_filters_results": "PASS",
+      "clear_button_present": "PASS",
+      "debounce_working": "PASS"
+    },
+    "US-12_Create_Folders": {
+      "new_folder_button_present": "PASS",
+      "create_folder_modal_opens": "PASS",
+      "folder_name_input_present": "PASS",
+      "api_creates_folder": "PASS - 201 response",
+      "api_lists_folders": "PASS",
+      "api_deletes_folder": "PASS - 204 response"
+    },
+    "US-13_Move_Diagram_to_Folder": {
+      "folder_sidebar_present": "PASS",
+      "all_diagrams_filter": "PASS",
+      "no_folder_filter": "PASS",
+      "specific_folder_filter": "PASS",
+      "folder_dropdown_in_save_modal": "PASS",
+      "api_moves_diagram_to_folder": "PASS",
+      "api_removes_diagram_from_folder": "PASS"
+    },
+    "Diagram_Generation": {
+      "graphviz_generation": "PASS",
+      "mermaid_generation": "PASS",
+      "plantuml_generation": "PASS",
+      "diagram_renders_in_preview": "PASS"
+    }
+  },
+  "backend_test_results": {
+    "TestSignup": "4/4 passed",
+    "TestLogin": "3/3 passed",
+    "TestProtectedRoutes": "4/4 passed",
+    "TestDiagramCRUD": "8/8 passed",
+    "TestDiagramGeneration": "4/4 passed",
+    "TestFolderCRUD": "3/3 passed",
+    "TestDiagramFolderAssociation": "4/4 passed",
+    "TestHealthCheck": "1/1 passed"
+  }
+}
