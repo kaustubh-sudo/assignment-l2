@@ -5,7 +5,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 **Time Limit:** 1 hour  
 **Total Bugs:** 10  
-**Total Points:** 70  
+**Total Points:** 75  
 **Categories:** Authentication (4 bugs), Save/Load (6 bugs)
 
 ---
@@ -182,8 +182,8 @@ You have been given access to a **Diagram Maker** web application that allows us
 | Category | Bugs | Points |
 |----------|------|--------|
 | Authentication | 4 | 20 |
-| Save/Load | 6 | 50 |
-| **Total** | **10** | **70** |
+| Save/Load | 6 | 55 |
+| **Total** | **10** | **75** |
 
 ### Scoring
 - Each bug fixed correctly = Full points for that bug

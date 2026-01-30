@@ -18,7 +18,7 @@
 | SAVE-004 | Save/Load | Medium | 10 | DiagramRenderer.js |
 | SAVE-005 | Save/Load | Easy | 5 | SaveDiagramModal.js |
 | SAVE-006 | Save/Load | Easy | 5 | server.py |
-| **Total** | | | **70** | |
+| **Total** | | | **75** | |
 
 ---
 
@@ -363,11 +363,11 @@ python evaluate.py --candidate "Candidate Name" --html
 
 | Score | Grade | Assessment |
 |-------|-------|-----------|
-| 60-70 | A | Excellent - Fixed most/all bugs |
-| 45-59 | B | Good - Fixed majority of bugs |
-| 30-44 | C | Average - Fixed some bugs |
-| 15-29 | D | Below Average - Missed many bugs |
-| 0-14 | F | Needs Improvement |
+| 65-75 | A | Excellent - Fixed most/all bugs |
+| 50-64 | B | Good - Fixed majority of bugs |
+| 35-49 | C | Average - Fixed some bugs |
+| 20-34 | D | Below Average - Missed many bugs |
+| 0-19 | F | Needs Improvement |
 
 ---
 
