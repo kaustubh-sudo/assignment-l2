@@ -220,6 +220,207 @@ async def get_current_user_info(current_user: TokenData = Depends(get_current_us
         created_at=created_at
     )
 
+# ============== Diagram CRUD Endpoints ==============
+
+@api_router.post("/diagrams", response_model=DiagramResponse, status_code=status.HTTP_201_CREATED)
+async def create_diagram(
+    diagram_data: DiagramCreate,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """
+    Save a new diagram for the authenticated user.
+    Requires valid JWT token in Authorization header.
+    """
+    now = datetime.now(timezone.utc)
+    
+    diagram = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user.user_id,
+        "title": diagram_data.title,
+        "description": diagram_data.description,
+        "diagram_type": diagram_data.diagram_type,
+        "diagram_code": diagram_data.diagram_code,
+        "created_at": now.isoformat(),
+        "updated_at": now.isoformat()
+    }
+    
+    await db.diagrams.insert_one(diagram)
+    
+    logger.info(f"Diagram created: {diagram['id']} by user {current_user.user_id}")
+    
+    return DiagramResponse(
+        id=diagram['id'],
+        user_id=diagram['user_id'],
+        title=diagram['title'],
+        description=diagram['description'],
+        diagram_type=diagram['diagram_type'],
+        diagram_code=diagram['diagram_code'],
+        created_at=now,
+        updated_at=now
+    )
+
+@api_router.put("/diagrams/{diagram_id}", response_model=DiagramResponse)
+async def update_diagram(
+    diagram_id: str,
+    diagram_data: DiagramUpdate,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """
+    Update an existing diagram.
+    Only the owner can update their diagram.
+    """
+    # Find the diagram
+    existing_diagram = await db.diagrams.find_one({"id": diagram_id})
+    
+    if not existing_diagram:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Diagram not found"
+        )
+    
+    # Check ownership
+    if existing_diagram['user_id'] != current_user.user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to update this diagram"
+        )
+    
+    now = datetime.now(timezone.utc)
+    
+    # Update the diagram
+    update_data = {
+        "title": diagram_data.title,
+        "description": diagram_data.description,
+        "diagram_type": diagram_data.diagram_type,
+        "diagram_code": diagram_data.diagram_code,
+        "updated_at": now.isoformat()
+    }
+    
+    await db.diagrams.update_one(
+        {"id": diagram_id},
+        {"$set": update_data}
+    )
+    
+    logger.info(f"Diagram updated: {diagram_id} by user {current_user.user_id}")
+    
+    # Parse created_at
+    created_at = existing_diagram['created_at']
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at)
+    
+    return DiagramResponse(
+        id=diagram_id,
+        user_id=current_user.user_id,
+        title=diagram_data.title,
+        description=diagram_data.description,
+        diagram_type=diagram_data.diagram_type,
+        diagram_code=diagram_data.diagram_code,
+        created_at=created_at,
+        updated_at=now
+    )
+
+@api_router.get("/diagrams", response_model=List[DiagramListResponse])
+async def get_user_diagrams(current_user: TokenData = Depends(get_current_user)):
+    """
+    Get all diagrams for the authenticated user.
+    """
+    diagrams = await db.diagrams.find(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("updated_at", -1).to_list(100)
+    
+    result = []
+    for d in diagrams:
+        created_at = d['created_at']
+        updated_at = d['updated_at']
+        if isinstance(created_at, str):
+            created_at = datetime.fromisoformat(created_at)
+        if isinstance(updated_at, str):
+            updated_at = datetime.fromisoformat(updated_at)
+        
+        result.append(DiagramListResponse(
+            id=d['id'],
+            title=d['title'],
+            description=d.get('description', ''),
+            diagram_type=d['diagram_type'],
+            created_at=created_at,
+            updated_at=updated_at
+        ))
+    
+    return result
+
+@api_router.get("/diagrams/{diagram_id}", response_model=DiagramResponse)
+async def get_diagram(
+    diagram_id: str,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """
+    Get a specific diagram by ID.
+    Only the owner can view their diagram.
+    """
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    
+    if not diagram:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Diagram not found"
+        )
+    
+    # Check ownership
+    if diagram['user_id'] != current_user.user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to view this diagram"
+        )
+    
+    created_at = diagram['created_at']
+    updated_at = diagram['updated_at']
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at)
+    if isinstance(updated_at, str):
+        updated_at = datetime.fromisoformat(updated_at)
+    
+    return DiagramResponse(
+        id=diagram['id'],
+        user_id=diagram['user_id'],
+        title=diagram['title'],
+        description=diagram.get('description', ''),
+        diagram_type=diagram['diagram_type'],
+        diagram_code=diagram['diagram_code'],
+        created_at=created_at,
+        updated_at=updated_at
+    )
+
+@api_router.delete("/diagrams/{diagram_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_diagram(
+    diagram_id: str,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """
+    Delete a diagram by ID.
+    Only the owner can delete their diagram.
+    """
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    
+    if not diagram:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Diagram not found"
+        )
+    
+    # Check ownership
+    if diagram['user_id'] != current_user.user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to delete this diagram"
+        )
+    
+    await db.diagrams.delete_one({"id": diagram_id})
+    
+    logger.info(f"Diagram deleted: {diagram_id} by user {current_user.user_id}")
+    
+    return None
+
 @api_router.post("/generate-diagram", response_model=DiagramGenerationResponse)
 async def generate_diagram(request: DiagramGenerationRequest):
     """
