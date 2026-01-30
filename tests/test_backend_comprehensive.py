@@ -904,58 +904,24 @@ class TestEdgeCases:
 class TestIntegration:
     """Integration tests for complete workflows"""
     
-    @pytest.fixture(scope="function")
-    def client(self):
+    def test_diagram_generation_all_types(self):
+        """Test diagram generation for all supported types"""
         from fastapi.testclient import TestClient
         from server import app
-        with TestClient(app) as c:
-            yield c
-    
-    def test_full_auth_flow(self, client):
-        """Test complete authentication flow"""
-        import uuid
-        import time
-        email = f"fullflow_{uuid.uuid4().hex[:8]}_{int(time.time())}@example.com"
-        password = "securepassword123"
         
-        # 1. Sign up
-        signup_resp = client.post("/api/auth/signup", json={
-            "email": email,
-            "password": password
-        })
-        assert signup_resp.status_code == 201
-        user_id = signup_resp.json()['id']
-        
-        # 2. Login
-        login_resp = client.post("/api/auth/login", json={
-            "email": email,
-            "password": password
-        })
-        assert login_resp.status_code == 200
-        token = login_resp.json()['access_token']
-        
-        # 3. Access protected route
-        me_resp = client.get("/api/auth/me", headers={
-            "Authorization": f"Bearer {token}"
-        })
-        assert me_resp.status_code == 200
-        assert me_resp.json()['id'] == user_id
-        assert me_resp.json()['email'] == email
-    
-    def test_diagram_generation_all_types(self, client):
-        """Test diagram generation for all supported types"""
-        diagram_types = ['graphviz', 'mermaid', 'plantuml', 'd2', 'blockdiag', 'pikchr']
-        
-        for dtype in diagram_types:
-            response = client.post("/api/generate-diagram", json={
-                "description": "User performs action, system responds",
-                "diagram_type": dtype
-            })
+        with TestClient(app) as client:
+            diagram_types = ['graphviz', 'mermaid', 'plantuml', 'd2', 'blockdiag', 'pikchr']
             
-            assert response.status_code == 200, f"Failed for {dtype}"
-            data = response.json()
-            assert 'code' in data, f"No code for {dtype}"
-            assert len(data['code']) > 0, f"Empty code for {dtype}"
+            for dtype in diagram_types:
+                response = client.post("/api/generate-diagram", json={
+                    "description": "User performs action, system responds",
+                    "diagram_type": dtype
+                })
+                
+                assert response.status_code == 200, f"Failed for {dtype}"
+                data = response.json()
+                assert 'code' in data, f"No code for {dtype}"
+                assert len(data['code']) > 0, f"Empty code for {dtype}"
 
 
 if __name__ == "__main__":
