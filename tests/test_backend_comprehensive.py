@@ -577,12 +577,13 @@ class TestDiagramGeneratorsV3:
 class TestAPIEndpoints:
     """Tests for FastAPI endpoints in server.py"""
     
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def client(self):
-        """Create test client"""
+        """Create test client - reused across class"""
         from fastapi.testclient import TestClient
         from server import app
-        return TestClient(app)
+        with TestClient(app) as c:
+            yield c
     
     def test_root_endpoint(self, client):
         """Test root endpoint returns hello world"""
