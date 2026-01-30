@@ -85,7 +85,7 @@ const DiagramRenderer = () => {
             const data = await response.json();
             setDiagramType(data.diagram_type);
             setGeneratedCode(data.diagram_code);
-            // BUG: Not setting userInput from description
+            setUserInput(data.description || '');
             setSavedDiagram({
               id: data.id,
               title: data.title,
@@ -391,15 +391,16 @@ const DiagramRenderer = () => {
         title: data.title,
         description: data.description,
         folder_id: data.folder_id,
-        updated_at: savedDiagram?.updated_at  // BUG: Using old timestamp instead of new one
+        updated_at: data.updated_at
       });
 
       setShowSaveModal(false);
       toast.success(savedDiagram?.id ? 'Diagram updated!' : 'Diagram saved!');
     } catch (err) {
       toast.error(err.message);
+    } finally {
+      setIsSaving(false);
     }
-    // BUG: Missing finally block - isSaving never reset to false
   };
 
   // Format last saved time
