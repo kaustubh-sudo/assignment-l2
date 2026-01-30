@@ -220,18 +220,18 @@ def generate_plantuml_v3(description):
     # Steps
     for step in steps:
         if any(word in step.lower() for word in ['error', 'fail', 'reject']):
-            code += f'#{dc2626}:{step};\n'
+            code += f'#dc2626:{step};\n'
         elif any(word in step.lower() for word in ['validate', 'check']):
-            code += f'#{f59e0b}:{step};\n'
+            code += f'#f59e0b:{step};\n'
         else:
             code += f':{step};\n'
     
     # Decision
     if decision:
         code += f'\nif ({decision["condition"]}?) then (yes)\n'
-        code += f'  #{dcfce7}:{decision["yes"]};\n'
+        code += f'  #dcfce7:{decision["yes"]};\n'
         code += 'else (no)\n'
-        code += f'  #{fee2e2}:{decision["no"]};\n'
+        code += f'  #fee2e2:{decision["no"]};\n'
         code += 'endif\n'
     
     code += '\nstop\n'
