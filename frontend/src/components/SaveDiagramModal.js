@@ -1,11 +1,28 @@
-import React, { useState } from 'react';
-import { X, Save } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Save, Folder } from 'lucide-react';
 import { Button } from './ui/button';
 
-const SaveDiagramModal = ({ isOpen, onClose, onSave, isLoading, existingTitle = '', existingDescription = '' }) => {
+const SaveDiagramModal = ({ 
+  isOpen, 
+  onClose, 
+  onSave, 
+  isLoading, 
+  existingTitle = '', 
+  existingDescription = '',
+  existingFolderId = null,
+  folders = []
+}) => {
   const [title, setTitle] = useState(existingTitle);
   const [description, setDescription] = useState(existingDescription);
+  const [folderId, setFolderId] = useState(existingFolderId);
   const [error, setError] = useState('');
+
+  // Update state when existing values change
+  useEffect(() => {
+    setTitle(existingTitle);
+    setDescription(existingDescription);
+    setFolderId(existingFolderId);
+  }, [existingTitle, existingDescription, existingFolderId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,7 +38,11 @@ const SaveDiagramModal = ({ isOpen, onClose, onSave, isLoading, existingTitle = 
     }
     
     setError('');
-    onSave({ title: title.trim(), description: description.trim() });
+    onSave({ 
+      title: title.trim(), 
+      description: description.trim(),
+      folder_id: folderId || null
+    });
   };
 
   const handleClose = () => {
@@ -70,6 +91,7 @@ const SaveDiagramModal = ({ isOpen, onClose, onSave, isLoading, existingTitle = 
               className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               disabled={isLoading}
               autoFocus
+              data-testid="diagram-title-input"
             />
             {error && (
               <p className="mt-1 text-sm text-red-400">{error}</p>
@@ -89,10 +111,34 @@ const SaveDiagramModal = ({ isOpen, onClose, onSave, isLoading, existingTitle = 
               maxLength={1000}
               className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
               disabled={isLoading}
+              data-testid="diagram-description-input"
             />
             <p className="mt-1 text-xs text-gray-500 text-right">
               {description.length}/1000
             </p>
+          </div>
+          
+          {/* Folder Selection */}
+          <div>
+            <label htmlFor="diagram-folder" className="block text-sm font-medium text-gray-300 mb-2">
+              <Folder className="w-4 h-4 inline mr-1" />
+              Folder <span className="text-gray-500">(optional)</span>
+            </label>
+            <select
+              id="diagram-folder"
+              value={folderId || ''}
+              onChange={(e) => setFolderId(e.target.value || null)}
+              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              disabled={isLoading}
+              data-testid="diagram-folder-select"
+            >
+              <option value="">No Folder</option>
+              {folders.map((folder) => (
+                <option key={folder.id} value={folder.id}>
+                  {folder.name}
+                </option>
+              ))}
+            </select>
           </div>
           
           {/* Actions */}
@@ -110,6 +156,7 @@ const SaveDiagramModal = ({ isOpen, onClose, onSave, isLoading, existingTitle = 
               type="submit"
               disabled={isLoading || !title.trim()}
               className="flex-1 bg-blue-600 hover:bg-blue-700"
+              data-testid="save-diagram-submit"
             >
               {isLoading ? (
                 <>
