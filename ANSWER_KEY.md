@@ -23,7 +23,10 @@
 | LIST-003 | List/Display | Easy | 5 | server.py |
 | LIST-004 | List/Display | Medium | 10 | DiagramsList.js |
 | LIST-005 | List/Display | Easy | 5 | DiagramCard.js |
-| **Total** | | | **120** | |
+| EXPORT-001 | Export | Easy | 5 | DiagramRenderer.js |
+| EXPORT-002 | Export | Medium | 10 | DiagramRenderer.js |
+| EXPORT-003 | Export | Easy | 5 | PreviewPanel.js |
+| **Total** | | | **140** | |
 
 ---
 
@@ -303,6 +306,80 @@ toast.success('Diagram deleted successfully');
 
 ---
 
+## EXPORT-001: Generic Filename
+
+### File: `/app/frontend/src/pages/DiagramRenderer.js`
+
+### Buggy Code
+```javascript
+const getExportFilename = (format) => {
+  // BUG: Always returns generic filename, ignores diagram title
+  return `diagram.${format}`;
+};
+```
+
+### Fixed Code
+```javascript
+const getExportFilename = (format) => {
+  const title = savedDiagram?.title;
+  if (title) {
+    const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return `${sanitizedTitle}.${format}`;
+  }
+  return `diagram-${Date.now()}.${format}`;
+};
+```
+
+---
+
+## EXPORT-002: Spinner Never Clears
+
+### File: `/app/frontend/src/pages/DiagramRenderer.js`
+
+### Buggy Code
+```javascript
+} catch (err) {
+  toast.error(`Failed to export diagram: ${err.message}`);
+  console.error('Export error:', err);
+}
+// BUG: Missing finally block - isExporting never reset to false
+```
+
+### Fixed Code
+```javascript
+} catch (err) {
+  toast.error(`Failed to export diagram: ${err.message}`);
+  console.error('Export error:', err);
+} finally {
+  setIsExporting(false);
+}
+```
+
+---
+
+## EXPORT-003: Button Not Disabled
+
+### File: `/app/frontend/src/components/PreviewPanel.js`
+
+### Buggy Code
+```javascript
+<Button
+  size="sm"
+  className="bg-gradient-to-r ..."
+>
+```
+
+### Fixed Code
+```javascript
+<Button
+  size="sm"
+  disabled={isExporting}
+  className="bg-gradient-to-r ... disabled:opacity-50 disabled:cursor-not-allowed"
+>
+```
+
+---
+
 ## Quick Commands
 
 ```bash
@@ -316,6 +393,7 @@ python inject_bugs.py
 python inject_bugs.py --category "Authentication"
 python inject_bugs.py --category "Save/Load"
 python inject_bugs.py --category "List/Display"
+python inject_bugs.py --category "Export"
 
 # Fix all bugs
 python fix_bugs.py
@@ -330,8 +408,8 @@ python evaluate.py --candidate "Name" --html
 
 | Score | Grade | Assessment |
 |-------|-------|-----------|
-| 100-120 | A | Excellent |
-| 75-99 | B | Good |
-| 50-74 | C | Average |
-| 25-49 | D | Below Average |
-| 0-24 | F | Needs Improvement |
+| 120-140 | A | Excellent |
+| 90-119 | B | Good |
+| 60-89 | C | Average |
+| 30-59 | D | Below Average |
+| 0-29 | F | Needs Improvement |

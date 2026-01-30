@@ -4,9 +4,9 @@
 You have been given access to a **Diagram Maker** web application that allows users to create, save, and manage diagrams. The application has several bugs that need to be identified and fixed.
 
 **Time Limit:** 1 hour  
-**Total Bugs:** 15  
-**Total Points:** 120  
-**Categories:** Authentication (4), Save/Load (6), List/Display (5)
+**Total Bugs:** 18  
+**Total Points:** 140  
+**Categories:** Authentication (4), Save/Load (6), List/Display (5), Export (3)
 
 ---
 
@@ -16,7 +16,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 - **Database:** MongoDB
 
 ## Key Files
-- Backend: `/app/backend/server.py`, `/app/backend/auth.py`
+- Backend: `/app/backend/server.py`
 - Frontend: `/app/frontend/src/pages/`, `/app/frontend/src/components/`
 
 ---
@@ -215,6 +215,43 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
+## Export Bugs (3 bugs, 20 points)
+
+### EXPORT-001: Export Filename Always "diagram.png" (5 pts)
+**Difficulty:** Easy | **Time:** ~1 min
+
+**How to Reproduce:**
+1. Save diagram titled "My Flowchart"
+2. Click Export → PNG
+3. ❌ Downloads as "diagram.png"
+
+**Expected:** Should download as "my-flowchart.png"
+
+---
+
+### EXPORT-002: Export Button Spinner Never Clears (10 pts)
+**Difficulty:** Medium | **Time:** ~1.5 min
+
+**How to Reproduce:**
+1. Click Export button
+2. Spinner appears, export completes
+3. ❌ Spinner keeps spinning forever
+
+**Expected:** Spinner should stop after export completes
+
+---
+
+### EXPORT-003: Export Multiple Times Downloads Duplicate Files (5 pts)
+**Difficulty:** Easy | **Time:** ~1 min
+
+**How to Reproduce:**
+1. Click export button 3 times rapidly
+2. ❌ Downloads 3 files
+
+**Expected:** Button should be disabled during export to prevent duplicates
+
+---
+
 ## Evaluation Criteria
 
 | Category | Bugs | Points |
@@ -222,7 +259,8 @@ You have been given access to a **Diagram Maker** web application that allows us
 | Authentication | 4 | 20 |
 | Save/Load | 6 | 55 |
 | List/Display | 5 | 45 |
-| **Total** | **15** | **120** |
+| Export | 3 | 20 |
+| **Total** | **18** | **140** |
 
 ---
 
