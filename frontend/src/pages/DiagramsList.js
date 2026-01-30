@@ -222,7 +222,7 @@ const DiagramsList = () => {
             </div>
           </div>
         ) : diagrams.length === 0 ? (
-          /* Empty State */
+          /* Empty State - No diagrams at all */
           <div className="flex flex-col items-center justify-center py-20 px-4">
             <div className="p-6 bg-gray-800/50 rounded-full mb-6">
               <FolderOpen className="w-16 h-16 text-gray-500" />
@@ -239,10 +239,29 @@ const DiagramsList = () => {
               Create Your First Diagram
             </Button>
           </div>
+        ) : filteredDiagrams.length === 0 ? (
+          /* No Search Results */
+          <div className="flex flex-col items-center justify-center py-20 px-4" data-testid="no-results-state">
+            <div className="p-6 bg-gray-800/50 rounded-full mb-6">
+              <Search className="w-16 h-16 text-gray-500" />
+            </div>
+            <h2 className="text-2xl font-semibold text-white mb-2">No results found</h2>
+            <p className="text-gray-400 text-center max-w-md mb-6">
+              No diagrams match "<span className="text-white font-medium">{debouncedSearchQuery}</span>". Try a different search term.
+            </p>
+            <Button
+              onClick={handleClearSearch}
+              variant="outline"
+              className="border-gray-600 hover:bg-gray-700"
+            >
+              <X className="w-4 h-4 mr-2" />
+              Clear Search
+            </Button>
+          </div>
         ) : (
           /* Diagrams Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {diagrams.map((diagram) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" data-testid="diagrams-grid">
+            {filteredDiagrams.map((diagram) => (
               <DiagramCard
                 key={diagram.id}
                 diagram={diagram}
