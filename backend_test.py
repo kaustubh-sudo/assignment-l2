@@ -398,6 +398,8 @@ def run_auth_tests() -> list:
     auth_results.append(result)
     
     return auth_results
+
+def test_kroki_rendering(code: str, diagram_type: str) -> Dict[str, Any]:
     """Test if generated code renders successfully with Kroki API"""
     try:
         # Test with Kroki API using POST method
@@ -415,6 +417,222 @@ def run_auth_tests() -> list:
             "kroki_success": False,
             "kroki_error": str(e)
         }
+
+def test_status_endpoints() -> list:
+    """Test status endpoints"""
+    print("\n📊 Starting Status Endpoints Tests")
+    
+    status_results = []
+    
+    # Test 1: Create status check
+    url = f"{API_BASE}/status"
+    payload = {"client_name": "test_client"}
+    
+    print(f"\n{'='*60}")
+    print(f"STATUS TEST: Create Status Check")
+    print(f"URL: {url}")
+    print(f"Payload: {json.dumps(payload, indent=2)}")
+    print(f"{'='*60}")
+    
+    try:
+        response = requests.post(url, json=payload, timeout=30)
+        
+        result = {
+            "test_name": "Create Status Check",
+            "status_code": response.status_code,
+            "success": response.status_code == 200,
+            "response_time": response.elapsed.total_seconds()
+        }
+        
+        if response.status_code == 200:
+            json_response = response.json()
+            result["response_data"] = json_response
+            result["has_id"] = "id" in json_response
+            result["has_client_name"] = "client_name" in json_response
+            result["has_timestamp"] = "timestamp" in json_response
+            
+            print(f"✅ SUCCESS: Status {response.status_code}")
+            print(f"   Response time: {result['response_time']:.2f}s")
+            print(f"   ID: {json_response.get('id', 'N/A')}")
+            print(f"   Client: {json_response.get('client_name', 'N/A')}")
+        else:
+            result["error_response"] = response.text
+            print(f"❌ FAILED: Status {response.status_code}")
+            print(f"   Error: {response.text}")
+            
+    except requests.exceptions.RequestException as e:
+        result = {
+            "test_name": "Create Status Check",
+            "status_code": None,
+            "success": False,
+            "error": str(e)
+        }
+        print(f"❌ REQUEST ERROR: {e}")
+    
+    status_results.append(result)
+    
+    # Test 2: Get status checks
+    url = f"{API_BASE}/status"
+    
+    print(f"\n{'='*60}")
+    print(f"STATUS TEST: Get Status Checks")
+    print(f"URL: {url}")
+    print(f"{'='*60}")
+    
+    try:
+        response = requests.get(url, timeout=30)
+        
+        result = {
+            "test_name": "Get Status Checks",
+            "status_code": response.status_code,
+            "success": response.status_code == 200,
+            "response_time": response.elapsed.total_seconds()
+        }
+        
+        if response.status_code == 200:
+            json_response = response.json()
+            result["response_data"] = json_response
+            result["is_list"] = isinstance(json_response, list)
+            result["list_length"] = len(json_response) if isinstance(json_response, list) else 0
+            
+            print(f"✅ SUCCESS: Status {response.status_code}")
+            print(f"   Response time: {result['response_time']:.2f}s")
+            print(f"   Status checks count: {result['list_length']}")
+        else:
+            result["error_response"] = response.text
+            print(f"❌ FAILED: Status {response.status_code}")
+            print(f"   Error: {response.text}")
+            
+    except requests.exceptions.RequestException as e:
+        result = {
+            "test_name": "Get Status Checks",
+            "status_code": None,
+            "success": False,
+            "error": str(e)
+        }
+        print(f"❌ REQUEST ERROR: {e}")
+    
+    status_results.append(result)
+    
+    return status_results
+
+def test_root_endpoint() -> Dict[str, Any]:
+    """Test root endpoint"""
+    print("\n🏠 Starting Root Endpoint Test")
+    
+    url = f"{API_BASE}/"
+    
+    print(f"\n{'='*60}")
+    print(f"ROOT TEST: API Root Endpoint")
+    print(f"URL: {url}")
+    print(f"{'='*60}")
+    
+    try:
+        response = requests.get(url, timeout=30)
+        
+        result = {
+            "test_name": "API Root Endpoint",
+            "status_code": response.status_code,
+            "success": response.status_code == 200,
+            "response_time": response.elapsed.total_seconds()
+        }
+        
+        if response.status_code == 200:
+            json_response = response.json()
+            result["response_data"] = json_response
+            result["has_message"] = "message" in json_response
+            result["message_correct"] = json_response.get("message") == "Hello World"
+            
+            print(f"✅ SUCCESS: Status {response.status_code}")
+            print(f"   Response time: {result['response_time']:.2f}s")
+            print(f"   Message: {json_response.get('message', 'N/A')}")
+        else:
+            result["error_response"] = response.text
+            print(f"❌ FAILED: Status {response.status_code}")
+            print(f"   Error: {response.text}")
+            
+    except requests.exceptions.RequestException as e:
+        result = {
+            "test_name": "API Root Endpoint",
+            "status_code": None,
+            "success": False,
+            "error": str(e)
+        }
+        print(f"❌ REQUEST ERROR: {e}")
+    
+    return result
+
+def run_diagram_generation_tests() -> list:
+    """Run comprehensive diagram generation tests"""
+    print("\n🎨 Starting Diagram Generation Tests")
+    
+    diagram_results = []
+    
+    # Test scenarios as requested in the review
+    test_scenarios = [
+        {
+            "diagram_type": "graphviz",
+            "description": "User logs in, system validates credentials, if valid show dashboard else show error",
+            "test_name": "GraphViz - User Login Flow",
+            "expected_length_min": 400,
+            "expected_length_max": 2000
+        },
+        {
+            "diagram_type": "mermaid", 
+            "description": "Start process, validate input, if approved continue else reject, complete task",
+            "test_name": "Mermaid - Process Validation Flow",
+            "expected_length_min": 200,
+            "expected_length_max": 1500
+        },
+        {
+            "diagram_type": "plantuml",
+            "description": "User submits form, system processes request, saves to database",
+            "test_name": "PlantUML - Form Submission Workflow",
+            "expected_length_min": 300,
+            "expected_length_max": 1200
+        },
+        {
+            "diagram_type": "pikchr",
+            "description": "Simple workflow from start to end with processing step",
+            "test_name": "Pikchr - Simple Workflow",
+            "expected_length_min": 100,
+            "expected_length_max": 800
+        },
+        # Edge cases
+        {
+            "diagram_type": "graphviz",
+            "description": "This is a very long description that contains many details about a complex business process that involves multiple stakeholders, various decision points, error handling mechanisms, retry logic, parallel processing, data validation, security checks, audit logging, notification systems, and final reporting mechanisms that need to be carefully orchestrated to ensure proper system functionality and user experience",
+            "test_name": "GraphViz - Very Long Description",
+            "expected_length_min": 500,
+            "expected_length_max": 3000
+        },
+        {
+            "diagram_type": "mermaid",
+            "description": "Process with special characters: @#$%^&*()_+-=[]{}|;':\",./<>?",
+            "test_name": "Mermaid - Special Characters",
+            "expected_length_min": 100,
+            "expected_length_max": 1000
+        },
+        {
+            "diagram_type": "plantuml",
+            "description": "If user is authenticated then check permissions, if admin show admin panel else show user dashboard, if not authenticated redirect to login",
+            "test_name": "PlantUML - Complex Conditional Logic",
+            "expected_length_min": 400,
+            "expected_length_max": 1500
+        }
+    ]
+    
+    for scenario in test_scenarios:
+        result = test_api_endpoint(
+            description=scenario["description"],
+            diagram_type=scenario["diagram_type"],
+            test_name=scenario["test_name"],
+            expected_length_min=scenario["expected_length_min"],
+            expected_length_max=scenario["expected_length_max"]
+        )
+        diagram_results.append(result)
+    
+    return diagram_results
 
 def main():
     """Run all test scenarios"""
