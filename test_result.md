@@ -451,13 +451,13 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.4"
-  test_sequence: 5
-  last_updated: "Diagram CRUD API endpoints testing completed - all 28 scenarios passed with 100% success rate"
+  version: "1.5"
+  test_sequence: 6
+  last_updated: "Complete Backend Regression Test completed - all 28 scenarios passed with 100% success rate"
 
 test_plan:
   current_focus:
-    - "Diagram CRUD API Endpoints - COMPLETED"
+    - "Complete Backend Regression Test - COMPLETED"
   stuck_tasks: []
   test_all: true
   test_priority: "completed"
