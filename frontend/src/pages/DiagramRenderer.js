@@ -31,13 +31,40 @@ const DiagramRenderer = () => {
   // Save diagram state
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [savedDiagram, setSavedDiagram] = useState(null); // { id, title, description, updated_at }
+  const [savedDiagram, setSavedDiagram] = useState(null); // { id, title, description, folder_id, updated_at }
   const [isExporting, setIsExporting] = useState(false);
+  
+  // Folders state
+  const [folders, setFolders] = useState([]);
   
   // Use ref to prevent duplicate renders
   const renderingRef = React.useRef(false);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
+  // Fetch folders
+  useEffect(() => {
+    const fetchFolders = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/folders`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setFolders(data.folders || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch folders:', err);
+      }
+    };
+    
+    if (token) {
+      fetchFolders();
+    }
+  }, [token, BACKEND_URL]);
 
   // Load diagram data when editing (from URL param or state)
   useEffect(() => {
