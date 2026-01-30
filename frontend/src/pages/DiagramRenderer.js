@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import InputPanel from '../components/InputPanel';
 import PreviewPanel from '../components/PreviewPanel';
@@ -11,9 +11,10 @@ const DiagramRenderer = () => {
   const { token } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const { diagramId } = useParams(); // Get diagram ID from URL params
   
-  // Check if editing existing diagram
-  const editingDiagram = location.state?.diagram;
+  // Check if editing existing diagram (from state or URL)
+  const editingDiagramFromState = location.state?.diagram;
   
   const [userInput, setUserInput] = useState(
     "A user presses a button. The system checks if the user is logged in. If the user is logged in, it shows the dashboard. If the user is not logged in, it shows the login page."
@@ -25,6 +26,7 @@ const DiagramRenderer = () => {
   const [isRendering, setIsRendering] = useState(false);
   const [error, setError] = useState(null);
   const [showCode, setShowCode] = useState(false);
+  const [isLoadingDiagram, setIsLoadingDiagram] = useState(false);
   
   // Save diagram state
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -36,13 +38,16 @@ const DiagramRenderer = () => {
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-  // Load diagram data when editing
+  // Load diagram data when editing (from URL param or state)
   useEffect(() => {
-    if (editingDiagram) {
-      // Fetch full diagram data including code
+    const diagramIdToLoad = diagramId || editingDiagramFromState?.id;
+    
+    if (diagramIdToLoad) {
+      setIsLoadingDiagram(true);
+      
       const fetchDiagram = async () => {
         try {
-          const response = await fetch(`${BACKEND_URL}/api/diagrams/${editingDiagram.id}`, {
+          const response = await fetch(`${BACKEND_URL}/api/diagrams/${diagramIdToLoad}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -61,19 +66,28 @@ const DiagramRenderer = () => {
             
             // Render the diagram
             if (data.diagram_code) {
-              renderDiagramWithKroki(data.diagram_code, data.diagram_type);
+              await renderDiagramWithKroki(data.diagram_code, data.diagram_type);
             }
             
             toast.info(`Editing: ${data.title}`);
+          } else if (response.status === 404) {
+            toast.error('Diagram not found');
+            navigate('/');
+          } else if (response.status === 403) {
+            toast.error('You do not have access to this diagram');
+            navigate('/');
           }
         } catch (err) {
           toast.error('Failed to load diagram');
+          navigate('/');
+        } finally {
+          setIsLoadingDiagram(false);
         }
       };
       
       fetchDiagram();
     }
-  }, [editingDiagram, token]);
+  }, [diagramId, editingDiagramFromState?.id, token]);
 
   // Kroki type is now directly the diagram type selected by user
   const getKrokiType = (type) => {
