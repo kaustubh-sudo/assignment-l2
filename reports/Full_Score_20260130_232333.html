@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Report - Full Score</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; padding: 2rem; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #0f172a; margin-bottom: 0.5rem; }
+        .subtitle { color: #64748b; margin-bottom: 2rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .score-card { text-align: center; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+        .score { font-size: 4rem; font-weight: bold; }
+        .score-label { font-size: 1.25rem; opacity: 0.9; }
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.3); border-radius: 4px; margin-top: 1rem; overflow: hidden; }
+        .progress-fill { height: 100%; background: white; border-radius: 4px; transition: width 0.5s; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; }
+        .stat { padding: 1rem; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #3b82f6; }
+        .stat-label { color: #64748b; font-size: 0.875rem; }
+        .bug-list { }
+        .bug-item { display: flex; align-items: center; padding: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .bug-item:last-child { border-bottom: none; }
+        .bug-status { width: 12px; height: 12px; border-radius: 50%; margin-right: 1rem; }
+        .bug-info { flex: 1; }
+        .bug-id { font-weight: 600; color: #0f172a; }
+        .bug-desc { color: #64748b; font-size: 0.875rem; }
+        .bug-meta { display: flex; gap: 1rem; font-size: 0.75rem; color: #94a3b8; }
+        .badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; }
+        .badge-fixed { background: #dcfce7; color: #166534; }
+        .badge-broken { background: #fee2e2; color: #991b1b; }
+        .badge-difficulty { background: #f1f5f9; color: #475569; margin-left: 0.5rem; }
+        .category-header { font-weight: 600; color: #475569; margin: 1rem 0 0.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        .category-header:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Assessment Report</h1>
+        <p class="subtitle">Candidate: Full Score | Generated: 2026-01-30 23:23:33</p>
+        
+        <div class="card score-card">
+            <div class="score">100.0%</div>
+            <div class="score-label">75 / 75 Points</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 100.0%"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">Bugs Fixed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Bugs Remaining</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">Total Bugs</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 1rem; color: #0f172a;">Bug Details</h2>
+            <div class="bug-list">
+<div class="category-header">Authentication (20/20 pts)</div>
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">AUTH-001 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Email case-sensitive login - Login should be case-insensitive</div>
+                        <div class="bug-meta">
+                            <span>Points: 5/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">AUTH-002 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Duplicate email registration allowed - Should check for existing email</div>
+                        <div class="bug-meta">
+                            <span>Points: 5/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">AUTH-003 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Logout doesn't clear token from localStorage</div>
+                        <div class="bug-meta">
+                            <span>Points: 5/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">AUTH-004 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Password minimum length not enforced - Should require 6+ characters</div>
+                        <div class="bug-meta">
+                            <span>Points: 5/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+<div class="category-header">Save/Load (55/55 pts)</div>
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-001 <span class="badge badge-difficulty">Hard</span></div>
+                        <div class="bug-desc">Save creates duplicate entries - Should update existing diagram with same title</div>
+                        <div class="bug-meta">
+                            <span>Points: 15/15</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-002 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Load diagram doesn't populate textarea - diagram code not loaded properly</div>
+                        <div class="bug-meta">
+                            <span>Points: 10/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-003 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Save button stays disabled after save completes</div>
+                        <div class="bug-meta">
+                            <span>Points: 10/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-004 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Last saved timestamp doesn't update after saving</div>
+                        <div class="bug-meta">
+                            <span>Points: 10/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-005 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Title field doesn't clear after save - should reset form</div>
+                        <div class="bug-meta">
+                            <span>Points: 5/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-006 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Save without title succeeds - should require title</div>
+                        <div class="bug-meta">
+                            <span>Points: 5/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
