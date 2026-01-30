@@ -70,18 +70,36 @@ class DiagramGenerationResponse(BaseModel):
     code: str
     kroki_type: str
 
+# Folder Models
+class FolderCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+
+class FolderResponse(BaseModel):
+    id: str
+    user_id: str
+    name: str
+    created_at: datetime
+
+class FolderListResponse(BaseModel):
+    folders: List[FolderResponse]
+
 # Diagram Save/Update Models
 class DiagramCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     description: str = Field(default="", max_length=1000)
     diagram_type: str
     diagram_code: str
+    folder_id: str | None = None
 
 class DiagramUpdate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     description: str = Field(default="", max_length=1000)
     diagram_type: str
     diagram_code: str
+    folder_id: str | None = None
+
+class DiagramFolderUpdate(BaseModel):
+    folder_id: str | None = None
 
 class DiagramResponse(BaseModel):
     id: str
@@ -90,6 +108,7 @@ class DiagramResponse(BaseModel):
     description: str
     diagram_type: str
     diagram_code: str
+    folder_id: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -98,6 +117,7 @@ class DiagramListResponse(BaseModel):
     title: str
     description: str
     diagram_type: str
+    folder_id: str | None = None
     created_at: datetime
     updated_at: datetime
 
