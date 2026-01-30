@@ -353,6 +353,78 @@ async def create_diagram(
           {diagram.created_at}
         </span>''',
     },
+    
+    # ============== EXPORT BUGS ==============
+    "EXPORT-001": {
+        "file": "/app/frontend/src/pages/DiagramRenderer.js",
+        "description": "Export filename always 'diagram.png' - should use diagram title",
+        "category": "Export",
+        "difficulty": "Easy",
+        "points": 5,
+        "time_estimate": "1 min",
+        "original": '''  // Generate filename from diagram title or default
+  const getExportFilename = (format) => {
+    const title = savedDiagram?.title;
+    if (title) {
+      // Sanitize title for filename (remove special characters)
+      const sanitizedTitle = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      return `${sanitizedTitle}.${format}`;
+    }
+    return `diagram-${Date.now()}.${format}`;
+  };''',
+        "buggy": '''  // Generate filename from diagram title or default
+  const getExportFilename = (format) => {
+    // BUG: Always returns generic filename, ignores diagram title
+    return `diagram.${format}`;
+  };''',
+    },
+    "EXPORT-002": {
+        "file": "/app/frontend/src/pages/DiagramRenderer.js",
+        "description": "Export button loading spinner never clears",
+        "category": "Export",
+        "difficulty": "Medium",
+        "points": 10,
+        "time_estimate": "1.5 min",
+        "original": '''    } catch (err) {
+      toast.error(`Failed to export diagram: ${err.message}`);
+      console.error('Export error:', err);
+    } finally {
+      setIsExporting(false);
+    }
+  };''',
+        "buggy": '''    } catch (err) {
+      toast.error(`Failed to export diagram: ${err.message}`);
+      console.error('Export error:', err);
+    }
+    // BUG: Missing finally block - isExporting never reset to false
+  };''',
+    },
+    "EXPORT-003": {
+        "file": "/app/frontend/src/components/PreviewPanel.js",
+        "description": "Export button not disabled during export - allows duplicate downloads",
+        "category": "Export",
+        "difficulty": "Easy",
+        "points": 5,
+        "time_estimate": "1 min",
+        "original": '''                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="sm"
+                      disabled={isExporting}
+                      className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white h-8 px-3 text-xs rounded-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      data-testid="export-button"
+                    >''',
+        "buggy": '''                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="sm"
+                      className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white h-8 px-3 text-xs rounded-lg shadow-md"
+                      data-testid="export-button"
+                    >''',
+    },
 }
 
 
