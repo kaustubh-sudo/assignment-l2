@@ -238,7 +238,8 @@ const DiagramsList = () => {
         throw new Error(data.detail || 'Failed to delete diagram');
       }
 
-      // Remove from local state - BUG: Not updating state correctly
+      // Remove from local state
+      setDiagrams(prevDiagrams => prevDiagrams.filter(d => d.id !== deleteTarget.id));
       toast.success('Diagram deleted successfully');
       setDeleteTarget(null);
     } catch (err) {
