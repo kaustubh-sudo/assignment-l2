@@ -285,6 +285,7 @@ async def create_diagram(
         description=diagram['description'],
         diagram_type=diagram['diagram_type'],
         diagram_code=diagram['diagram_code'],
+        folder_id=diagram['folder_id'],
         created_at=now,
         updated_at=now
     )
@@ -315,6 +316,15 @@ async def update_diagram(
             detail="You don't have permission to update this diagram"
         )
     
+    # Validate folder_id if provided
+    if diagram_data.folder_id:
+        folder = await db.folders.find_one({"id": diagram_data.folder_id, "user_id": current_user.user_id})
+        if not folder:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Folder not found"
+            )
+    
     now = datetime.now(timezone.utc)
     
     # Update the diagram
@@ -323,6 +333,7 @@ async def update_diagram(
         "description": diagram_data.description,
         "diagram_type": diagram_data.diagram_type,
         "diagram_code": diagram_data.diagram_code,
+        "folder_id": diagram_data.folder_id,
         "updated_at": now.isoformat()
     }
     
@@ -345,6 +356,7 @@ async def update_diagram(
         description=diagram_data.description,
         diagram_type=diagram_data.diagram_type,
         diagram_code=diagram_data.diagram_code,
+        folder_id=diagram_data.folder_id,
         created_at=created_at,
         updated_at=now
     )
