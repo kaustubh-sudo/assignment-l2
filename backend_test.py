@@ -1033,7 +1033,14 @@ def main():
     auth_results = run_auth_tests()
     all_results.extend(auth_results)
     
-    # 2. Diagram Generation Tests
+    # 2. Diagram CRUD Tests
+    print(f"\n{'='*80}")
+    print("📋 DIAGRAM CRUD API TESTING")
+    print(f"{'='*80}")
+    crud_results = run_diagram_crud_tests()
+    all_results.extend(crud_results)
+    
+    # 3. Diagram Generation Tests
     print(f"\n{'='*80}")
     print("🎨 DIAGRAM GENERATION TESTING")
     print(f"{'='*80}")
