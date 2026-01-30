@@ -95,6 +95,13 @@ Password: password123
 - `frontend/src/components/DiagramCard.js` - Diagram card component
 
 ## Changelog
+- **Jan 30, 2026**: US-10 Export Diagram - VERIFIED ✅
+  - Export button in preview panel with SVG/PNG dropdown options
+  - Filename uses sanitized diagram title (or 'diagram-{timestamp}' if untitled)
+  - Loading state with spinner during export
+  - Button disabled during export to prevent multiple clicks
+  - Success toast shows exported filename
+- **Jan 30, 2026**: P1 Bug Fix - Login error toast now shows "Invalid email or password"
 - **Jan 30, 2026**: US-9 Load Saved Diagram for Editing - VERIFIED ✅
   - Route `/diagrams/:id` navigates to editor with loaded diagram
   - All CRUD operations tested and working (100% backend tests pass)
