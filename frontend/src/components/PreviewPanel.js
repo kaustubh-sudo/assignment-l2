@@ -28,28 +28,29 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport, isExporting
   };
   
   return (
-    <Card className="h-full flex flex-col shadow-lg border-slate-200 bg-white rounded-xl sm:rounded-2xl">
-      <CardHeader className="flex-none pb-3 sm:pb-4 px-4 sm:px-6">
-        <div className="flex items-center justify-between flex-wrap gap-2 sm:gap-3">
+    <Card className="h-full flex flex-col shadow-lg border-slate-200 bg-white rounded-xl sm:rounded-2xl overflow-hidden">
+      {/* Header */}
+      <CardHeader className="flex-shrink-0 pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-5 border-b border-slate-100">
+        <div className="flex items-center justify-between gap-3">
           <CardTitle className="text-base sm:text-lg md:text-xl font-semibold text-slate-800">
             Preview
           </CardTitle>
           
-          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
+          <div className="flex items-center gap-2">
             {renderedDiagram && (
               <>
-                {/* Zoom Controls - Compact on mobile */}
-                <div className="flex items-center gap-0.5 border border-slate-200 rounded-lg sm:rounded-xl p-0.5 bg-slate-50">
+                {/* Zoom Controls */}
+                <div className="flex items-center gap-0.5 border border-slate-200 rounded-lg p-0.5 bg-slate-50">
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={handleZoomOut}
-                    className="h-7 w-7 p-0 hover:bg-slate-200 rounded-md sm:rounded-lg"
+                    className="h-7 w-7 p-0 hover:bg-slate-200 rounded-md"
                   >
-                    <ZoomOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-600" />
+                    <ZoomOut className="w-3.5 h-3.5 text-slate-600" />
                   </Button>
                   
-                  <span className="text-xs font-medium px-1.5 sm:px-2 min-w-[40px] sm:min-w-[50px] text-center text-slate-600">
+                  <span className="text-xs font-medium px-2 min-w-[45px] text-center text-slate-600">
                     {Math.round(zoom)}%
                   </span>
                   
@@ -57,18 +58,18 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport, isExporting
                     size="sm"
                     variant="ghost"
                     onClick={handleZoomIn}
-                    className="h-7 w-7 p-0 hover:bg-slate-200 rounded-md sm:rounded-lg"
+                    className="h-7 w-7 p-0 hover:bg-slate-200 rounded-md"
                   >
-                    <ZoomIn className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-600" />
+                    <ZoomIn className="w-3.5 h-3.5 text-slate-600" />
                   </Button>
                   
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={handleResetZoom}
-                    className="h-7 w-7 p-0 hover:bg-slate-200 rounded-md sm:rounded-lg"
+                    className="h-7 w-7 p-0 hover:bg-slate-200 rounded-md"
                   >
-                    <Maximize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-600" />
+                    <Maximize2 className="w-3.5 h-3.5 text-slate-600" />
                   </Button>
                 </div>
                 
@@ -78,15 +79,15 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport, isExporting
                     <Button
                       size="sm"
                       disabled={isExporting}
-                      className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white h-7 sm:h-8 md:h-9 px-2 sm:px-3 md:px-4 text-xs md:text-sm rounded-lg sm:rounded-xl shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white h-8 px-3 text-xs rounded-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                       data-testid="export-button"
                     >
                       {isExporting ? (
-                        <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin sm:mr-2" />
+                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
                       ) : (
-                        <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+                        <Download className="w-3.5 h-3.5 mr-1.5" />
                       )}
-                      <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'Export'}</span>
+                      <span>{isExporting ? 'Exporting...' : 'Export'}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-white border-slate-200 shadow-lg">
@@ -116,31 +117,32 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport, isExporting
         </div>
       </CardHeader>
       
-      <CardContent className="flex-1 p-3 sm:p-4 lg:p-5 overflow-hidden">
-        <div className="h-full flex items-center justify-center bg-slate-50 rounded-lg sm:rounded-xl border border-slate-200 overflow-auto custom-scrollbar">
+      {/* Content */}
+      <CardContent className="flex-1 p-4 overflow-hidden">
+        <div className="h-full flex items-center justify-center bg-slate-50 rounded-xl border border-slate-200 overflow-auto">
           {isLoading ? (
-            <div className="w-full h-full p-4 sm:p-6 space-y-4">
+            <div className="w-full h-full p-6 space-y-4">
               <Skeleton className="w-full h-8 bg-slate-200" />
               <Skeleton className="w-3/4 h-8 bg-slate-200" />
               <Skeleton className="w-full h-32 bg-slate-200" />
               <Skeleton className="w-5/6 h-8 bg-slate-200" />
-              <div className="flex justify-center items-center py-6 sm:py-8">
+              <div className="flex justify-center items-center py-6">
                 <div className="relative">
-                  <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-blue-500 border-t-transparent" />
-                  <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
+                  <Sparkles className="w-6 h-6 text-blue-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                 </div>
               </div>
-              <p className="text-center text-sm sm:text-base text-slate-500 font-medium">Creating your diagram...</p>
+              <p className="text-center text-sm text-slate-500 font-medium">Creating your diagram...</p>
             </div>
           ) : error ? (
-            <Alert variant="destructive" className="m-4 sm:m-6 max-w-2xl">
+            <Alert variant="destructive" className="m-4 max-w-2xl">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="text-sm">
                 {error}
               </AlertDescription>
             </Alert>
           ) : renderedDiagram ? (
-            <div className="w-full h-full p-4 sm:p-6 flex items-center justify-center animate-fade-in overflow-auto">
+            <div className="w-full h-full p-4 flex items-center justify-center animate-fade-in overflow-auto">
               {renderedDiagram.type === 'svg' ? (
                 <div
                   className="flex items-center justify-center transition-transform duration-200"
@@ -157,10 +159,10 @@ const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport, isExporting
               )}
             </div>
           ) : (
-            <div className="text-center text-slate-400 space-y-3 sm:space-y-4 p-6 sm:p-8">
-              <ImageIcon className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto opacity-30" />
-              <p className="text-base sm:text-lg md:text-xl font-semibold text-slate-600">Ready to create something amazing?</p>
-              <p className="text-sm sm:text-base text-slate-400">Describe your diagram on the left and click "Generate Diagram"</p>
+            <div className="text-center text-slate-400 space-y-3 p-6">
+              <ImageIcon className="w-16 h-16 mx-auto opacity-30" />
+              <p className="text-base font-semibold text-slate-600">Ready to create something amazing?</p>
+              <p className="text-sm text-slate-400">Describe your diagram on the left and click "Generate Diagram"</p>
             </div>
           )}
         </div>
