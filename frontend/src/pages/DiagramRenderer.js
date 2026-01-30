@@ -297,6 +297,11 @@ const DiagramRenderer = () => {
             onClear={clearAll}
             isGenerating={isGenerating}
             isRendering={isRendering}
+            // Save props
+            onSave={() => setShowSaveModal(true)}
+            canSave={!!generatedCode}
+            savedDiagram={savedDiagram}
+            lastSavedAt={formatLastSaved(savedDiagram?.updated_at)}
           />
         </div>
 
@@ -310,6 +315,16 @@ const DiagramRenderer = () => {
           />
         </div>
       </div>
+
+      {/* Save Diagram Modal */}
+      <SaveDiagramModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        onSave={handleSaveDiagram}
+        isLoading={isSaving}
+        existingTitle={savedDiagram?.title || ''}
+        existingDescription={savedDiagram?.description || ''}
+      />
     </div>
   );
 };
