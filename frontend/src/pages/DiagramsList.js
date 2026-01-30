@@ -88,6 +88,96 @@ const DiagramsList = () => {
     setSearchQuery('');
   };
 
+  // Fetch folders
+  const fetchFolders = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/folders`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setFolders(data.folders || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch folders:', err);
+    }
+  };
+
+  // Create folder
+  const handleCreateFolder = async (name) => {
+    setIsCreatingFolder(true);
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/folders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to create folder');
+      }
+      
+      setFolders([...folders, data].sort((a, b) => a.name.localeCompare(b.name)));
+      setShowCreateFolderModal(false);
+      toast.success(`Folder "${name}" created`);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsCreatingFolder(false);
+    }
+  };
+
+  // Delete folder
+  const handleDeleteFolder = async () => {
+    if (!deleteFolderTarget) return;
+    
+    setIsDeletingFolder(true);
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/folders/${deleteFolderTarget.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok && response.status !== 204) {
+        const data = await response.json();
+        throw new Error(data.detail || 'Failed to delete folder');
+      }
+      
+      // Update local state
+      setFolders(folders.filter(f => f.id !== deleteFolderTarget.id));
+      
+      // Clear folder_id from diagrams in this folder
+      setDiagrams(diagrams.map(d => 
+        d.folder_id === deleteFolderTarget.id ? { ...d, folder_id: null } : d
+      ));
+      
+      // Reset selection if this folder was selected
+      if (selectedFolderId === deleteFolderTarget.id) {
+        setSelectedFolderId(null);
+      }
+      
+      toast.success(`Folder "${deleteFolderTarget.name}" deleted`);
+      setDeleteFolderTarget(null);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsDeletingFolder(false);
+    }
+  };
+
   // Fetch diagrams
   const fetchDiagrams = async () => {
     setIsLoading(true);
