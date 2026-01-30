@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Alert, AlertDescription } from './ui/alert';
 import { Skeleton } from './ui/skeleton';
-import { Eye, AlertCircle, Image as ImageIcon, Download, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { AlertCircle, Image as ImageIcon, Download, ZoomIn, ZoomOut, Maximize2, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +12,7 @@ import {
 } from './ui/dropdown-menu';
 import { Sparkles } from 'lucide-react';
 
-const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport }) => {
+const PreviewPanel = ({ renderedDiagram, isLoading, error, onExport, isExporting }) => {
   const [zoom, setZoom] = useState(100);
   
   const handleZoomIn = () => {
