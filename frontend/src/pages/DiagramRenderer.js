@@ -489,6 +489,8 @@ const DiagramRenderer = () => {
         isLoading={isSaving}
         existingTitle={savedDiagram?.title || ''}
         existingDescription={savedDiagram?.description || ''}
+        existingFolderId={savedDiagram?.folder_id || null}
+        folders={folders}
       />
     </div>
   );
