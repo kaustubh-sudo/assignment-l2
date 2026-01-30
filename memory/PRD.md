@@ -26,12 +26,18 @@ Build an enhanced Kroki diagram renderer application with user authentication an
 | US-8 | Delete Diagram - Users can delete diagrams with confirmation | ✅ DONE |
 | US-9 | Load for Editing - Users can click saved diagram to open in editor | ✅ DONE |
 | US-10 | Export Diagram - Users can export diagrams as PNG/SVG | ✅ DONE |
-| US-11 | Search Diagrams - Users can search diagrams by title/description | ✅ DONE (Jan 30, 2026) |
+| US-11 | Search Diagrams - Users can search diagrams by title/description | ✅ DONE |
 
-### 3. Testing
+### 3. Folder Organization
 | ID | Requirement | Status |
 |----|-------------|--------|
-| T-1 | Comprehensive testing suite | 🔄 IN PROGRESS (56% backend, 43% frontend) |
+| US-12 | Create Folders - Users can create folders to organize diagrams | ✅ DONE (Jan 30, 2026) |
+| US-13 | Move Diagram to Folder - Users can assign diagrams to folders | ✅ DONE (Jan 30, 2026) |
+
+### 4. Testing
+| ID | Requirement | Status |
+|----|-------------|--------|
+| T-1 | Comprehensive testing suite | 🔄 IN PROGRESS |
 | T-2 | 100% code coverage | ⏳ PENDING |
 
 ## Technical Architecture
@@ -46,25 +52,37 @@ Build an enhanced Kroki diagram renderer application with user authentication an
 - **Framework**: React with React Router
 - **State Management**: React Context API (AuthContext)
 - **Styling**: Tailwind CSS, Shadcn/UI components
-- **Notifications**: react-hot-toast / sonner
+- **Notifications**: sonner
 
 ### Key API Endpoints
 ```
+# Auth
 POST /api/auth/signup     - User registration
 POST /api/auth/login      - User authentication
 GET  /api/auth/me         - Get current user info
-POST /api/diagrams        - Create new diagram
-GET  /api/diagrams        - List user's diagrams
+
+# Diagrams
+POST /api/diagrams        - Create new diagram (with optional folder_id)
+GET  /api/diagrams        - List user's diagrams (includes folder_id)
 GET  /api/diagrams/{id}   - Get specific diagram
-PUT  /api/diagrams/{id}   - Update diagram
+PUT  /api/diagrams/{id}   - Update diagram (with optional folder_id)
+PUT  /api/diagrams/{id}/folder - Move diagram to folder
 DELETE /api/diagrams/{id} - Delete diagram
+
+# Folders
+POST /api/folders         - Create new folder
+GET  /api/folders         - List user's folders
+DELETE /api/folders/{id}  - Delete folder (clears folder_id from diagrams)
+
+# Generation
 POST /api/generate-diagram - Generate diagram code from description
 ```
 
 ### Database Schema
 ```
 users: { id, email, hashed_password, created_at }
-diagrams: { id, user_id, title, description, diagram_type, diagram_code, created_at, updated_at }
+diagrams: { id, user_id, title, description, diagram_type, diagram_code, folder_id, created_at, updated_at }
+folders: { id, user_id, name, created_at }
 ```
 
 ## Known Issues
@@ -72,9 +90,7 @@ diagrams: { id, user_id, title, description, diagram_type, diagram_code, created
 ### ~~P1: Login Error Toast~~ ✅ FIXED (Jan 30, 2026)
 - **Status**: RESOLVED
 - **Issue**: Technical error was shown instead of "Invalid email or password"
-- **Root Cause**: React StrictMode causing double renders which consumed the response body twice
-- **Fix**: Updated `AuthContext.js` to read response as text first, added fallback in `Login.js`
-- **Files Changed**: `/app/frontend/src/context/AuthContext.js`, `/app/frontend/src/pages/Login.js`
+- **Fix**: Updated response handling in AuthContext.js
 
 ### P2: Test Coverage
 - **Status**: Not started
@@ -83,32 +99,30 @@ diagrams: { id, user_id, title, description, diagram_type, diagram_code, created
 
 ## Test Credentials
 ```
-Email: e2etest@example.com
+Email: foldertest@example.com
 Password: password123
 ```
 
 ## File References
-- `backend/server.py` - Main API endpoints
+- `backend/server.py` - Main API endpoints including folder endpoints
 - `backend/auth.py` - Authentication helpers
 - `frontend/src/context/AuthContext.js` - Auth state management
-- `frontend/src/pages/DiagramRenderer.js` - Main editor with load/save
-- `frontend/src/pages/DiagramsList.js` - Diagram list page
-- `frontend/src/components/DiagramCard.js` - Diagram card component
+- `frontend/src/pages/DiagramRenderer.js` - Main editor with load/save/folder selection
+- `frontend/src/pages/DiagramsList.js` - Diagram list with folder sidebar and filtering
+- `frontend/src/components/DiagramCard.js` - Diagram card with folder badge
+- `frontend/src/components/CreateFolderModal.js` - Create folder modal
+- `frontend/src/components/SaveDiagramModal.js` - Save modal with folder dropdown
 
 ## Changelog
+- **Jan 30, 2026**: US-12 & US-13 Folder Organization - VERIFIED ✅
+  - "New Folder" button opens create folder modal
+  - Folder sidebar with All Diagrams, No Folder, and user folders with counts
+  - Folder filtering shows diagrams in selected folder
+  - Save modal has folder dropdown for assigning diagrams
+  - Diagram cards display amber folder badge when assigned
+  - Folders can be deleted (diagrams moved to "No Folder")
+  - Backend: 14/14 folder tests passed
 - **Jan 30, 2026**: US-11 Search Diagrams - VERIFIED ✅
-  - Search input above diagram list with debounced search (300ms)
-  - Case-insensitive search on title and description
-  - "No results found" state with search query display
-  - Clear button (X) to reset search
-  - Frontend filtering (no API needed)
 - **Jan 30, 2026**: US-10 Export Diagram - VERIFIED ✅
-  - Export button in preview panel with SVG/PNG dropdown options
-  - Filename uses sanitized diagram title (or 'diagram-{timestamp}' if untitled)
-  - Loading state with spinner during export
-  - Button disabled during export to prevent multiple clicks
-  - Success toast shows exported filename
-- **Jan 30, 2026**: P1 Bug Fix - Login error toast now shows "Invalid email or password"
 - **Jan 30, 2026**: US-9 Load Saved Diagram for Editing - VERIFIED ✅
-  - Route `/diagrams/:id` navigates to editor with loaded diagram
-  - All CRUD operations tested and working (100% backend tests pass)
+- **Jan 30, 2026**: P1 Bug Fix - Login error toast now shows "Invalid email or password"
