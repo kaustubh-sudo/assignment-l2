@@ -208,6 +208,7 @@ const DiagramsList = () => {
   useEffect(() => {
     fetchDiagrams();
     fetchFolders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   // Handle edit - navigate to editor with diagram data
