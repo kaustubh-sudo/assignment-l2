@@ -4,9 +4,9 @@
 You have been given access to a **Diagram Maker** web application that allows users to create, save, and manage diagrams. The application has several bugs that need to be identified and fixed.
 
 **Time Limit:** 1 hour  
-**Total Bugs:** 18  
-**Total Points:** 140  
-**Categories:** Authentication (4), Save/Load (6), List/Display (5), Export (3)
+**Total Bugs:** 22  
+**Total Points:** 170  
+**Categories:** Authentication (4), Save/Load (6), List/Display (5), Export (3), Search (4)
 
 ---
 
@@ -252,6 +252,57 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
+## Search Bugs (4 bugs, 30 points)
+
+### SEARCH-001: Search is Case-Sensitive (5 pts)
+**Difficulty:** Easy | **Time:** ~1 min
+
+**How to Reproduce:**
+1. Save diagram "Test Diagram"
+2. Search "test" → ❌ No results
+3. Search "Test" → ✓ Found
+
+**Expected:** Search should be case-insensitive
+
+---
+
+### SEARCH-002: Search Ignores Folder Filter (10 pts)
+**Difficulty:** Medium | **Time:** ~2 min
+
+**How to Reproduce:**
+1. Create folder "Work"
+2. Save "Diagram A" in Work folder
+3. Save "Diagram B" outside Work folder
+4. Select "Work" folder, search "Diagram"
+5. ❌ Shows both A and B (should only show A)
+
+**Expected:** Search should respect folder filter
+
+---
+
+### SEARCH-003: Clear Search Button Doesn't Work (10 pts)
+**Difficulty:** Medium | **Time:** ~1.5 min
+
+**How to Reproduce:**
+1. Search "test" → Shows filtered results
+2. Click X (clear) button
+3. ❌ Still shows filtered results
+
+**Expected:** Clicking clear should show all diagrams
+
+---
+
+### SEARCH-004: Search Doesn't Debounce (5 pts)
+**Difficulty:** Easy | **Time:** ~1.5 min
+
+**How to Reproduce:**
+1. Type quickly in search box
+2. ❌ Notice UI lag/stutter on every keystroke
+
+**Expected:** Should debounce and only filter after typing stops
+
+---
+
 ## Evaluation Criteria
 
 | Category | Bugs | Points |
@@ -260,7 +311,8 @@ You have been given access to a **Diagram Maker** web application that allows us
 | Save/Load | 6 | 55 |
 | List/Display | 5 | 45 |
 | Export | 3 | 20 |
-| **Total** | **18** | **140** |
+| Search | 4 | 30 |
+| **Total** | **22** | **170** |
 
 ---
 

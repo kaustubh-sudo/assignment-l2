@@ -26,60 +26,47 @@
 | EXPORT-001 | Export | Easy | 5 | DiagramRenderer.js |
 | EXPORT-002 | Export | Medium | 10 | DiagramRenderer.js |
 | EXPORT-003 | Export | Easy | 5 | PreviewPanel.js |
-| **Total** | | | **140** | |
+| SEARCH-001 | Search | Easy | 5 | DiagramsList.js |
+| SEARCH-002 | Search | Medium | 10 | DiagramsList.js |
+| SEARCH-003 | Search | Medium | 10 | DiagramsList.js |
+| SEARCH-004 | Search | Easy | 5 | DiagramsList.js |
+| **Total** | | | **170** | |
 
 ---
 
-## AUTH-001: Email Case-Sensitive Login
+## Authentication Bugs
 
-### File: `/app/backend/server.py`
-
-### Buggy Code
+### AUTH-001: Email Case-Sensitive Login
+**File:** `/app/backend/server.py`
 ```python
+# Buggy
 user_doc = await db.users.find_one({"email": credentials.email})
-```
 
-### Fixed Code
-```python
+# Fixed
 user_doc = await db.users.find_one({"email": credentials.email.lower()})
 ```
 
----
-
-## AUTH-002: Duplicate Email Registration
-
-### File: `/app/backend/server.py`
-
-### Buggy Code
+### AUTH-002: Duplicate Email Registration
+**File:** `/app/backend/server.py`
 ```python
-# Check if user already exists - DISABLED FOR TESTING
-# existing_user = await db.users.find_one(...)
-```
-
-### Fixed Code
-```python
+# Buggy: check is commented out
+# Fixed: uncomment and add .lower()
 existing_user = await db.users.find_one({"email": user_data.email.lower()})
 if existing_user:
     raise HTTPException(status_code=400, detail="Email already registered")
 ```
 
----
-
-## AUTH-003: Logout Doesn't Clear Token
-
-### File: `/app/frontend/src/context/AuthContext.js`
-
-### Buggy Code
+### AUTH-003: Logout Doesn't Clear Token
+**File:** `/app/frontend/src/context/AuthContext.js`
 ```javascript
+// Buggy
 const logout = () => {
   // Token removal disabled
   setToken(null);
   setUser(null);
 };
-```
 
-### Fixed Code
-```javascript
+// Fixed
 const logout = () => {
   localStorage.removeItem('token');
   setToken(null);
@@ -87,295 +74,169 @@ const logout = () => {
 };
 ```
 
----
-
-## AUTH-004: Password Minimum Length
-
-### File: `/app/backend/server.py`
-
-### Buggy Code
+### AUTH-004: Password Minimum Length
+**File:** `/app/backend/server.py`
 ```python
-# Password validation disabled for testing
-```
-
-### Fixed Code
-```python
+# Add before user creation
 if len(user_data.password) < 6:
     raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
 ```
 
 ---
 
-## SAVE-001: Duplicate Entries
+## Save/Load Bugs
 
-### File: `/app/backend/server.py`
-
-### Buggy Code
+### SAVE-001: Duplicate Entries
+**File:** `/app/backend/server.py`
 ```python
-# Duplicate check disabled - allows multiple diagrams with same title
-```
-
-### Fixed Code
-```python
+# Add duplicate check before insert
 existing_diagram = await db.diagrams.find_one({
     "user_id": current_user.user_id,
     "title": diagram_data.title
 })
 if existing_diagram:
-    # Update existing instead of creating new
-    await db.diagrams.update_one({"id": existing_diagram["id"]}, {"$set": update_data})
-    return existing_diagram_response
+    # Update existing instead
 ```
 
----
-
-## SAVE-002: Load Doesn't Populate Description
-
-### File: `/app/frontend/src/pages/DiagramRenderer.js`
-
-### Buggy Code
+### SAVE-002: Load Doesn't Populate Description
+**File:** `/app/frontend/src/pages/DiagramRenderer.js`
 ```javascript
-// BUG: Not setting userInput from description
-setSavedDiagram({...});
-```
-
-### Fixed Code
-```javascript
+// Add this line when loading
 setUserInput(data.description || '');
-setSavedDiagram({...});
 ```
 
----
-
-## SAVE-003: Save Button Stays Disabled
-
-### File: `/app/frontend/src/pages/DiagramRenderer.js`
-
-### Buggy Code
+### SAVE-003: Save Button Stays Disabled
+**File:** `/app/frontend/src/pages/DiagramRenderer.js`
 ```javascript
-} catch (err) {
-  toast.error(err.message);
-}
-// BUG: Missing finally block
-```
-
-### Fixed Code
-```javascript
-} catch (err) {
-  toast.error(err.message);
+// Add finally block
 } finally {
   setIsSaving(false);
 }
 ```
 
----
-
-## SAVE-004: Timestamp Doesn't Update
-
-### File: `/app/frontend/src/pages/DiagramRenderer.js`
-
-### Buggy Code
+### SAVE-004: Timestamp Doesn't Update
+**File:** `/app/frontend/src/pages/DiagramRenderer.js`
 ```javascript
-updated_at: savedDiagram?.updated_at  // BUG: Using old timestamp
-```
-
-### Fixed Code
-```javascript
+// Use data.updated_at instead of savedDiagram?.updated_at
 updated_at: data.updated_at
 ```
 
----
-
-## SAVE-005: Title Doesn't Clear
-
-### File: `/app/frontend/src/components/SaveDiagramModal.js`
-
-### Buggy Code
+### SAVE-005: Title Doesn't Clear
+**File:** `/app/frontend/src/components/SaveDiagramModal.js`
 ```javascript
-onSave({...});
-// BUG: Form not reset after save
-```
-
-### Fixed Code
-```javascript
-onSave({...});
+// Add form reset after save
 if (!existingTitle) {
   setTitle('');
   setDescription('');
 }
 ```
 
----
-
-## SAVE-006: Empty Title Accepted
-
-### File: `/app/backend/server.py`
-
-### Buggy Code
+### SAVE-006: Empty Title Accepted
+**File:** `/app/backend/server.py`
 ```python
-title: str = Field(default="", max_length=200)  # BUG: No min_length
-```
-
-### Fixed Code
-```python
+# Use min_length=1 in Pydantic model
 title: str = Field(..., min_length=1, max_length=200)
 ```
 
 ---
 
-## LIST-001: Shows Everyone's Diagrams
+## List/Display Bugs
 
-### File: `/app/backend/server.py`
-
-### Buggy Code
+### LIST-001: Shows Everyone's Diagrams
+**File:** `/app/backend/server.py`
 ```python
-# BUG: Missing user_id filter - shows all diagrams
-query_filter = {}
-```
-
-### Fixed Code
-```python
+# Add user filter
 query_filter = {"user_id": current_user.user_id}
 ```
 
----
-
-## LIST-002: Delete Wrong Diagram
-
-### File: `/app/frontend/src/components/DiagramCard.js`
-
-### Buggy Code
+### LIST-002: Delete Wrong Diagram
+**File:** `/app/frontend/src/components/DiagramCard.js`
 ```javascript
-onDelete({ ...diagram, id: diagram.id + '_wrong' });  // BUG: Corrupted ID
+// Fix: pass correct diagram
+onDelete(diagram);  // Not diagram with corrupted ID
 ```
 
-### Fixed Code
-```javascript
-onDelete(diagram);
-```
-
----
-
-## LIST-003: Sorted Oldest First
-
-### File: `/app/backend/server.py`
-
-### Buggy Code
+### LIST-003: Sorted Oldest First
+**File:** `/app/backend/server.py`
 ```python
-sort_direction = 1  # BUG: ascending shows oldest first
+sort_direction = -1  # Not 1
 ```
 
-### Fixed Code
-```python
-sort_direction = -1  # descending shows newest first
-```
-
----
-
-## LIST-004: Count Doesn't Update
-
-### File: `/app/frontend/src/pages/DiagramsList.js`
-
-### Buggy Code
+### LIST-004: Count Doesn't Update
+**File:** `/app/frontend/src/pages/DiagramsList.js`
 ```javascript
-// Remove from local state - BUG: Not updating state correctly
-toast.success('Diagram deleted successfully');
-```
-
-### Fixed Code
-```javascript
+// Add state update
 setDiagrams(prevDiagrams => prevDiagrams.filter(d => d.id !== deleteTarget.id));
-toast.success('Diagram deleted successfully');
 ```
 
----
-
-## LIST-005: Raw Date Format
-
-### File: `/app/frontend/src/components/DiagramCard.js`
-
-### Buggy Code
+### LIST-005: Raw Date Format
+**File:** `/app/frontend/src/components/DiagramCard.js`
 ```javascript
-{diagram.created_at}
-```
-
-### Fixed Code
-```javascript
+// Use formatDate function
 {formatDate(diagram.created_at)}
 ```
 
 ---
 
-## EXPORT-001: Generic Filename
+## Export Bugs
 
-### File: `/app/frontend/src/pages/DiagramRenderer.js`
-
-### Buggy Code
+### EXPORT-001: Generic Filename
+**File:** `/app/frontend/src/pages/DiagramRenderer.js`
 ```javascript
-const getExportFilename = (format) => {
-  // BUG: Always returns generic filename, ignores diagram title
-  return `diagram.${format}`;
-};
+// Use title in filename
+const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+return `${sanitizedTitle}.${format}`;
 ```
 
-### Fixed Code
+### EXPORT-002: Spinner Never Clears
+**File:** `/app/frontend/src/pages/DiagramRenderer.js`
 ```javascript
-const getExportFilename = (format) => {
-  const title = savedDiagram?.title;
-  if (title) {
-    const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    return `${sanitizedTitle}.${format}`;
-  }
-  return `diagram-${Date.now()}.${format}`;
-};
-```
-
----
-
-## EXPORT-002: Spinner Never Clears
-
-### File: `/app/frontend/src/pages/DiagramRenderer.js`
-
-### Buggy Code
-```javascript
-} catch (err) {
-  toast.error(`Failed to export diagram: ${err.message}`);
-  console.error('Export error:', err);
-}
-// BUG: Missing finally block - isExporting never reset to false
-```
-
-### Fixed Code
-```javascript
-} catch (err) {
-  toast.error(`Failed to export diagram: ${err.message}`);
-  console.error('Export error:', err);
+// Add finally block
 } finally {
   setIsExporting(false);
 }
 ```
 
----
-
-## EXPORT-003: Button Not Disabled
-
-### File: `/app/frontend/src/components/PreviewPanel.js`
-
-### Buggy Code
+### EXPORT-003: Button Not Disabled
+**File:** `/app/frontend/src/components/PreviewPanel.js`
 ```javascript
-<Button
-  size="sm"
-  className="bg-gradient-to-r ..."
->
+// Add disabled prop
+<Button disabled={isExporting} ...>
 ```
 
-### Fixed Code
+---
+
+## Search Bugs
+
+### SEARCH-001: Case-Sensitive Search
+**File:** `/app/frontend/src/pages/DiagramsList.js`
 ```javascript
-<Button
-  size="sm"
-  disabled={isExporting}
-  className="bg-gradient-to-r ... disabled:opacity-50 disabled:cursor-not-allowed"
->
+// Add toLowerCase()
+const query = debouncedSearchQuery.toLowerCase().trim();
+diagram.title.toLowerCase().includes(query)
+```
+
+### SEARCH-002: Ignores Folder Filter
+**File:** `/app/frontend/src/pages/DiagramsList.js`
+```javascript
+// Apply folder filter BEFORE search filter (always)
+// Not only when not searching
+```
+
+### SEARCH-003: Clear Button Doesn't Work
+**File:** `/app/frontend/src/pages/DiagramsList.js`
+```javascript
+// Add setSearchQuery('')
+const handleClearSearch = () => {
+  setSearchQuery('');
+};
+```
+
+### SEARCH-004: No Debounce
+**File:** `/app/frontend/src/pages/DiagramsList.js`
+```javascript
+// Use debounced value
+const debouncedSearchQuery = useDebounce(searchQuery, 300);
 ```
 
 ---
@@ -390,10 +251,7 @@ python manager.py status
 python inject_bugs.py
 
 # Inject by category
-python inject_bugs.py --category "Authentication"
-python inject_bugs.py --category "Save/Load"
-python inject_bugs.py --category "List/Display"
-python inject_bugs.py --category "Export"
+python inject_bugs.py --category "Search"
 
 # Fix all bugs
 python fix_bugs.py
@@ -408,8 +266,8 @@ python evaluate.py --candidate "Name" --html
 
 | Score | Grade | Assessment |
 |-------|-------|-----------|
-| 120-140 | A | Excellent |
-| 90-119 | B | Good |
-| 60-89 | C | Average |
-| 30-59 | D | Below Average |
-| 0-29 | F | Needs Improvement |
+| 140-170 | A | Excellent |
+| 110-139 | B | Good |
+| 75-109 | C | Average |
+| 40-74 | D | Below Average |
+| 0-39 | F | Needs Improvement |
