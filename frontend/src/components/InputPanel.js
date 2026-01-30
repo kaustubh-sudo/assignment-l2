@@ -31,29 +31,29 @@ const InputPanel = ({
   lastSavedAt,
 }) => {
   return (
-    <Card className="h-full flex flex-col shadow-xl border-border/50 bg-card/95 backdrop-blur-sm rounded-2xl">
-      <CardHeader className="pb-4 border-b border-border/50">
-        <div className="flex items-center justify-between">
+    <Card className="h-full flex flex-col shadow-lg border-slate-200 bg-white rounded-xl sm:rounded-2xl">
+      <CardHeader className="pb-3 sm:pb-4 border-b border-slate-100 px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <CardTitle className="text-lg md:text-xl font-semibold">
+            <CardTitle className="text-base sm:text-lg md:text-xl font-semibold text-slate-800">
               Describe Your Diagram
             </CardTitle>
-            <p className="text-base text-muted-foreground mt-2">
+            <p className="text-sm text-slate-500 mt-1">
               Explain what you want to visualize in plain language
             </p>
           </div>
           {lastSavedAt && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-md">
+            <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-md">
               <Clock className="w-3 h-3" />
-              <span>Last saved: {lastSavedAt}</span>
+              <span>Saved: {lastSavedAt}</span>
             </div>
           )}
         </div>
       </CardHeader>
       
-      <CardContent className="flex-1 flex flex-col gap-5 pt-5 overflow-hidden">
-        <div className="space-y-3">
-          <Label className="text-base font-medium">
+      <CardContent className="flex-1 flex flex-col gap-4 sm:gap-5 pt-4 sm:pt-5 overflow-hidden px-4 sm:px-6">
+        <div className="space-y-2 sm:space-y-3">
+          <Label className="text-sm sm:text-base font-medium text-slate-700">
             Choose diagram type
           </Label>
           <div className="flex flex-wrap gap-2">
@@ -62,22 +62,23 @@ const InputPanel = ({
                 key={type.value}
                 onClick={() => setDiagramType(type.value)}
                 className={`
-                  flex flex-col items-start px-4 py-2.5 rounded-xl border-2 transition-all duration-200
+                  flex flex-col items-start px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl border-2 transition-all duration-200
                   ${diagramType === type.value 
-                    ? 'border-blue-500 bg-blue-500/10 shadow-md' 
-                    : 'border-border bg-background/50 hover:border-blue-400/50 hover:bg-background/80'
+                    ? 'border-blue-500 bg-blue-50 shadow-sm' 
+                    : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50'
                   }
                 `}
+                data-testid={`diagram-type-${type.value}`}
               >
-                <span className="font-medium text-sm">{type.label}</span>
-                <span className="text-xs text-muted-foreground">{type.description}</span>
+                <span className="font-medium text-xs sm:text-sm text-slate-800">{type.label}</span>
+                <span className="text-xs text-slate-500 hidden sm:block">{type.description}</span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col gap-3 min-h-0">
-          <Label htmlFor="user-input" className="text-base font-medium">
+        <div className="flex-1 flex flex-col gap-2 sm:gap-3 min-h-0">
+          <Label htmlFor="user-input" className="text-sm sm:text-base font-medium text-slate-700">
             Describe what you want to create
           </Label>
           <Textarea
@@ -85,7 +86,8 @@ const InputPanel = ({
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             placeholder="Example: Create a flowchart showing the customer support process from ticket creation to resolution..."
-            className="flex-1 text-base leading-relaxed custom-scrollbar resize-none min-h-[150px] md:min-h-[200px] bg-background/50"
+            className="flex-1 text-sm sm:text-base leading-relaxed custom-scrollbar resize-none min-h-[120px] sm:min-h-[150px] md:min-h-[200px] bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400"
+            data-testid="diagram-input-textarea"
           />
         </div>
 
@@ -95,7 +97,7 @@ const InputPanel = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full justify-between text-sm text-muted-foreground hover:text-foreground"
+                className="w-full justify-between text-sm text-slate-500 hover:text-slate-700"
               >
                 <span className="flex items-center gap-2">
                   <Code2 className="w-4 h-4 flex-shrink-0" />
@@ -105,8 +107,8 @@ const InputPanel = ({
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-2">
-              <div className="rounded-lg bg-[hsl(var(--editor-bg))] p-4 max-h-40 overflow-auto custom-scrollbar">
-                <pre className="text-sm text-[hsl(var(--editor-foreground))] font-mono whitespace-pre-wrap break-all">
+              <div className="rounded-lg bg-slate-800 p-3 sm:p-4 max-h-40 overflow-auto custom-scrollbar">
+                <pre className="text-xs sm:text-sm text-slate-100 font-mono whitespace-pre-wrap break-all">
                   {generatedCode}
                 </pre>
               </div>
@@ -114,30 +116,33 @@ const InputPanel = ({
           </Collapsible>
         )}
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-2 sm:gap-3 pt-2">
           <Button
             onClick={onGenerate}
             disabled={isGenerating || isRendering || !userInput.trim()}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl h-12 text-base font-medium rounded-xl"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white transition-all duration-300 shadow-md hover:shadow-lg h-10 sm:h-12 text-sm sm:text-base font-medium rounded-lg sm:rounded-xl"
+            data-testid="generate-diagram-btn"
           >
-            <Sparkles className="w-5 h-5 mr-2" />
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
             {isGenerating ? 'Thinking...' : isRendering ? 'Creating...' : 'Generate Diagram'}
           </Button>
           <Button
             onClick={onSave}
             disabled={!canSave}
             variant="outline"
-            className="border-border hover:bg-green-500/10 hover:border-green-500/50 h-12 px-4 rounded-xl transition-all"
+            className="border-slate-200 hover:bg-green-50 hover:border-green-300 h-10 sm:h-12 px-3 sm:px-4 rounded-lg sm:rounded-xl transition-all"
             title={savedDiagram ? 'Update diagram' : 'Save diagram'}
+            data-testid="save-diagram-btn"
           >
-            <Save className="w-5 h-5" />
+            <Save className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
           <Button
             onClick={onClear}
             variant="outline"
-            className="border-border hover:bg-muted h-12 px-4 rounded-xl"
+            className="border-slate-200 hover:bg-slate-50 h-10 sm:h-12 px-3 sm:px-4 rounded-lg sm:rounded-xl"
+            data-testid="clear-diagram-btn"
           >
-            <RotateCcw className="w-5 h-5" />
+            <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
         </div>
       </CardContent>
