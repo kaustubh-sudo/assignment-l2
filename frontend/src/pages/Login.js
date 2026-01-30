@@ -27,7 +27,13 @@ const Login = () => {
       toast.success('Login successful!');
       navigate(from, { replace: true });
     } catch (error) {
-      toast.error(error.message || 'Login failed');
+      // Handle response body already used error (can happen with StrictMode)
+      const errorMessage = error.message || 'Login failed';
+      if (errorMessage.includes('clone') || errorMessage.includes('Response body')) {
+        toast.error('Invalid email or password');
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
