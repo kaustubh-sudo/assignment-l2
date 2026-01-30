@@ -4,9 +4,9 @@
 You have been given access to a **Diagram Maker** web application that allows users to create, save, and manage diagrams. The application has several bugs that need to be identified and fixed.
 
 **Time Limit:** 1 hour  
-**Total Bugs:** 10  
-**Total Points:** 75  
-**Categories:** Authentication (4 bugs), Save/Load (6 bugs)
+**Total Bugs:** 15  
+**Total Points:** 120  
+**Categories:** Authentication (4), Save/Load (6), List/Display (5)
 
 ---
 
@@ -24,8 +24,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 ## Authentication Bugs (4 bugs, 20 points)
 
 ### AUTH-001: Login Case Sensitivity Issue (5 pts)
-**Difficulty:** Easy  
-**Estimated Time:** 1 minute
+**Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
 1. Sign up with email: `Test@Example.com`
@@ -33,147 +32,186 @@ You have been given access to a **Diagram Maker** web application that allows us
 3. Try to log in with email: `test@example.com` (lowercase)
 4. ❌ You get "Invalid credentials" error
 
-**Expected Behavior:**
-- Login should work regardless of email case
+**Expected:** Login should work regardless of email case
 
 ---
 
 ### AUTH-002: Duplicate Email Registration (5 pts)
-**Difficulty:** Easy  
-**Estimated Time:** 2 minutes
+**Difficulty:** Easy | **Time:** ~2 min
 
 **How to Reproduce:**
 1. Sign up with email: `test@example.com`
 2. Log out
-3. Sign up again with the same email: `test@example.com`
-4. ❌ Registration succeeds (should show "Email already exists" error)
+3. Sign up again with: `test@example.com`
+4. ❌ Registration succeeds
 
-**Expected Behavior:**
-- System should prevent duplicate email registrations
+**Expected:** Should show "Email already exists" error
 
 ---
 
 ### AUTH-003: Logout Token Persistence (5 pts)
-**Difficulty:** Easy  
-**Estimated Time:** 1 minute
+**Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
 1. Log in as any user
-2. Click "Logout" button (you get redirected to login page)
-3. Open browser DevTools → Application → Local Storage
-4. ❌ Token is still present in localStorage
-5. Press browser Back button → You're still logged in!
+2. Click "Logout" (redirects to login page)
+3. Open DevTools → Application → Local Storage
+4. ❌ Token is still present
+5. Press Back button → Still logged in!
 
-**Expected Behavior:**
-- Logout should completely clear the authentication token
+**Expected:** Logout should clear the token from localStorage
 
 ---
 
 ### AUTH-004: Password Minimum Length Not Enforced (5 pts)
-**Difficulty:** Easy  
-**Estimated Time:** 1 minute
+**Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
 1. Go to Sign Up page
 2. Enter email: `test2@example.com`
 3. Enter password: `12` (only 2 characters)
-4. Click Sign Up
-5. ❌ Registration succeeds (should require 6+ characters)
+4. ❌ Registration succeeds
 
-**Expected Behavior:**
-- Should show error "Password must be at least 6 characters"
+**Expected:** Should require 6+ characters
 
 ---
 
-## Save/Load Bugs (6 bugs, 50 points)
+## Save/Load Bugs (6 bugs, 55 points)
 
 ### SAVE-001: Save Creates Duplicate Entries (15 pts)
-**Difficulty:** Hard  
-**Estimated Time:** 4 minutes
+**Difficulty:** Hard | **Time:** ~4 min
 
 **How to Reproduce:**
-1. Create a diagram and click "Generate"
-2. Click Save → Enter title "Test Diagram"
-3. Go to "My Diagrams" → See 1 entry ✓
-4. Go back to Editor, click Save again (same title)
-5. Go to "My Diagrams" → ❌ See 2 entries with same title
+1. Create and save diagram with title "Test Diagram"
+2. Go to "My Diagrams" → See 1 entry ✓
+3. Go back to Editor, save again (same title)
+4. Go to "My Diagrams" → ❌ See 2 entries
 
-**Expected Behavior:**
-- Saving with same title should update existing diagram, not create duplicate
+**Expected:** Saving with same title should update existing diagram
 
 ---
 
 ### SAVE-002: Load Diagram Doesn't Populate Description (10 pts)
-**Difficulty:** Medium  
-**Estimated Time:** 2 minutes
+**Difficulty:** Medium | **Time:** ~2 min
 
 **How to Reproduce:**
-1. Save a diagram with title "Test" and description "My test diagram"
+1. Save a diagram with description "My test diagram"
 2. Go to "My Diagrams"
-3. Click "Test" to edit/load it
-4. ❌ The description textarea is empty
+3. Click the diagram to edit
+4. ❌ Description textarea is empty
 
-**Expected Behavior:**
-- Loading a diagram should restore the description in the input field
+**Expected:** Loading should restore the description
 
 ---
 
 ### SAVE-003: Save Button Stays Disabled (10 pts)
-**Difficulty:** Medium  
-**Estimated Time:** 1.5 minutes
+**Difficulty:** Medium | **Time:** ~1.5 min
 
 **How to Reproduce:**
 1. Create and save a diagram
 2. Modify the description
-3. Click Save → Spinner shows briefly
-4. ❌ Save button remains grayed out/disabled after save completes
+3. Click Save → Spinner shows
+4. ❌ Save button remains grayed out after completion
 
-**Expected Behavior:**
-- Save button should re-enable after save operation completes
+**Expected:** Save button should re-enable after save completes
 
 ---
 
 ### SAVE-004: "Last Saved" Timestamp Doesn't Update (10 pts)
-**Difficulty:** Medium  
-**Estimated Time:** 2 minutes
+**Difficulty:** Medium | **Time:** ~2 min
 
 **How to Reproduce:**
 1. Save a diagram → Shows "Saved at 10:00 AM"
 2. Wait a minute, make changes
 3. Save again → ❌ Still shows "10:00 AM"
 
-**Expected Behavior:**
-- Timestamp should update to reflect the most recent save time
+**Expected:** Timestamp should update after each save
 
 ---
 
 ### SAVE-005: Title Field Doesn't Clear After Save (5 pts)
-**Difficulty:** Easy  
-**Estimated Time:** 1 minute
+**Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
 1. Click Save, enter title "Diagram A"
 2. Click Save button → Success
-3. Click Save again
-4. ❌ Title input still shows "Diagram A" (should be empty for new diagram)
+3. Click Save again for new diagram
+4. ❌ Title still shows "Diagram A"
 
-**Expected Behavior:**
-- For new diagrams, form should reset after successful save
+**Expected:** Form should reset for new diagrams
 
 ---
 
 ### SAVE-006: Save Without Title Succeeds (5 pts)
-**Difficulty:** Easy  
-**Estimated Time:** 1.5 minutes
+**Difficulty:** Easy | **Time:** ~1.5 min
 
 **How to Reproduce:**
 1. Create a diagram
-2. Click Save, leave title completely empty
-3. Click Save button
-4. ❌ Might succeed or show unclear error
+2. Click Save, leave title empty
+3. ❌ Save succeeds or shows unclear error
 
-**Expected Behavior:**
-- Should show clear error "Title is required" and prevent save
+**Expected:** Should require title with clear error message
+
+---
+
+## List/Display Bugs (5 bugs, 45 points)
+
+### LIST-001: My Diagrams Shows Everyone's Diagrams (15 pts)
+**Difficulty:** Hard | **Time:** ~4 min
+
+**How to Reproduce:**
+1. Account A saves diagram "A's Diagram"
+2. Logout, create Account B, save "B's Diagram"
+3. In Account B's list → ❌ See BOTH diagrams
+
+**Expected:** Each user should only see their own diagrams
+
+---
+
+### LIST-002: Delete Removes Wrong Diagram (10 pts)
+**Difficulty:** Medium | **Time:** ~2.5 min
+
+**How to Reproduce:**
+1. Create and save 3 diagrams: A, B, C
+2. Click Delete on diagram B
+3. ❌ Delete fails or wrong diagram affected
+
+**Expected:** Should delete the correct diagram
+
+---
+
+### LIST-003: Diagram List Sorted Oldest First (5 pts)
+**Difficulty:** Easy | **Time:** ~1.5 min
+
+**How to Reproduce:**
+1. Save 3 diagrams (A, B, C in that order)
+2. Go to My Diagrams list
+3. ❌ Shows: A, B, C (oldest first)
+
+**Expected:** Should show newest first: C, B, A
+
+---
+
+### LIST-004: Diagram Count Doesn't Update After Delete (10 pts)
+**Difficulty:** Medium | **Time:** ~2 min
+
+**How to Reproduce:**
+1. Save 3 diagrams → Shows "3 diagrams" ✓
+2. Delete 1 diagram
+3. ❌ Still shows "3 diagrams"
+
+**Expected:** Count should update to "2 diagrams"
+
+---
+
+### LIST-005: Created Date Shows Wrong Format (5 pts)
+**Difficulty:** Easy | **Time:** ~1 min
+
+**How to Reproduce:**
+1. Save a diagram
+2. View list → ❌ Shows "2024-01-31T10:30:00Z"
+
+**Expected:** Should show "Jan 31, 2024" or similar readable format
 
 ---
 
@@ -183,15 +221,12 @@ You have been given access to a **Diagram Maker** web application that allows us
 |----------|------|--------|
 | Authentication | 4 | 20 |
 | Save/Load | 6 | 55 |
-| **Total** | **10** | **75** |
-
-### Scoring
-- Each bug fixed correctly = Full points for that bug
-- Points vary by difficulty (Easy: 5pts, Medium: 10pts, Hard: 15pts)
+| List/Display | 5 | 45 |
+| **Total** | **15** | **120** |
 
 ---
 
-## How to Run the Application
+## How to Run
 
 ```bash
 # Check service status
@@ -203,13 +238,11 @@ sudo supervisorctl restart frontend
 
 # View logs
 tail -f /var/log/supervisor/backend.err.log
-tail -f /var/log/supervisor/frontend.err.log
 ```
 
 ---
 
 ## Submission
-Your fixes will be automatically evaluated by running:
 ```bash
 python evaluate.py --candidate "Your Name"
 ```
