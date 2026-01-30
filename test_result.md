@@ -435,10 +435,7 @@ metadata:
   last_updated: "Added user authentication (signup/login with JWT)"
 
 test_plan:
-  current_focus:
-    - "User Authentication - Signup"
-    - "User Authentication - Login"
-    - "User Authentication - Get Current User"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
