@@ -439,9 +439,9 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.3"
-  test_sequence: 4
-  last_updated: "Comprehensive backend regression test completed - all 14 scenarios passed"
+  version: "1.4"
+  test_sequence: 5
+  last_updated: "Diagram CRUD API endpoints testing completed - all 28 scenarios passed with 100% success rate"
 
 test_plan:
   current_focus:
