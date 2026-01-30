@@ -207,6 +207,20 @@ const DiagramRenderer = () => {
     }
   };
 
+  // Generate filename from diagram title or default
+  const getExportFilename = (format) => {
+    const title = savedDiagram?.title;
+    if (title) {
+      // Sanitize title for filename (remove special characters)
+      const sanitizedTitle = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      return `${sanitizedTitle}.${format}`;
+    }
+    return `diagram-${Date.now()}.${format}`;
+  };
+
   // Export diagram as SVG or PNG
   const handleExport = async (format) => {
     if (!renderedDiagram) {
@@ -219,19 +233,28 @@ const DiagramRenderer = () => {
       return;
     }
 
+    // Prevent multiple clicks
+    if (isExporting) {
+      return;
+    }
+
+    setIsExporting(true);
+
     try {
+      const filename = getExportFilename(format);
+      
       if (format === 'svg') {
         // Export as SVG
         const blob = new Blob([renderedDiagram.content], { type: 'image/svg+xml' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${diagramType}-diagram-${Date.now()}.svg`;
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        toast.success('Diagram exported as SVG!');
+        toast.success(`Exported as ${filename}`);
       } else if (format === 'png') {
         // Render as PNG using Kroki
         const krokiType = getKrokiType(diagramType);
@@ -262,16 +285,18 @@ const DiagramRenderer = () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${diagramType}-diagram-${Date.now()}.png`;
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        toast.success('Diagram exported as PNG!');
+        toast.success(`Exported as ${filename}`);
       }
     } catch (err) {
       toast.error(`Failed to export diagram: ${err.message}`);
       console.error('Export error:', err);
+    } finally {
+      setIsExporting(false);
     }
   };
 
