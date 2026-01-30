@@ -239,7 +239,7 @@ const DiagramsList = () => {
       }
 
       // Remove from local state
-      setDiagrams(diagrams.filter(d => d.id !== deleteTarget.id));
+      setDiagrams(prevDiagrams => prevDiagrams.filter(d => d.id !== deleteTarget.id));
       toast.success('Diagram deleted successfully');
       setDeleteTarget(null);
     } catch (err) {
