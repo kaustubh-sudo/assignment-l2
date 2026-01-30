@@ -53,24 +53,24 @@ const SaveDiagramModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={handleClose}
       />
       
       {/* Modal */}
-      <div className="relative bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-white border border-slate-200 rounded-xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
             <Save className="w-5 h-5 text-blue-500" />
             {existingTitle ? 'Update Diagram' : 'Save Diagram'}
           </h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-slate-400 hover:text-slate-600 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -79,8 +79,8 @@ const SaveDiagramModal = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="diagram-title" className="block text-sm font-medium text-gray-300 mb-2">
-              Title <span className="text-red-400">*</span>
+            <label htmlFor="diagram-title" className="block text-sm font-medium text-slate-600 mb-2">
+              Title <span className="text-red-500">*</span>
             </label>
             <input
               id="diagram-title"
@@ -88,19 +88,19 @@ const SaveDiagramModal = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter diagram title"
-              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               disabled={isLoading}
               autoFocus
               data-testid="diagram-title-input"
             />
             {error && (
-              <p className="mt-1 text-sm text-red-400">{error}</p>
+              <p className="mt-1 text-sm text-red-500">{error}</p>
             )}
           </div>
           
           <div>
-            <label htmlFor="diagram-description" className="block text-sm font-medium text-gray-300 mb-2">
-              Description <span className="text-gray-500">(optional)</span>
+            <label htmlFor="diagram-description" className="block text-sm font-medium text-slate-600 mb-2">
+              Description <span className="text-slate-400">(optional)</span>
             </label>
             <textarea
               id="diagram-description"
@@ -109,26 +109,26 @@ const SaveDiagramModal = ({
               placeholder="Enter a brief description"
               rows={3}
               maxLength={1000}
-              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
               disabled={isLoading}
               data-testid="diagram-description-input"
             />
-            <p className="mt-1 text-xs text-gray-500 text-right">
+            <p className="mt-1 text-xs text-slate-400 text-right">
               {description.length}/1000
             </p>
           </div>
           
           {/* Folder Selection */}
           <div>
-            <label htmlFor="diagram-folder" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="diagram-folder" className="block text-sm font-medium text-slate-600 mb-2">
               <Folder className="w-4 h-4 inline mr-1" />
-              Folder <span className="text-gray-500">(optional)</span>
+              Folder <span className="text-slate-400">(optional)</span>
             </label>
             <select
               id="diagram-folder"
               value={folderId || ''}
               onChange={(e) => setFolderId(e.target.value || null)}
-              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               disabled={isLoading}
               data-testid="diagram-folder-select"
             >
@@ -148,7 +148,7 @@ const SaveDiagramModal = ({
               variant="outline"
               onClick={handleClose}
               disabled={isLoading}
-              className="flex-1"
+              className="flex-1 border-slate-200"
             >
               Cancel
             </Button>
