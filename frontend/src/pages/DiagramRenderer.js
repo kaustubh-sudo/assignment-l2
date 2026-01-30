@@ -85,6 +85,7 @@ const DiagramRenderer = () => {
             const data = await response.json();
             setDiagramType(data.diagram_type);
             setGeneratedCode(data.diagram_code);
+            setUserInput(data.description || '');
             setSavedDiagram({
               id: data.id,
               title: data.title,
