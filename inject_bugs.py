@@ -17,11 +17,13 @@ from typing import Dict, List, Tuple
 
 # Bug definitions: bug_id -> (file_path, original_code, buggy_code, description)
 BUGS: Dict[str, Dict] = {
+    # ============== AUTHENTICATION BUGS ==============
     "AUTH-001": {
         "file": "/app/backend/server.py",
         "description": "Email case-sensitive login - Login should be case-insensitive",
         "category": "Authentication",
         "difficulty": "Easy",
+        "points": 5,
         "time_estimate": "1 min",
         "original": '''    # Find user by email
     user_doc = await db.users.find_one({"email": credentials.email.lower()})''',
@@ -33,6 +35,7 @@ BUGS: Dict[str, Dict] = {
         "description": "Duplicate email registration allowed - Should check for existing email",
         "category": "Authentication",
         "difficulty": "Easy",
+        "points": 5,
         "time_estimate": "2 min",
         "original": '''    # Check if user already exists
     existing_user = await db.users.find_one({"email": user_data.email.lower()})
@@ -54,6 +57,7 @@ BUGS: Dict[str, Dict] = {
         "description": "Logout doesn't clear token from localStorage",
         "category": "Authentication",
         "difficulty": "Easy",
+        "points": 5,
         "time_estimate": "1 min",
         "original": '''  const logout = () => {
     localStorage.removeItem('token');
@@ -65,6 +69,218 @@ BUGS: Dict[str, Dict] = {
     setToken(null);
     setUser(null);
   };''',
+    },
+    "AUTH-004": {
+        "file": "/app/backend/server.py",
+        "description": "Password minimum length not enforced - Should require 6+ characters",
+        "category": "Authentication",
+        "difficulty": "Easy",
+        "points": 5,
+        "time_estimate": "1 min",
+        "original": '''@api_router.post("/auth/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def signup(user_data: UserCreate):
+    """
+    Register a new user with email and password.
+    Password must be at least 6 characters.
+    """
+    # Validate password length
+    if len(user_data.password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 6 characters"
+        )
+    
+    # Check if user already exists''',
+        "buggy": '''@api_router.post("/auth/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def signup(user_data: UserCreate):
+    """
+    Register a new user with email and password.
+    Password must be at least 6 characters.
+    """
+    # Password validation disabled for testing
+    
+    # Check if user already exists''',
+    },
+    
+    # ============== SAVE/LOAD BUGS ==============
+    "SAVE-001": {
+        "file": "/app/backend/server.py",
+        "description": "Save creates duplicate entries - Should update existing diagram with same title",
+        "category": "Save/Load",
+        "difficulty": "Hard",
+        "points": 15,
+        "time_estimate": "4 min",
+        "original": '''@api_router.post("/diagrams", response_model=DiagramResponse, status_code=status.HTTP_201_CREATED)
+async def create_diagram(
+    diagram_data: DiagramCreate,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """
+    Save a new diagram for the authenticated user.
+    Requires valid JWT token in Authorization header.
+    """
+    # Check for existing diagram with same title (prevent duplicates)
+    existing_diagram = await db.diagrams.find_one({
+        "user_id": current_user.user_id,
+        "title": diagram_data.title
+    })
+    
+    if existing_diagram:
+        # Update existing diagram instead of creating duplicate
+        now = datetime.now(timezone.utc)
+        update_data = {
+            "description": diagram_data.description,
+            "diagram_type": diagram_data.diagram_type,
+            "diagram_code": diagram_data.diagram_code,
+            "folder_id": diagram_data.folder_id,
+            "updated_at": now.isoformat()
+        }
+        
+        await db.diagrams.update_one(
+            {"id": existing_diagram["id"]},
+            {"$set": update_data}
+        )
+        
+        created_at = existing_diagram['created_at']
+        if isinstance(created_at, str):
+            created_at = datetime.fromisoformat(created_at)
+        
+        logger.info(f"Diagram updated (duplicate title): {existing_diagram['id']} by user {current_user.user_id}")
+        
+        return DiagramResponse(
+            id=existing_diagram['id'],
+            user_id=current_user.user_id,
+            title=diagram_data.title,
+            description=diagram_data.description,
+            diagram_type=diagram_data.diagram_type,
+            diagram_code=diagram_data.diagram_code,
+            folder_id=diagram_data.folder_id,
+            created_at=created_at,
+            updated_at=now
+        )
+    
+    # Validate folder_id if provided''',
+        "buggy": '''@api_router.post("/diagrams", response_model=DiagramResponse, status_code=status.HTTP_201_CREATED)
+async def create_diagram(
+    diagram_data: DiagramCreate,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """
+    Save a new diagram for the authenticated user.
+    Requires valid JWT token in Authorization header.
+    """
+    # Duplicate check disabled - allows multiple diagrams with same title
+    
+    # Validate folder_id if provided''',
+    },
+    "SAVE-002": {
+        "file": "/app/frontend/src/pages/DiagramRenderer.js",
+        "description": "Load diagram doesn't populate textarea - diagram code not loaded properly",
+        "category": "Save/Load",
+        "difficulty": "Medium",
+        "points": 10,
+        "time_estimate": "2 min",
+        "original": '''          if (response.ok) {
+            const data = await response.json();
+            setDiagramType(data.diagram_type);
+            setGeneratedCode(data.diagram_code);
+            setUserInput(data.description || '');
+            setSavedDiagram({''',
+        "buggy": '''          if (response.ok) {
+            const data = await response.json();
+            setDiagramType(data.diagram_type);
+            setGeneratedCode(data.diagram_code);
+            // BUG: Not setting userInput from description
+            setSavedDiagram({''',
+    },
+    "SAVE-003": {
+        "file": "/app/frontend/src/pages/DiagramRenderer.js",
+        "description": "Save button stays disabled after save completes",
+        "category": "Save/Load",
+        "difficulty": "Medium",
+        "points": 10,
+        "time_estimate": "1.5 min",
+        "original": '''      toast.success(savedDiagram?.id ? 'Diagram updated!' : 'Diagram saved!');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsSaving(false);
+    }''',
+        "buggy": '''      toast.success(savedDiagram?.id ? 'Diagram updated!' : 'Diagram saved!');
+    } catch (err) {
+      toast.error(err.message);
+    }
+    // BUG: Missing finally block - isSaving never reset to false''',
+    },
+    "SAVE-004": {
+        "file": "/app/frontend/src/pages/DiagramRenderer.js",
+        "description": "Last saved timestamp doesn't update after saving",
+        "category": "Save/Load",
+        "difficulty": "Medium",
+        "points": 10,
+        "time_estimate": "2 min",
+        "original": '''      setSavedDiagram({
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        folder_id: data.folder_id,
+        updated_at: data.updated_at
+      });''',
+        "buggy": '''      setSavedDiagram({
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        folder_id: data.folder_id,
+        updated_at: savedDiagram?.updated_at  // BUG: Using old timestamp instead of new one
+      });''',
+    },
+    "SAVE-005": {
+        "file": "/app/frontend/src/components/SaveDiagramModal.js",
+        "description": "Title field doesn't clear after save - should reset form",
+        "category": "Save/Load",
+        "difficulty": "Easy",
+        "points": 5,
+        "time_estimate": "1 min",
+        "original": '''    setError('');
+    onSave({ 
+      title: title.trim(), 
+      description: description.trim(),
+      folder_id: folderId || null
+    });
+    // Reset form after save
+    if (!existingTitle) {
+      setTitle('');
+      setDescription('');
+    }
+  };''',
+        "buggy": '''    setError('');
+    onSave({ 
+      title: title.trim(), 
+      description: description.trim(),
+      folder_id: folderId || null
+    });
+    // BUG: Form not reset after save
+  };''',
+    },
+    "SAVE-006": {
+        "file": "/app/backend/server.py",
+        "description": "Save without title succeeds - should require title",
+        "category": "Save/Load",
+        "difficulty": "Easy",
+        "points": 5,
+        "time_estimate": "1.5 min",
+        "original": '''class DiagramCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str = Field(default="", max_length=1000)
+    diagram_type: str
+    diagram_code: str
+    folder_id: str | None = None''',
+        "buggy": '''class DiagramCreate(BaseModel):
+    title: str = Field(default="", max_length=200)  # BUG: No min_length validation
+    description: str = Field(default="", max_length=1000)
+    diagram_type: str
+    diagram_code: str
+    folder_id: str | None = None''',
     },
 }
 
@@ -127,16 +343,20 @@ def list_bugs() -> None:
     print("AVAILABLE BUGS FOR INJECTION")
     print("="*70)
     
+    total_points = 0
     for bug_id, bug in BUGS.items():
+        points = bug.get('points', 5)
+        total_points += points
         print(f"\n[{bug_id}]")
         print(f"  Category:    {bug['category']}")
         print(f"  Difficulty:  {bug['difficulty']}")
+        print(f"  Points:      {points}")
         print(f"  Time Est:    {bug['time_estimate']}")
         print(f"  File:        {bug['file']}")
         print(f"  Description: {bug['description']}")
     
     print("\n" + "="*70)
-    print(f"Total: {len(BUGS)} bugs")
+    print(f"Total: {len(BUGS)} bugs | {total_points} points")
     print("="*70 + "\n")
 
 
@@ -166,6 +386,7 @@ def main():
     parser.add_argument("--list", action="store_true", help="List all available bugs")
     parser.add_argument("--bug", type=str, help="Inject specific bug by ID (e.g., AUTH-001)")
     parser.add_argument("--status", action="store_true", help="Show current status of all bugs")
+    parser.add_argument("--category", type=str, help="Inject bugs from specific category only")
     
     args = parser.parse_args()
     
@@ -188,6 +409,27 @@ def main():
         success, message = inject_bug(args.bug)
         icon = "✅" if success else "❌"
         print(f"{icon} {message}")
+        return
+    
+    if args.category:
+        print(f"\n" + "="*50)
+        print(f"INJECTING {args.category.upper()} BUGS")
+        print("="*50)
+        
+        success_count = 0
+        total_count = 0
+        for bug_id, bug in BUGS.items():
+            if bug["category"].lower() == args.category.lower():
+                total_count += 1
+                success, message = inject_bug(bug_id)
+                icon = "✅" if success else "❌"
+                print(f"{icon} {message}")
+                if success:
+                    success_count += 1
+        
+        print("="*50)
+        print(f"Injected: {success_count}/{total_count} bugs")
+        print("="*50 + "\n")
         return
     
     # Default: inject all bugs
