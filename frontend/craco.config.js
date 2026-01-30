@@ -30,6 +30,18 @@ if (config.enableHealthCheck) {
 }
 
 const webpackConfig = {
+  jest: {
+    configure: {
+      moduleNameMapper: {
+        '^@/(.*)$': '<rootDir>/src/$1',
+      },
+      transformIgnorePatterns: [
+        '/node_modules/(?!(react-router|react-router-dom|@testing-library)/)',
+      ],
+      testEnvironment: 'jsdom',
+      setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
+    },
+  },
   webpack: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
