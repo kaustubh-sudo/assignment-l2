@@ -148,7 +148,256 @@ def test_api_endpoint(description: str, diagram_type: str, test_name: str, expec
     
     return result
 
-def test_kroki_rendering(code: str, diagram_type: str) -> Dict[str, Any]:
+def test_auth_signup(email: str, password: str, test_name: str, expect_success: bool = True) -> Dict[str, Any]:
+    """Test user signup endpoint"""
+    url = f"{API_BASE}/auth/signup"
+    payload = {
+        "email": email,
+        "password": password
+    }
+    
+    print(f"\n{'='*60}")
+    print(f"AUTH TEST: {test_name}")
+    print(f"URL: {url}")
+    print(f"Payload: {json.dumps(payload, indent=2)}")
+    print(f"{'='*60}")
+    
+    try:
+        response = requests.post(url, json=payload, timeout=30)
+        
+        result = {
+            "test_name": test_name,
+            "status_code": response.status_code,
+            "success": response.status_code == (201 if expect_success else 400),
+            "response_time": response.elapsed.total_seconds(),
+            "content_type": response.headers.get('content-type', ''),
+            "expect_success": expect_success
+        }
+        
+        if response.status_code in [200, 201]:
+            try:
+                json_response = response.json()
+                result["response_data"] = json_response
+                result["has_user_id"] = "id" in json_response
+                result["has_email"] = "email" in json_response
+                result["has_created_at"] = "created_at" in json_response
+                result["email_matches"] = json_response.get("email") == email
+                
+                print(f"✅ SUCCESS: Status {response.status_code}")
+                print(f"   Response time: {result['response_time']:.2f}s")
+                print(f"   User ID: {json_response.get('id', 'N/A')}")
+                print(f"   Email: {json_response.get('email', 'N/A')}")
+                print(f"   Created at: {json_response.get('created_at', 'N/A')}")
+                
+            except json.JSONDecodeError as e:
+                result["json_error"] = str(e)
+                result["raw_response"] = response.text[:500]
+                print(f"❌ JSON DECODE ERROR: {e}")
+        else:
+            result["error_response"] = response.text
+            if expect_success:
+                print(f"❌ FAILED: Status {response.status_code}")
+                print(f"   Error: {response.text}")
+            else:
+                print(f"✅ EXPECTED FAILURE: Status {response.status_code}")
+                print(f"   Error: {response.text}")
+                result["success"] = True  # Expected failure is success
+            
+    except requests.exceptions.RequestException as e:
+        result = {
+            "test_name": test_name,
+            "status_code": None,
+            "success": False,
+            "error": str(e)
+        }
+        print(f"❌ REQUEST ERROR: {e}")
+    
+    return result
+
+def test_auth_login(email: str, password: str, test_name: str, expect_success: bool = True) -> Dict[str, Any]:
+    """Test user login endpoint"""
+    url = f"{API_BASE}/auth/login"
+    payload = {
+        "email": email,
+        "password": password
+    }
+    
+    print(f"\n{'='*60}")
+    print(f"AUTH TEST: {test_name}")
+    print(f"URL: {url}")
+    print(f"Payload: {json.dumps(payload, indent=2)}")
+    print(f"{'='*60}")
+    
+    try:
+        response = requests.post(url, json=payload, timeout=30)
+        
+        result = {
+            "test_name": test_name,
+            "status_code": response.status_code,
+            "success": response.status_code == (200 if expect_success else 401),
+            "response_time": response.elapsed.total_seconds(),
+            "content_type": response.headers.get('content-type', ''),
+            "expect_success": expect_success
+        }
+        
+        if response.status_code == 200:
+            try:
+                json_response = response.json()
+                result["response_data"] = json_response
+                result["has_access_token"] = "access_token" in json_response
+                result["has_token_type"] = "token_type" in json_response
+                result["token_type_correct"] = json_response.get("token_type") == "bearer"
+                result["access_token"] = json_response.get("access_token")
+                
+                print(f"✅ SUCCESS: Status {response.status_code}")
+                print(f"   Response time: {result['response_time']:.2f}s")
+                print(f"   Token type: {json_response.get('token_type', 'N/A')}")
+                print(f"   Access token: {json_response.get('access_token', 'N/A')[:50]}...")
+                
+            except json.JSONDecodeError as e:
+                result["json_error"] = str(e)
+                result["raw_response"] = response.text[:500]
+                print(f"❌ JSON DECODE ERROR: {e}")
+        else:
+            result["error_response"] = response.text
+            if expect_success:
+                print(f"❌ FAILED: Status {response.status_code}")
+                print(f"   Error: {response.text}")
+            else:
+                print(f"✅ EXPECTED FAILURE: Status {response.status_code}")
+                print(f"   Error: {response.text}")
+                result["success"] = True  # Expected failure is success
+            
+    except requests.exceptions.RequestException as e:
+        result = {
+            "test_name": test_name,
+            "status_code": None,
+            "success": False,
+            "error": str(e)
+        }
+        print(f"❌ REQUEST ERROR: {e}")
+    
+    return result
+
+def test_auth_me(access_token: str, test_name: str, expect_success: bool = True) -> Dict[str, Any]:
+    """Test get current user endpoint"""
+    url = f"{API_BASE}/auth/me"
+    headers = {}
+    if access_token:
+        headers["Authorization"] = f"Bearer {access_token}"
+    
+    print(f"\n{'='*60}")
+    print(f"AUTH TEST: {test_name}")
+    print(f"URL: {url}")
+    print(f"Headers: Authorization: Bearer {access_token[:20] if access_token else 'None'}...")
+    print(f"{'='*60}")
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=30)
+        
+        expected_status = 200 if expect_success else (401 if not access_token else 401)
+        result = {
+            "test_name": test_name,
+            "status_code": response.status_code,
+            "success": response.status_code == expected_status,
+            "response_time": response.elapsed.total_seconds(),
+            "content_type": response.headers.get('content-type', ''),
+            "expect_success": expect_success
+        }
+        
+        if response.status_code == 200:
+            try:
+                json_response = response.json()
+                result["response_data"] = json_response
+                result["has_user_id"] = "id" in json_response
+                result["has_email"] = "email" in json_response
+                result["has_created_at"] = "created_at" in json_response
+                
+                print(f"✅ SUCCESS: Status {response.status_code}")
+                print(f"   Response time: {result['response_time']:.2f}s")
+                print(f"   User ID: {json_response.get('id', 'N/A')}")
+                print(f"   Email: {json_response.get('email', 'N/A')}")
+                print(f"   Created at: {json_response.get('created_at', 'N/A')}")
+                
+            except json.JSONDecodeError as e:
+                result["json_error"] = str(e)
+                result["raw_response"] = response.text[:500]
+                print(f"❌ JSON DECODE ERROR: {e}")
+        else:
+            result["error_response"] = response.text
+            if expect_success:
+                print(f"❌ FAILED: Status {response.status_code}")
+                print(f"   Error: {response.text}")
+            else:
+                print(f"✅ EXPECTED FAILURE: Status {response.status_code}")
+                print(f"   Error: {response.text}")
+                result["success"] = True  # Expected failure is success
+            
+    except requests.exceptions.RequestException as e:
+        result = {
+            "test_name": test_name,
+            "status_code": None,
+            "success": False,
+            "error": str(e)
+        }
+        print(f"❌ REQUEST ERROR: {e}")
+    
+    return result
+
+def run_auth_tests() -> list:
+    """Run comprehensive authentication tests"""
+    print("🔐 Starting Authentication Tests")
+    
+    # Generate unique email for testing
+    timestamp = int(time.time())
+    test_email = f"testuser_{timestamp}@example.com"
+    test_password = "testpass123"
+    
+    auth_results = []
+    
+    # Test 1: Valid signup
+    result = test_auth_signup(test_email, test_password, "Valid Signup", expect_success=True)
+    auth_results.append(result)
+    
+    # Test 2: Duplicate email signup (should fail)
+    result = test_auth_signup(test_email, test_password, "Duplicate Email Signup", expect_success=False)
+    auth_results.append(result)
+    
+    # Test 3: Invalid email format (should fail)
+    result = test_auth_signup("invalid-email", test_password, "Invalid Email Format", expect_success=False)
+    auth_results.append(result)
+    
+    # Test 4: Password too short (should fail)
+    result = test_auth_signup(f"short_{timestamp}@example.com", "12345", "Password Too Short", expect_success=False)
+    auth_results.append(result)
+    
+    # Test 5: Valid login
+    result = test_auth_login(test_email, test_password, "Valid Login", expect_success=True)
+    auth_results.append(result)
+    valid_token = result.get("access_token") if result.get("success") else None
+    
+    # Test 6: Wrong password (should fail)
+    result = test_auth_login(test_email, "wrongpassword", "Wrong Password", expect_success=False)
+    auth_results.append(result)
+    
+    # Test 7: Non-existent email (should fail)
+    result = test_auth_login(f"nonexistent_{timestamp}@example.com", test_password, "Non-existent Email", expect_success=False)
+    auth_results.append(result)
+    
+    # Test 8: Get current user with valid token
+    if valid_token:
+        result = test_auth_me(valid_token, "Valid Token - Get Current User", expect_success=True)
+        auth_results.append(result)
+    
+    # Test 9: Get current user without token (should fail)
+    result = test_auth_me("", "No Token - Get Current User", expect_success=False)
+    auth_results.append(result)
+    
+    # Test 10: Get current user with invalid token (should fail)
+    result = test_auth_me("invalid.jwt.token", "Invalid Token - Get Current User", expect_success=False)
+    auth_results.append(result)
+    
+    return auth_results
     """Test if generated code renders successfully with Kroki API"""
     try:
         # Test with Kroki API using POST method
