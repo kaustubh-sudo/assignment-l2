@@ -165,6 +165,42 @@ backend:
         agent: "testing"
         comment: "✅ VERIFIED: Final implementation with only 4 diagram types (GraphViz, Mermaid, PlantUML, Excalidraw) working perfectly. Tested exact review request scenarios: 1) GraphViz complex conditional workflow (1430 chars) with proper ellipse/diamond/box nodes, colors, conditional branches - Kroki 200 OK. 2) Mermaid multi-step process (1006 chars) with flowchart, styled nodes, Yes/No branches, color-coded types - Kroki 200 OK. 3) PlantUML workflow (851 chars) with activity diagram, skinparam styling, partitions, conditional logic - Kroki 200 OK. 4) Excalidraw hand-drawn flowchart (9547 chars) with JSON format, rectangles, arrows, proper element structure - Kroki 200 OK. Enhanced conditional parsing now properly handles 'if/else' patterns. All 4 types generate sophisticated diagrams with advanced features as specified. 100% test success rate."
 
+  - task: "User Authentication - Signup"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/backend/auth.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented user signup with email and password (min 6 chars). Uses bcrypt for password hashing. Stores users in MongoDB. Endpoint: POST /api/auth/signup"
+
+  - task: "User Authentication - Login"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/backend/auth.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented user login with JWT access token (24h expiry). Validates email/password. Returns access_token. Endpoint: POST /api/auth/login"
+
+  - task: "User Authentication - Get Current User"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/backend/auth.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented protected endpoint to get current user info. Requires valid JWT in Authorization header. Endpoint: GET /api/auth/me"
+
 
 frontend:
   - task: "Initial Load & UI Elements"
