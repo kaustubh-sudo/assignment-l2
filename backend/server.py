@@ -413,8 +413,8 @@ async def get_user_diagrams(current_user: TokenData = Depends(get_current_user))
     """
     Get all diagrams for the authenticated user.
     """
-    # BUG: Missing user_id filter - shows all diagrams
-    query_filter = {}
+    # Filter by user_id to show only user's diagrams
+    query_filter = {"user_id": current_user.user_id}
     diagrams = await db.diagrams.find(
         query_filter,
         {"_id": 0}
