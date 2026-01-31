@@ -4,9 +4,9 @@
 You have been given access to a **Diagram Maker** web application that allows users to create, save, and manage diagrams. The application has several bugs that need to be identified and fixed.
 
 **Time Limit:** 1 hour  
-**Total Bugs:** 25  
-**Total Points:** 195  
-**Categories:** Authentication (4), Save/Load (6), List/Display (5), Export (3), Search (4), Folders (3)
+**Total Bugs:** 23  
+**Total Points:** 185  
+**Categories:** Authentication (4), Save/Load (5), List/Display (4), Export (3), Search (4), Folders (3)
 
 ---
 
@@ -76,7 +76,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-## Save/Load Bugs (6 bugs, 55 points)
+## Save/Load Bugs (5 bugs, 50 points)
 
 ### SAVE-001: Save Creates Duplicate Entries (15 pts)
 **Difficulty:** Hard | **Time:** ~4 min
@@ -142,19 +142,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### SAVE-006: Save Without Title Succeeds (5 pts)
-**Difficulty:** Easy | **Time:** ~1.5 min
-
-**How to Reproduce:**
-1. Create a diagram
-2. Click Save, leave title empty
-3. ❌ Save succeeds or shows unclear error
-
-**Expected:** Should require title with clear error message
-
----
-
-## List/Display Bugs (5 bugs, 45 points)
+## List/Display Bugs (4 bugs, 40 points)
 
 ### LIST-001: My Diagrams Shows Everyone's Diagrams (15 pts)
 **Difficulty:** Hard | **Time:** ~4 min
@@ -177,18 +165,6 @@ You have been given access to a **Diagram Maker** web application that allows us
 3. ❌ Delete fails or wrong diagram affected
 
 **Expected:** Should delete the correct diagram
-
----
-
-### LIST-003: Diagram List Sorted Oldest First (5 pts)
-**Difficulty:** Easy | **Time:** ~1.5 min
-
-**How to Reproduce:**
-1. Save 3 diagrams (A, B, C in that order)
-2. Go to My Diagrams list
-3. ❌ Shows: A, B, C (oldest first)
-
-**Expected:** Should show newest first: C, B, A
 
 ---
 
@@ -348,12 +324,12 @@ You have been given access to a **Diagram Maker** web application that allows us
 | Category | Bugs | Points |
 |----------|------|--------|
 | Authentication | 4 | 20 |
-| Save/Load | 6 | 55 |
-| List/Display | 5 | 45 |
+| Save/Load | 5 | 50 |
+| List/Display | 4 | 40 |
 | Export | 3 | 20 |
 | Search | 4 | 30 |
 | Folders | 3 | 25 |
-| **Total** | **25** | **195** |
+| **Total** | **23** | **185** |
 
 ---
 

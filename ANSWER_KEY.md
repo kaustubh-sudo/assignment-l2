@@ -17,10 +17,8 @@
 | SAVE-003 | Save/Load | Medium | 10 | DiagramRenderer.js |
 | SAVE-004 | Save/Load | Medium | 10 | DiagramRenderer.js |
 | SAVE-005 | Save/Load | Easy | 5 | SaveDiagramModal.js |
-| SAVE-006 | Save/Load | Easy | 5 | server.py |
 | LIST-001 | List/Display | Hard | 15 | server.py |
 | LIST-002 | List/Display | Medium | 10 | DiagramCard.js |
-| LIST-003 | List/Display | Easy | 5 | server.py |
 | LIST-004 | List/Display | Medium | 10 | DiagramsList.js |
 | LIST-005 | List/Display | Easy | 5 | DiagramCard.js |
 | EXPORT-001 | Export | Easy | 5 | DiagramRenderer.js |
@@ -33,7 +31,7 @@
 | FOLDER-001 | Folders | Medium | 10 | server.py |
 | FOLDER-002 | Folders | Medium | 10 | DiagramRenderer.js |
 | FOLDER-003 | Folders | Easy | 5 | CreateFolderModal.js |
-| **Total** | | | **195** | |
+| **Total** | | | **185** | |
 
 ---
 
@@ -134,13 +132,6 @@ if (!existingTitle) {
 }
 ```
 
-### SAVE-006: Empty Title Accepted
-**File:** `/app/backend/server.py`
-```python
-# Use min_length=1 in Pydantic model
-title: str = Field(..., min_length=1, max_length=200)
-```
-
 ---
 
 ## List/Display Bugs
@@ -157,12 +148,6 @@ query_filter = {"user_id": current_user.user_id}
 ```javascript
 // Fix: pass correct diagram
 onDelete(diagram);  // Not diagram with corrupted ID
-```
-
-### LIST-003: Sorted Oldest First
-**File:** `/app/backend/server.py`
-```python
-sort_direction = -1  # Not 1
 ```
 
 ### LIST-004: Count Doesn't Update
@@ -306,8 +291,8 @@ python evaluate.py --candidate "Name" --html
 
 | Score | Grade | Assessment |
 |-------|-------|-----------|
-| 160-195 | A | Excellent |
-| 125-159 | B | Good |
-| 85-124 | C | Average |
-| 45-84 | D | Below Average |
+| 150-185 | A | Excellent |
+| 115-149 | B | Good |
+| 80-114 | C | Average |
+| 45-79 | D | Below Average |
 | 0-44 | F | Needs Improvement |
