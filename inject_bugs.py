@@ -114,6 +114,25 @@ BUGS: Dict[str, Dict] = {
         "fix_check": lambda content: bool(re.search(r'len\s*\(\s*user_data\.password\s*\)\s*<\s*\d+', content)) or bool(re.search(r'password.*min_length', content)),
         "bug_check": lambda content: not bool(re.search(r'len\s*\(\s*user_data\.password\s*\)\s*<\s*\d+', content)) and bool(re.search(r'async def signup', content)),
     },
+    "AUTH-004-FE": {
+        "file": "/app/frontend/src/pages/Signup.js",
+        "description": "Frontend password validation - companion to AUTH-004",
+        "category": "Authentication",
+        "difficulty": "Easy",
+        "points": 0,
+        "time_estimate": "0 min",
+        "hint": "Frontend validation for password length",
+        "original": '''    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    if (password !== confirmPassword) {''',
+        "buggy": '''    // Frontend password validation disabled for testing
+    if (password !== confirmPassword) {''',
+        "fix_check": lambda content: bool(re.search(r'password\.length\s*<\s*6', content)),
+        "bug_check": lambda content: bool(re.search(r'Frontend password validation disabled', content)),
+    },
     
     # ============== SAVE/LOAD BUGS ==============
     "SAVE-001": {
