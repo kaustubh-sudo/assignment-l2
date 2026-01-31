@@ -297,7 +297,7 @@ async def create_diagram(
       description: description.trim(),
       folder_id: folderId || null
     });
-    // BUG: Form not reset after save
+    // TODO: Title field shows old value when opening modal for new diagram
   };''',
         # Flexible check: is setTitle('') called after onSave?
         "fix_check": lambda content: bool(re.search(r'onSave\s*\([^)]*\)[^;]*;[^}]*setTitle\s*\(\s*[\'"][\'"]', content, re.DOTALL)),
@@ -315,7 +315,7 @@ async def create_diagram(
         "hint": "In GET /diagrams, is the query filtering by user_id?",
         "original": '''    # Filter by user_id to show only user's diagrams
     query_filter = {"user_id": current_user.user_id}''',
-        "buggy": '''    # BUG: Missing user_id filter - shows all diagrams
+        "buggy": '''    # FIXME: Users can see other users' diagrams! Security issue - needs filtering
     query_filter = {}''',
         # Flexible check: is user_id in the query filter?
         "fix_check": lambda content: bool(re.search(r'query_filter\s*=\s*\{[^}]*["\']?user_id["\']?\s*:', content)) or bool(re.search(r'find\s*\(\s*\{[^}]*user_id[^}]*current_user', content)),
@@ -335,7 +335,8 @@ async def create_diagram(
   };''',
         "buggy": '''  const handleDeleteClick = (e) => {
     e.stopPropagation(); // Prevent card click
-    onDelete({ ...diagram, id: diagram.id + '_wrong' });  // BUG: Corrupted ID
+    // FIXME: Wrong diagram gets deleted when clicking delete button
+    onDelete({ ...diagram, id: diagram.id + '_wrong' });
   };''',
         # Flexible check: is onDelete called with just diagram (not corrupted)?
         "fix_check": lambda content: bool(re.search(r'onDelete\s*\(\s*diagram\s*\)', content)),
@@ -352,7 +353,7 @@ async def create_diagram(
         "original": '''      // Remove from local state
       setDiagrams(prevDiagrams => prevDiagrams.filter(d => d.id !== deleteTarget.id));
       toast.success('Diagram deleted successfully');''',
-        "buggy": '''      // Remove from local state - BUG: Not updating state correctly
+        "buggy": '''      // FIXME: Diagram count in sidebar doesn't decrease after deletion
       toast.success('Diagram deleted successfully');''',
         # Flexible check: is setDiagrams called with filter after delete?
         "fix_check": lambda content: bool(re.search(r'setDiagrams\s*\([^)]*filter\s*\(', content)),
@@ -372,6 +373,7 @@ async def create_diagram(
         </span>''',
         "buggy": '''        <span className="flex items-center gap-1.5 text-xs text-slate-400">
           <Calendar className="w-3.5 h-3.5" />
+          {/* TODO: Date displays as ugly ISO string like "2024-01-15T10:30:00.000Z" */}
           {diagram.created_at}
         </span>''',
         # Flexible check: is formatDate or toLocaleDateString used?
