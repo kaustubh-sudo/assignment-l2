@@ -188,17 +188,6 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### LIST-005: Created Date Shows Wrong Format (5 pts)
-**Difficulty:** Easy | **Time:** ~1 min
-
-**How to Reproduce:**
-1. Save a diagram
-2. View list → ❌ Shows "2024-01-31T10:30:00Z"
-
-**Expected:** Should show "Jan 31, 2024" or similar readable format
-
----
-
 ## Export Bugs (3 bugs, 20 points)
 
 ### EXPORT-001: Export Filename Always "diagram.png" (5 pts)
