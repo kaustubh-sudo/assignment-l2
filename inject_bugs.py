@@ -478,29 +478,6 @@ async def create_diagram(
     },
     
     # ============== SEARCH BUGS ==============
-    "SEARCH-001": {
-        "file": "/app/frontend/src/pages/DiagramsList.js",
-        "description": "Search is case-sensitive - should be case-insensitive",
-        "category": "Search",
-        "difficulty": "Easy",
-        "points": 5,
-        "time_estimate": "1 min",
-        "hint": "Is toLowerCase() used when comparing search query with titles?",
-        "original": '''      const query = debouncedSearchQuery.toLowerCase().trim();
-      result = result.filter(diagram => 
-        diagram.title.toLowerCase().includes(query) ||
-        (diagram.description && diagram.description.toLowerCase().includes(query))
-      );''',
-        "buggy": '''      // FIXME: Search for "Test" doesn't find "test" - case matching issue
-      const query = debouncedSearchQuery.trim();
-      result = result.filter(diagram => 
-        diagram.title.includes(query) ||
-        (diagram.description && diagram.description.includes(query))
-      );''',
-        # Flexible check: is toLowerCase used in search filtering?
-        "fix_check": lambda content: bool(re.search(r'\.toLowerCase\(\).*\.includes\(.*query|query.*\.toLowerCase\(\)', content)),
-        "bug_check": lambda content: bool(re.search(r'\.filter\([^)]*diagram\.title\.includes\(query\)', content)) and not bool(re.search(r'toLowerCase', content)),
-    },
     "SEARCH-002": {
         "file": "/app/frontend/src/pages/DiagramsList.js",
         "description": "Search ignores folder filter - shows results from all folders",
