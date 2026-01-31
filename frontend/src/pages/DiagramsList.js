@@ -34,9 +34,9 @@ const DiagramsList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Search state - BUG: not using debounce
+  // Search state
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = searchQuery;  // Should use useDebounce
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   
   // Folder state
   const [folders, setFolders] = useState([]);
@@ -64,30 +64,28 @@ const DiagramsList = () => {
   const filteredDiagrams = useMemo(() => {
     let result = diagrams;
     
-    // BUG: Only apply folder filter when not searching
-    if (!debouncedSearchQuery.trim()) {
-      if (selectedFolderId === 'none') {
-        result = result.filter(d => !d.folder_id);
-      } else if (selectedFolderId) {
-        result = result.filter(d => d.folder_id === selectedFolderId);
-      }
+    // Filter by folder
+    if (selectedFolderId === 'none') {
+      result = result.filter(d => !d.folder_id);
+    } else if (selectedFolderId) {
+      result = result.filter(d => d.folder_id === selectedFolderId);
     }
     
     // Filter by search query
     if (debouncedSearchQuery.trim()) {
-      const query = debouncedSearchQuery.trim();  // BUG: case-sensitive
+      const query = debouncedSearchQuery.toLowerCase().trim();
       result = result.filter(diagram => 
-        diagram.title.includes(query) ||
-        (diagram.description && diagram.description.includes(query))
+        diagram.title.toLowerCase().includes(query) ||
+        (diagram.description && diagram.description.toLowerCase().includes(query))
       );
     }
     
     return result;
   }, [diagrams, debouncedSearchQuery, selectedFolderId]);
 
-  // Clear search - BUG: doesn't actually clear
+  // Clear search
   const handleClearSearch = () => {
-    console.log('Clear search clicked');  // Missing setSearchQuery('')
+    setSearchQuery('');
   };
 
   // Fetch folders
@@ -240,7 +238,8 @@ const DiagramsList = () => {
         throw new Error(data.detail || 'Failed to delete diagram');
       }
 
-      // Remove from local state - BUG: Not updating state correctly
+      // Remove from local state
+      setDiagrams(prevDiagrams => prevDiagrams.filter(d => d.id !== deleteTarget.id));
       toast.success('Diagram deleted successfully');
       setDeleteTarget(null);
     } catch (err) {
