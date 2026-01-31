@@ -155,15 +155,15 @@ Transform this Kroki diagram app into a developer assessment tool by injecting b
 | `evaluate.py` | Score candidate submissions with reports |
 | `manager.py` | Manual control utility for assessors |
 
-### Bug Categories (23 total, 185 points)
+### Bug Categories (21 total, 175 points)
 | Category | Bugs | Points |
 |----------|------|--------|
 | Authentication | 4 | 20 |
 | Save/Load | 5 | 50 |
 | List/Display | 4 | 40 |
 | Export | 3 | 20 |
-| Search | 4 | 30 |
-| Folders | 3 | 25 |
+| Search | 3 | 25 |
+| Folders | 2 | 20 |
 
 ### Hint Comments in Buggy Code
 Each injected bug includes a hint comment (`TODO`, `FIXME`) that points candidates toward the issue without revealing the solution:
