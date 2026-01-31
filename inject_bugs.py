@@ -503,6 +503,89 @@ async def create_diagram(
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = searchQuery;  // Should use useDebounce''',
     },
+    
+    # ============== FOLDER BUGS ==============
+    "FOLDER-001": {
+        "file": "/app/backend/server.py",
+        "description": "Folder dropdown shows all users' folders - Missing user_id filter",
+        "category": "Folders",
+        "difficulty": "Medium",
+        "points": 10,
+        "time_estimate": "2 min",
+        "original": '''@api_router.get("/folders", response_model=FolderListResponse)
+async def get_user_folders(current_user: TokenData = Depends(get_current_user)):
+    """
+    Get all folders for the authenticated user.
+    """
+    folders = await db.folders.find(
+        {"user_id": current_user.user_id},
+        {"_id": 0}
+    ).sort("name", 1).to_list(100)''',
+        "buggy": '''@api_router.get("/folders", response_model=FolderListResponse)
+async def get_user_folders(current_user: TokenData = Depends(get_current_user)):
+    """
+    Get all folders for the authenticated user.
+    """
+    # BUG: Missing user_id filter - shows all users' folders
+    folders = await db.folders.find(
+        {},
+        {"_id": 0}
+    ).sort("name", 1).to_list(100)''',
+    },
+    "FOLDER-002": {
+        "file": "/app/frontend/src/pages/DiagramRenderer.js",
+        "description": "Folder selection not saved with diagram - folder_id not included in save",
+        "category": "Folders",
+        "difficulty": "Medium",
+        "points": 10,
+        "time_estimate": "2 min",
+        "original": '''      const diagramData = {
+        title,
+        description,
+        diagram_type: diagramType,
+        diagram_code: generatedCode,
+        folder_id: folder_id
+      };''',
+        "buggy": '''      const diagramData = {
+        title,
+        description,
+        diagram_type: diagramType,
+        diagram_code: generatedCode,
+        // BUG: folder_id not included in save
+      };''',
+    },
+    "FOLDER-003": {
+        "file": "/app/frontend/src/components/CreateFolderModal.js",
+        "description": "Create folder with empty name succeeds - missing validation",
+        "category": "Folders",
+        "difficulty": "Easy",
+        "points": 5,
+        "time_estimate": "1 min",
+        "original": '''  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!name.trim()) {
+      setError('Folder name is required');
+      return;
+    }
+    
+    if (name.length > 100) {
+      setError('Folder name must be less than 100 characters');
+      return;
+    }
+    
+    setError('');
+    onCreate(name.trim());
+  };''',
+        "buggy": '''  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // BUG: No validation - allows empty folder names
+    
+    setError('');
+    onCreate(name.trim());
+  };''',
+    },
 }
 
 
