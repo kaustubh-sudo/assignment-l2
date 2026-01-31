@@ -111,7 +111,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // FIXME: Users report staying logged in after logout - token persists somewhere
+    localStorage.removeItem('token');
     setToken(null);
     setUser(null);
   };
