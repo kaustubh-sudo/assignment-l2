@@ -85,7 +85,8 @@ const DiagramsList = () => {
 
   // Clear search - BUG: doesn't actually clear
   const handleClearSearch = () => {
-    console.log('Clear search clicked');  // Missing setSearchQuery('')
+    // Reset the search input
+    setSearchQuery("");
   };
 
   // Fetch folders
