@@ -111,8 +111,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // Clear auth state completely
-    localStorage.removeItem("token"); // Use double quotes instead of single
+    localStorage.removeItem('token');
     setToken(null);
     setUser(null);
   };
