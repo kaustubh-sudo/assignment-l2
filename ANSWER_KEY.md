@@ -157,13 +157,6 @@ onDelete(diagram);  // Not diagram with corrupted ID
 setDiagrams(prevDiagrams => prevDiagrams.filter(d => d.id !== deleteTarget.id));
 ```
 
-### LIST-005: Raw Date Format
-**File:** `/app/frontend/src/components/DiagramCard.js`
-```javascript
-// Use formatDate function
-{formatDate(diagram.created_at)}
-```
-
 ---
 
 ## Export Bugs
