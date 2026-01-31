@@ -624,7 +624,7 @@ async def get_user_folders(current_user: TokenData = Depends(get_current_user)):
         description,
         diagram_type: diagramType,
         diagram_code: generatedCode,
-        // TODO: Selected folder is ignored when saving - diagram always goes to "No Folder"
+        // TODO: folder_id is missing here - add it to save the folder selection
       };''',
         # Flexible check: is folder_id in diagramData?
         "fix_check": lambda content: bool(re.search(r'diagramData\s*=\s*\{[^}]*folder_id\s*:', content, re.DOTALL)),
