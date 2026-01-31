@@ -533,9 +533,9 @@ async def create_diagram(
   const handleClearSearch = () => {
     console.log('Clear search clicked');  // Missing setSearchQuery('')
   };''',
-        # Flexible check: does handleClearSearch call setSearchQuery('')?
-        "fix_check": lambda content: bool(re.search(r'handleClearSearch[^}]*setSearchQuery\s*\(\s*[\'"][\'"]', content, re.DOTALL)),
-        "bug_check": lambda content: bool(re.search(r'handleClearSearch', content)) and not bool(re.search(r'handleClearSearch[^}]*setSearchQuery\s*\(\s*[\'"][\'"]', content, re.DOTALL)),
+        # Flexible check: does handleClearSearch call setSearchQuery('') within its body?
+        "fix_check": lambda content: bool(re.search(r'handleClearSearch\s*=\s*\([^)]*\)\s*=>\s*\{[^}]*setSearchQuery\s*\(\s*[\'"][\'"]', content, re.DOTALL)),
+        "bug_check": lambda content: bool(re.search(r'handleClearSearch\s*=\s*\([^)]*\)\s*=>\s*\{[^}]*console\.log', content, re.DOTALL)) or (bool(re.search(r'handleClearSearch', content)) and not bool(re.search(r'handleClearSearch\s*=\s*\([^)]*\)\s*=>\s*\{[^}]*setSearchQuery\s*\(\s*[\'"][\'"]', content, re.DOTALL))),
     },
     "SEARCH-004": {
         "file": "/app/frontend/src/pages/DiagramsList.js",
