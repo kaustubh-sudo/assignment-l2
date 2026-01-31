@@ -165,8 +165,8 @@ async def signup(user_data: UserCreate):
             detail="Password must be at least 6 characters"
         )
     
-    # Check if user already exists - DISABLED FOR TESTING
-    existing_user = await db.users.find_one({"email": user_data.email})
+    # Check if user already exists
+    existing_user = await db.users.find_one({"email": user_data.email.lower()})
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -197,8 +197,8 @@ async def login(credentials: UserLogin):
     """
     Authenticate user and return JWT access token.
     """
-    # Find user by email (case insensitive)
-    user_doc = await db.users.find_one({"email": credentials.email.lower() })
+    # Find user by email
+    user_doc = await db.users.find_one({"email": credentials.email.lower()})
     if not user_doc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
