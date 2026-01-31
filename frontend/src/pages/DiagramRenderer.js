@@ -345,7 +345,6 @@ const DiagramRenderer = () => {
         diagram_type: diagramType,
         diagram_code: generatedCode,
         folder_id: folder_id
-        // TODO: Selected folder is ignored when saving - diagram always goes to "No Folder"
       };
 
       let response;
