@@ -34,9 +34,9 @@ const DiagramsList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Search state
+  // TODO: Search feels laggy - filtering runs on every keystroke
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const debouncedSearchQuery = searchQuery;
   
   // Folder state
   const [folders, setFolders] = useState([]);
@@ -64,19 +64,22 @@ const DiagramsList = () => {
   const filteredDiagrams = useMemo(() => {
     let result = diagrams;
     
-    // Filter by folder
-    if (selectedFolderId === 'none') {
-      result = result.filter(d => !d.folder_id);
-    } else if (selectedFolderId) {
-      result = result.filter(d => d.folder_id === selectedFolderId);
+    // FIXME: Searching while in a folder shows results from ALL folders
+    if (!debouncedSearchQuery.trim()) {
+      if (selectedFolderId === 'none') {
+        result = result.filter(d => !d.folder_id);
+      } else if (selectedFolderId) {
+        result = result.filter(d => d.folder_id === selectedFolderId);
+      }
     }
     
     // Filter by search query
     if (debouncedSearchQuery.trim()) {
-      const query = debouncedSearchQuery.toLowerCase().trim();
+      // FIXME: Search for "Test" doesn't find "test" - case matching issue
+      const query = debouncedSearchQuery.trim();
       result = result.filter(diagram => 
-        diagram.title.toLowerCase().includes(query) ||
-        (diagram.description && diagram.description.toLowerCase().includes(query))
+        diagram.title.includes(query) ||
+        (diagram.description && diagram.description.includes(query))
       );
     }
     
@@ -84,9 +87,9 @@ const DiagramsList = () => {
   }, [diagrams, debouncedSearchQuery, selectedFolderId]);
 
   // Clear search - BUG: doesn't actually clear
-  // Clear search
+  // FIXME: Clear search button (X) does nothing when clicked
   const handleClearSearch = () => {
-    setSearchQuery('');
+    console.log('Clear search clicked');
   };
 
   // Fetch folders
@@ -239,8 +242,7 @@ const DiagramsList = () => {
         throw new Error(data.detail || 'Failed to delete diagram');
       }
 
-      // Remove from local state
-      setDiagrams(prevDiagrams => prevDiagrams.filter(d => d.id !== deleteTarget.id));
+      // FIXME: Diagram count in sidebar doesn't decrease after deletion
       toast.success('Diagram deleted successfully');
       setDeleteTarget(null);
     } catch (err) {
