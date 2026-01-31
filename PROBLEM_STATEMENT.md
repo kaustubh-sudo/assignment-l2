@@ -51,7 +51,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### AUTH-003: Logout Token Persistence (5 pts)
+### AUTH-003: Logout Token Persistence (5 pts) --> not getting injected token is getting removed
 **Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
@@ -67,7 +67,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### AUTH-004: Password Minimum Length Not Enforced (5 pts)
+### AUTH-004: Password Minimum Length Not Enforced (5 pts) --> not getting injected (i think ui  side validation is there thats why not able to replicate)
 **Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
@@ -301,7 +301,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### FOLDER-002: Folder Selection Not Saved (10 pts)
+### FOLDER-002: Folder Selection Not Saved (10 pts) (make the hint more simpler)
 **Difficulty:** Medium | **Time:** ~2 min
 
 **How to Reproduce:**
@@ -316,7 +316,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### FOLDER-003: Create Folder with Empty Name Succeeds (5 pts)
+### FOLDER-003: Create Folder with Empty Name Succeeds (5 pts) --> (unable to replicate maybe because of ui side validation)
 **Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
