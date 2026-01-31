@@ -370,27 +370,6 @@ async def create_diagram(
         "fix_check": lambda content: bool(re.search(r'setDiagrams\s*\([^)]*filter\s*\(', content)),
         "bug_check": lambda content: bool(re.search(r'toast\.success.*[Dd]eleted', content)) and not bool(re.search(r'setDiagrams\s*\([^)]*filter', content)),
     },
-    "LIST-005": {
-        "file": "/app/frontend/src/components/DiagramCard.js",
-        "description": "Created date shows raw ISO format instead of readable date",
-        "category": "List/Display",
-        "difficulty": "Easy",
-        "points": 5,
-        "time_estimate": "1 min",
-        "hint": "Is the date being formatted before display?",
-        "original": '''        <span className="flex items-center gap-1.5 text-xs text-slate-400">
-          <Calendar className="w-3.5 h-3.5" />
-          {formatDate(diagram.created_at)}
-        </span>''',
-        "buggy": '''        <span className="flex items-center gap-1.5 text-xs text-slate-400">
-          <Calendar className="w-3.5 h-3.5" />
-          {/* TODO: Date displays as ugly ISO string like "2024-01-15T10:30:00.000Z" */}
-          {diagram.created_at}
-        </span>''',
-        # Flexible check: is formatDate or toLocaleDateString used?
-        "fix_check": lambda content: bool(re.search(r'formatDate\s*\(\s*diagram\.created_at\s*\)', content)) or bool(re.search(r'diagram\.created_at.*toLocale', content)) or bool(re.search(r'new Date\s*\(\s*diagram\.created_at\s*\)', content)),
-        "bug_check": lambda content: bool(re.search(r'\{\s*diagram\.created_at\s*\}', content)) and not bool(re.search(r'formatDate|toLocale|new Date', content)),
-    },
     
     # ============== EXPORT BUGS ==============
     "EXPORT-001": {
