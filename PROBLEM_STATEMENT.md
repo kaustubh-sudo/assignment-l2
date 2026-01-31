@@ -67,7 +67,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### AUTH-004: Password Minimum Length Not Enforced (5 pts) --> not working
+### AUTH-004: Password Minimum Length Not Enforced (5 pts)
 **Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
@@ -77,6 +77,8 @@ You have been given access to a **Diagram Maker** web application that allows us
 4. ❌ Registration succeeds
 
 **Expected:** Should require 6+ characters
+
+**Hint:** Check `server.py` signup endpoint for a `TODO` comment
 
 ---
 
