@@ -8,6 +8,8 @@ You have been given access to a **Diagram Maker** web application that allows us
 **Total Points:** 185  
 **Categories:** Authentication (4), Save/Load (5), List/Display (4), Export (3), Search (4), Folders (3)
 
+> 💡 **Tip:** Look for `TODO`, `FIXME`, and hint comments in the code - they point to the bugs!
+
 ---
 
 ## Application Stack
