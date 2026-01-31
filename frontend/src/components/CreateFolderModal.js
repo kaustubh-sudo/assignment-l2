@@ -9,15 +9,7 @@ const CreateFolderModal = ({ isOpen, onClose, onCreate, isLoading }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (!name.trim()) {
-      setError('Folder name is required');
-      return;
-    }
-    
-    if (name.length > 100) {
-      setError('Folder name must be less than 100 characters');
-      return;
-    }
+    // BUG: No validation - allows empty folder names
     
     setError('');
     onCreate(name.trim());

@@ -85,7 +85,7 @@ const DiagramRenderer = () => {
             const data = await response.json();
             setDiagramType(data.diagram_type);
             setGeneratedCode(data.diagram_code);
-            setUserInput(data.description || '');
+            // BUG: Not setting userInput from description
             setSavedDiagram({
               id: data.id,
               title: data.title,
@@ -238,16 +238,8 @@ const DiagramRenderer = () => {
 
   // Generate filename from diagram title or default
   const getExportFilename = (format) => {
-    const title = savedDiagram?.title;
-    if (title) {
-      // Sanitize title for filename (remove special characters)
-      const sanitizedTitle = title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
-      return `${sanitizedTitle}.${format}`;
-    }
-    return `diagram-${Date.now()}.${format}`;
+    // BUG: Always returns generic filename, ignores diagram title
+    return `diagram.${format}`;
   };
 
   // Export diagram as SVG or PNG
@@ -324,9 +316,8 @@ const DiagramRenderer = () => {
     } catch (err) {
       toast.error(`Failed to export diagram: ${err.message}`);
       console.error('Export error:', err);
-    } finally {
-      setIsExporting(false);
     }
+    // BUG: Missing finally block - isExporting never reset to false
   };
 
   const clearAll = () => {
@@ -353,7 +344,7 @@ const DiagramRenderer = () => {
         description,
         diagram_type: diagramType,
         diagram_code: generatedCode,
-        folder_id: folder_id
+        // BUG: folder_id not included in save
       };
 
       let response;
@@ -391,16 +382,15 @@ const DiagramRenderer = () => {
         title: data.title,
         description: data.description,
         folder_id: data.folder_id,
-        updated_at: data.updated_at
+        updated_at: savedDiagram?.updated_at  // BUG: Using old timestamp instead of new one
       });
 
       setShowSaveModal(false);
       toast.success(savedDiagram?.id ? 'Diagram updated!' : 'Diagram saved!');
     } catch (err) {
       toast.error(err.message);
-    } finally {
-      setIsSaving(false);
     }
+    // BUG: Missing finally block - isSaving never reset to false
   };
 
   // Format last saved time
