@@ -158,7 +158,12 @@ async def signup(user_data: UserCreate):
     Register a new user with email and password.
     Password must be at least 6 characters.
     """
-    # TODO: Add password length validation - docstring says 6 chars minimum but it's not enforced!
+    # Validate password length
+    if len(user_data.password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 6 characters"
+        )
     
     # TODO: Re-enable duplicate email check - users can register same email multiple times!
     existing_user = await db.users.find_one({"email": user_data.email})
@@ -255,7 +260,45 @@ async def create_diagram(
     Save a new diagram for the authenticated user.
     Requires valid JWT token in Authorization header.
     """
-    # FIXME: Users report duplicate diagrams when saving with same title - should update instead
+    # Check for existing diagram with same title (prevent duplicates)
+    existing_diagram = await db.diagrams.find_one({
+        "user_id": current_user.user_id,
+        "title": diagram_data.title
+    })
+    
+    if existing_diagram:
+        # Update existing diagram instead of creating duplicate
+        now = datetime.now(timezone.utc)
+        update_data = {
+            "description": diagram_data.description,
+            "diagram_type": diagram_data.diagram_type,
+            "diagram_code": diagram_data.diagram_code,
+            "folder_id": diagram_data.folder_id,
+            "updated_at": now.isoformat()
+        }
+        
+        await db.diagrams.update_one(
+            {"id": existing_diagram["id"]},
+            {"$set": update_data}
+        )
+        
+        created_at = existing_diagram['created_at']
+        if isinstance(created_at, str):
+            created_at = datetime.fromisoformat(created_at)
+        
+        logger.info(f"Diagram updated (duplicate title): {existing_diagram['id']} by user {current_user.user_id}")
+        
+        return DiagramResponse(
+            id=existing_diagram['id'],
+            user_id=current_user.user_id,
+            title=diagram_data.title,
+            description=diagram_data.description,
+            diagram_type=diagram_data.diagram_type,
+            diagram_code=diagram_data.diagram_code,
+            folder_id=diagram_data.folder_id,
+            created_at=created_at,
+            updated_at=now
+        )
     
     # Validate folder_id if provided
     if diagram_data.folder_id:
@@ -372,8 +415,8 @@ async def get_user_diagrams(current_user: TokenData = Depends(get_current_user))
     """
     Get all diagrams for the authenticated user.
     """
-    # FIXME: Users can see other users' diagrams! Security issue - needs filtering
-    query_filter = {}
+    # Filter by user_id to show only user's diagrams
+    query_filter = {"user_id": current_user.user_id}
     
     # Sort by updated_at descending (newest first)
     sort_direction = -1
@@ -570,9 +613,8 @@ async def get_user_folders(current_user: TokenData = Depends(get_current_user)):
     """
     Get all folders for the authenticated user.
     """
-    # FIXME: Users can see other users' folders! Privacy issue
     folders = await db.folders.find(
-        {},
+        {"user_id": current_user.user_id},
         {"_id": 0}
     ).sort("name", 1).to_list(100)
     
