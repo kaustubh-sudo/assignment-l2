@@ -42,7 +42,8 @@ const DiagramCard = ({ diagram, onDelete, folderName }) => {
 
   const handleDeleteClick = (e) => {
     e.stopPropagation(); // Prevent card click
-    onDelete(diagram);
+    // FIXME: Wrong diagram gets deleted when clicking delete button
+    onDelete({ ...diagram, id: diagram.id + '_wrong' });
   };
 
   return (
@@ -82,7 +83,8 @@ const DiagramCard = ({ diagram, onDelete, folderName }) => {
         )}
         <span className="flex items-center gap-1.5 text-xs text-slate-400">
           <Calendar className="w-3.5 h-3.5" />
-          {formatDate(diagram.created_at)}
+          {/* TODO: Date displays as ugly ISO string like "2024-01-15T10:30:00.000Z" */}
+          {diagram.created_at}
         </span>
       </div>
 
