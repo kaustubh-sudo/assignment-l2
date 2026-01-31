@@ -299,11 +299,11 @@ You have been given access to a **Diagram Maker** web application that allows us
 |----------|------|--------|
 | Authentication | 4 | 20 |
 | Save/Load | 5 | 50 |
-| List/Display | 4 | 40 |
+| List/Display | 3 | 35 |
 | Export | 3 | 20 |
 | Search | 3 | 25 |
 | Folders | 2 | 20 |
-| **Total** | **21** | **175** |
+| **Total** | **20** | **170** |
 
 ---
 
