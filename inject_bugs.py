@@ -405,7 +405,7 @@ async def create_diagram(
   };''',
         "buggy": '''  // Generate filename from diagram title or default
   const getExportFilename = (format) => {
-    // BUG: Always returns generic filename, ignores diagram title
+    // TODO: Downloaded files all named "diagram.png" - should use actual diagram title
     return `diagram.${format}`;
   };''',
         # Flexible check: is savedDiagram.title or title used in filename?
@@ -431,7 +431,7 @@ async def create_diagram(
       toast.error(`Failed to export diagram: ${err.message}`);
       console.error('Export error:', err);
     }
-    // BUG: Missing finally block - isExporting never reset to false
+    // FIXME: Export button shows spinner forever after export fails
   };''',
         # Flexible check: is there a finally with setIsExporting(false)?
         "fix_check": lambda content: bool(re.search(r'finally\s*\{[^}]*setIsExporting\s*\(\s*false\s*\)', content, re.DOTALL)),
@@ -455,6 +455,7 @@ async def create_diagram(
                     >''',
         "buggy": '''                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
+                    {/* TODO: Users can spam-click export and download multiple copies */}
                     <Button
                       size="sm"
                       className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white h-8 px-3 text-xs rounded-lg shadow-md"
