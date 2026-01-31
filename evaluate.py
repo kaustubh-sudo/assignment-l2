@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Evaluator for Developer Assessment
-Evaluates candidate's bug fixes and generates reports.
+Evaluates candidate's bug fixes using flexible logic-based checking.
 
 Usage:
     python evaluate.py --candidate "John Doe"           # Basic evaluation
@@ -16,15 +16,12 @@ import os
 from datetime import datetime
 from typing import Dict, List, Optional
 
-# Import bug definitions
+# Import bug definitions and flexible checker
 from inject_bugs import BUGS, check_bug_status
 
 
 def evaluate_bug(bug_id: str) -> Dict:
-    """
-    Evaluate a single bug.
-    Returns dict with bug info and evaluation result.
-    """
+    """Evaluate a single bug using flexible checking."""
     if bug_id not in BUGS:
         return {
             "bug_id": bug_id,
@@ -37,8 +34,6 @@ def evaluate_bug(bug_id: str) -> Dict:
     bug = BUGS[bug_id]
     status = check_bug_status(bug_id)
     is_fixed = status == "FIXED"
-    
-    # Use points from bug definition
     max_points = bug.get("points", 5)
     
     return {
@@ -46,6 +41,7 @@ def evaluate_bug(bug_id: str) -> Dict:
         "category": bug["category"],
         "description": bug["description"],
         "difficulty": bug["difficulty"],
+        "hint": bug.get("hint", ""),
         "file": bug["file"],
         "status": status,
         "fixed": is_fixed,
@@ -55,9 +51,7 @@ def evaluate_bug(bug_id: str) -> Dict:
 
 
 def evaluate_all() -> Dict:
-    """
-    Evaluate all bugs and return comprehensive results.
-    """
+    """Evaluate all bugs and return comprehensive results."""
     results = []
     total_points = 0
     max_points = 0
@@ -101,7 +95,6 @@ def generate_html_report(evaluation: Dict, candidate: str) -> str:
     """Generate HTML report."""
     summary = evaluation["summary"]
     
-    # Status colors
     def get_status_color(fixed):
         return "#22c55e" if fixed else "#ef4444"
     
@@ -127,20 +120,20 @@ def generate_html_report(evaluation: Dict, candidate: str) -> str:
         .stat {{ padding: 1rem; }}
         .stat-value {{ font-size: 2rem; font-weight: bold; color: #3b82f6; }}
         .stat-label {{ color: #64748b; font-size: 0.875rem; }}
-        .bug-list {{ }}
         .bug-item {{ display: flex; align-items: center; padding: 1rem; border-bottom: 1px solid #e2e8f0; }}
         .bug-item:last-child {{ border-bottom: none; }}
-        .bug-status {{ width: 12px; height: 12px; border-radius: 50%; margin-right: 1rem; }}
+        .bug-status {{ width: 12px; height: 12px; border-radius: 50%; margin-right: 1rem; flex-shrink: 0; }}
         .bug-info {{ flex: 1; }}
         .bug-id {{ font-weight: 600; color: #0f172a; }}
         .bug-desc {{ color: #64748b; font-size: 0.875rem; }}
-        .bug-meta {{ display: flex; gap: 1rem; font-size: 0.75rem; color: #94a3b8; }}
+        .bug-meta {{ display: flex; gap: 1rem; font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem; }}
         .badge {{ padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; }}
         .badge-fixed {{ background: #dcfce7; color: #166534; }}
         .badge-broken {{ background: #fee2e2; color: #991b1b; }}
         .badge-difficulty {{ background: #f1f5f9; color: #475569; margin-left: 0.5rem; }}
         .category-header {{ font-weight: 600; color: #475569; margin: 1rem 0 0.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }}
         .category-header:first-child {{ border-top: none; padding-top: 0; margin-top: 0; }}
+        .note {{ background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin-top: 1rem; font-size: 0.875rem; }}
     </style>
 </head>
 <body>
@@ -175,10 +168,10 @@ def generate_html_report(evaluation: Dict, candidate: str) -> str:
         
         <div class="card">
             <h2 style="margin-bottom: 1rem; color: #0f172a;">Bug Details</h2>
+            <p class="note">✨ Evaluation uses flexible logic-based checking. Your fix doesn't need to match exact patterns - as long as the bug is logically fixed, you get the points!</p>
             <div class="bug-list">
 """
     
-    # Group bugs by category
     bugs_by_category = {}
     for bug in evaluation["details"]:
         cat = bug.get("category", "Unknown")
@@ -227,23 +220,21 @@ def print_evaluation(evaluation: Dict, candidate: str) -> None:
     print("="*60)
     print(f"Timestamp: {evaluation['timestamp'][:19].replace('T', ' ')}")
     print("-"*60)
+    print("Note: Using flexible logic-based checking!")
+    print("-"*60)
     
-    # Score
     print(f"\n📊 SCORE: {summary['total_points']}/{summary['max_points']} ({summary['percentage']}%)")
     print(f"   Fixed: {summary['fixed_bugs']}/{summary['total_bugs']} bugs")
     
-    # Progress bar
     bar_width = 40
     filled = int(bar_width * summary['percentage'] / 100)
     bar = "█" * filled + "░" * (bar_width - filled)
     print(f"   [{bar}]")
     
-    # Category breakdown
     print("\n📁 BY CATEGORY:")
     for cat, data in evaluation["categories"].items():
         print(f"   {cat}: {data['fixed']}/{data['total']} fixed ({data['points']}/{data['max_points']} pts)")
     
-    # Bug details
     print("\n🐛 BUG DETAILS:")
     for bug in evaluation["details"]:
         icon = "✅" if bug["fixed"] else "❌"
@@ -263,7 +254,6 @@ def main():
     
     args = parser.parse_args()
     
-    # Check specific bug
     if args.bug:
         result = evaluate_bug(args.bug)
         if args.json:
@@ -274,19 +264,15 @@ def main():
             if result["bug_id"] in BUGS:
                 print(f"   Description: {result['description']}")
                 print(f"   Difficulty: {result['difficulty']}")
-                print(f"   Points: {result['points']}/{result['max_points']}\n")
+                print(f"   Points: {result['points']}/{result['max_points']}")
+                if result.get('hint'):
+                    print(f"   Hint: {result['hint']}\n")
         return
     
-    # Full evaluation
     evaluation = evaluate_all()
     
-    # Output format
     if args.json:
-        output = json.dumps({
-            "candidate": args.candidate,
-            **evaluation
-        }, indent=2)
-        
+        output = json.dumps({"candidate": args.candidate, **evaluation}, indent=2)
         if args.save:
             with open(args.save, 'w') as f:
                 f.write(output)
@@ -296,13 +282,11 @@ def main():
     
     elif args.html:
         html = generate_html_report(evaluation, args.candidate)
-        
         if args.save:
             with open(args.save, 'w') as f:
                 f.write(html)
             print(f"HTML report saved to: {args.save}")
         else:
-            # Save to default location
             os.makedirs("/app/reports", exist_ok=True)
             filename = f"/app/reports/{args.candidate.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
             with open(filename, 'w') as f:
@@ -311,21 +295,6 @@ def main():
     
     else:
         print_evaluation(evaluation, args.candidate)
-        
-        if args.save:
-            # Save console output to file
-            import io
-            import sys
-            
-            old_stdout = sys.stdout
-            sys.stdout = io.StringIO()
-            print_evaluation(evaluation, args.candidate)
-            output = sys.stdout.getvalue()
-            sys.stdout = old_stdout
-            
-            with open(args.save, 'w') as f:
-                f.write(output)
-            print(f"Report saved to: {args.save}")
 
 
 if __name__ == "__main__":
