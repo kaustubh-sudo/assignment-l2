@@ -49,7 +49,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### AUTH-003: Logout Token Persistence (5 pts)
+### AUTH-003: Logout Token Persistence (5 pts) --> not working
 **Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
@@ -63,7 +63,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### AUTH-004: Password Minimum Length Not Enforced (5 pts)
+### AUTH-004: Password Minimum Length Not Enforced (5 pts) --> not working
 **Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
@@ -104,7 +104,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### SAVE-003: Save Button Stays Disabled (10 pts)
+### SAVE-003: Save Button Stays Disabled (10 pts) --> not working
 **Difficulty:** Medium | **Time:** ~1.5 min
 
 **How to Reproduce:**
@@ -293,7 +293,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### FOLDER-002: Folder Selection Not Saved (10 pts)
+### FOLDER-002: Folder Selection Not Saved (10 pts) --> not working
 **Difficulty:** Medium | **Time:** ~2 min
 
 **How to Reproduce:**
@@ -306,7 +306,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### FOLDER-003: Create Folder with Empty Name Succeeds (5 pts)
+### FOLDER-003: Create Folder with Empty Name Succeeds (5 pts) --> not working
 **Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
