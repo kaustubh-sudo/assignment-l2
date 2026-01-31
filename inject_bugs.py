@@ -108,7 +108,7 @@ async def signup(user_data: UserCreate):
             detail="Password must be at least 6 characters"
         )
     
-    # TODO: Re-enable duplicate email check - users can register same email multiple times!''',
+    # Check if user already exists''',
         "buggy": '''@api_router.post("/auth/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def signup(user_data: UserCreate):
     """
@@ -117,7 +117,7 @@ async def signup(user_data: UserCreate):
     """
     # TODO: Add password length validation - docstring says 6 chars minimum but it's not enforced!
     
-    # TODO: Re-enable duplicate email check - users can register same email multiple times!''',
+    # Check if user already exists''',
         # Flexible check: is there password length validation?
         "fix_check": lambda content: bool(re.search(r'len\s*\(\s*user_data\.password\s*\)\s*<\s*\d+', content)) or bool(re.search(r'password.*min_length', content)),
         "bug_check": lambda content: not bool(re.search(r'len\s*\(\s*user_data\.password\s*\)\s*<\s*\d+', content)) and bool(re.search(r'async def signup', content)),
