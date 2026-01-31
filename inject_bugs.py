@@ -666,6 +666,25 @@ async def get_user_folders(current_user: TokenData = Depends(get_current_user)):
         "fix_check": lambda content: bool(re.search(r'!name\.trim\(\)|name\.trim\(\)\s*===\s*[\'"][\'"]|name\s*===\s*[\'"][\'"]', content)),
         "bug_check": lambda content: bool(re.search(r'onCreate\s*\(', content)) and not bool(re.search(r'if\s*\(\s*!name\.trim\(\)|if\s*\(\s*name\.trim\(\)\s*===', content)),
     },
+    "FOLDER-003-FE": {
+        "file": "/app/frontend/src/components/CreateFolderModal.js",
+        "description": "Frontend button disabled state - companion to FOLDER-003",
+        "category": "Folders",
+        "difficulty": "Easy",
+        "points": 0,
+        "time_estimate": "0 min",
+        "hint": "Frontend button disable for empty name",
+        "original": '''            <Button
+              type="submit"
+              disabled={isLoading || !name.trim()}
+              className="flex-1 bg-blue-600 hover:bg-blue-700"''',
+        "buggy": '''            <Button
+              type="submit"
+              disabled={isLoading}
+              className="flex-1 bg-blue-600 hover:bg-blue-700"''',
+        "fix_check": lambda content: bool(re.search(r'disabled=\{isLoading\s*\|\|\s*!name\.trim\(\)\}', content)),
+        "bug_check": lambda content: bool(re.search(r'disabled=\{isLoading\}[^|]', content)),
+    },
 }
 
 
