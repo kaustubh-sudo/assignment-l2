@@ -28,7 +28,7 @@
 | SEARCH-004 | Search | Easy | 5 | DiagramsList.js | TODO |
 | FOLDER-001 | Folders | Medium | 10 | server.py | FIXME |
 | FOLDER-002 | Folders | Medium | 10 | DiagramRenderer.js | TODO |
-| **Total** | | | **175** | | |
+| **Total** | | | **170** | | |
 
 ---
 
