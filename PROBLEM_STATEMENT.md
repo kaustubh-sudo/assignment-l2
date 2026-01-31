@@ -301,7 +301,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### FOLDER-002: Folder Selection Not Saved (10 pts) --> not working
+### FOLDER-002: Folder Selection Not Saved (10 pts)
 **Difficulty:** Medium | **Time:** ~2 min
 
 **How to Reproduce:**
@@ -311,6 +311,8 @@ You have been given access to a **Diagram Maker** web application that allows us
 4. ❌ Diagram not in the selected folder
 
 **Expected:** Folder assignment should persist
+
+**Hint:** Check `DiagramRenderer.js` for a `TODO` comment about folder_id
 
 ---
 
