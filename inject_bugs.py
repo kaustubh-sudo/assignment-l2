@@ -95,9 +95,7 @@ BUGS: Dict[str, Dict] = {
         "points": 5,
         "time_estimate": "1 min",
         "hint": "Check signup endpoint - is password length validated?",
-        "original": '''@api_router.post("/auth/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def signup(user_data: UserCreate):
-    """
+        "original": '''    """
     Register a new user with email and password.
     Password must be at least 6 characters.
     """
@@ -106,18 +104,12 @@ async def signup(user_data: UserCreate):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Password must be at least 6 characters"
-        )
-    
-    # Check if user already exists''',
-        "buggy": '''@api_router.post("/auth/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def signup(user_data: UserCreate):
-    """
+        )''',
+        "buggy": '''    """
     Register a new user with email and password.
     Password must be at least 6 characters.
     """
-    # TODO: Add password length validation - docstring says 6 chars minimum but it's not enforced!
-    
-    # Check if user already exists''',
+    # TODO: Add password length validation - docstring says 6 chars minimum but it's not enforced!''',
         # Flexible check: is there password length validation?
         "fix_check": lambda content: bool(re.search(r'len\s*\(\s*user_data\.password\s*\)\s*<\s*\d+', content)) or bool(re.search(r'password.*min_length', content)),
         "bug_check": lambda content: not bool(re.search(r'len\s*\(\s*user_data\.password\s*\)\s*<\s*\d+', content)) and bool(re.search(r'async def signup', content)),
