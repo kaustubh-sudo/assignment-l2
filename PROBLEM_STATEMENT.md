@@ -236,19 +236,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-## Search Bugs (4 bugs, 30 points)
-
-### SEARCH-001: Search is Case-Sensitive (5 pts)
-**Difficulty:** Easy | **Time:** ~1 min
-
-**How to Reproduce:**
-1. Save diagram "Test Diagram"
-2. Search "test" → ❌ No results
-3. Search "Test" → ✓ Found
-
-**Expected:** Search should be case-insensitive
-
----
+## Search Bugs (3 bugs, 25 points)
 
 ### SEARCH-002: Search Ignores Folder Filter (10 pts)
 **Difficulty:** Medium | **Time:** ~2 min
@@ -287,7 +275,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-## Folder Bugs (3 bugs, 25 points)
+## Folder Bugs (2 bugs, 20 points)
 
 ### FOLDER-001: Folder Dropdown Shows All Users' Folders (10 pts)
 **Difficulty:** Medium | **Time:** ~2 min
