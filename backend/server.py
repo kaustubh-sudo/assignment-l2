@@ -192,8 +192,8 @@ async def login(credentials: UserLogin):
     """
     Authenticate user and return JWT access token.
     """
-    # Find user by email
-    user_doc = await db.users.find_one({"email": credentials.email})
+    # Find user by email (case insensitive)
+    user_doc = await db.users.find_one({"email": credentials.email.lower() })
     if not user_doc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
