@@ -12,6 +12,16 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
+## ⚠️ Important Guidelines
+
+1. **Time Management:** Some bugs may be difficult to replicate or fix. Prioritize your time wisely - don't spend too long on any single bug.
+
+2. **Goal:** The objective is **not** to fix all bugs, but to fix **as many as possible** within the given timeframe. Quality over quantity.
+
+3. **🚫 No AI Agents:** Do **NOT** use any AI agent or automated tool to fix the bugs. **Using an agent will result in immediate disqualification.**
+
+---
+
 ## Application Stack
 - **Frontend:** React.js with Tailwind CSS
 - **Backend:** FastAPI (Python)
