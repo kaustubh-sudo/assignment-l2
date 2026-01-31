@@ -24,14 +24,12 @@
 | EXPORT-001 | Export | Easy | 5 | DiagramRenderer.js | TODO |
 | EXPORT-002 | Export | Medium | 10 | DiagramRenderer.js | FIXME |
 | EXPORT-003 | Export | Easy | 5 | PreviewPanel.js | TODO |
-| SEARCH-001 | Search | Easy | 5 | DiagramsList.js | FIXME |
 | SEARCH-002 | Search | Medium | 10 | DiagramsList.js | FIXME |
 | SEARCH-003 | Search | Medium | 10 | DiagramsList.js | FIXME |
 | SEARCH-004 | Search | Easy | 5 | DiagramsList.js | TODO |
 | FOLDER-001 | Folders | Medium | 10 | server.py | FIXME |
 | FOLDER-002 | Folders | Medium | 10 | DiagramRenderer.js | TODO |
-| FOLDER-003 | Folders | Easy | 5 | CreateFolderModal.js | TODO |
-| **Total** | | | **185** | | |
+| **Total** | | | **175** | | |
 
 ---
 
