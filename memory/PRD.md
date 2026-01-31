@@ -134,3 +134,55 @@ Password: password123
 - **Jan 30, 2026**: US-10 Export Diagram - VERIFIED ✅
 - **Jan 30, 2026**: US-9 Load Saved Diagram for Editing - VERIFIED ✅
 - **Jan 30, 2026**: P1 Bug Fix - Login error toast now shows "Invalid email or password"
+- **Jan 31, 2026**: Developer Assessment Framework - COMPLETE ✅
+  - Created bug injection/fix/evaluation framework in `/app/`
+  - 23 bugs across 6 categories: Authentication, Save/Load, List/Display, Export, Search, Folders
+  - Human-tolerant evaluation using regex-based logical checks (not strict string matching)
+  - Scripts: `inject_bugs.py`, `fix_bugs.py`, `evaluate.py`, `manager.py`
+  - Documentation: `PROBLEM_STATEMENT.md`, `ANSWER_KEY.md`
+  - HTML and JSON report generation in `/app/reports/`
+
+## Developer Assessment Framework
+
+### Purpose
+Transform this Kroki diagram app into a developer assessment tool by injecting bugs that candidates must fix.
+
+### Scripts
+| Script | Purpose |
+|--------|---------|
+| `inject_bugs.py` | Inject predefined bugs into codebase |
+| `fix_bugs.py` | Revert all bugs to clean state |
+| `evaluate.py` | Score candidate submissions with reports |
+| `manager.py` | Manual control utility for assessors |
+
+### Bug Categories (23 total, 185 points)
+| Category | Bugs | Points |
+|----------|------|--------|
+| Authentication | 4 | 20 |
+| Save/Load | 5 | 50 |
+| List/Display | 4 | 40 |
+| Export | 3 | 20 |
+| Search | 4 | 30 |
+| Folders | 3 | 25 |
+
+### Human-Tolerant Evaluation
+The evaluation uses regex-based logical checks, not strict string matching:
+- Accepts syntactic variations (different comments, quotes, spacing)
+- Detects if the bug is logically fixed, regardless of exact implementation
+- Fair scoring for real-world developer candidates
+
+### Usage
+```bash
+# Inject all bugs (prepare for assessment)
+python inject_bugs.py
+
+# Check current status
+python inject_bugs.py --status
+
+# Evaluate candidate submission
+python evaluate.py --candidate "John Doe" --html
+
+# Reset to clean state
+python fix_bugs.py
+```
+
