@@ -75,11 +75,10 @@ const DiagramsList = () => {
     
     // Filter by search query
     if (debouncedSearchQuery.trim()) {
-      // FIXME: Search for "Test" doesn't find "test" - case matching issue
-      const query = debouncedSearchQuery.trim();
+      const query = debouncedSearchQuery.toLowerCase().trim();
       result = result.filter(diagram => 
-        diagram.title.includes(query) ||
-        (diagram.description && diagram.description.includes(query))
+        diagram.title.toLowerCase().includes(query) ||
+        (diagram.description && diagram.description.toLowerCase().includes(query))
       );
     }
     
