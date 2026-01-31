@@ -344,7 +344,7 @@ const DiagramRenderer = () => {
         description,
         diagram_type: diagramType,
         diagram_code: generatedCode,
-        folder_id: folder_id
+        // TODO: folder_id is missing here - add it to save the folder selection
       };
 
       let response;
