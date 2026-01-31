@@ -20,7 +20,6 @@
 | LIST-001 | List/Display | Hard | 15 | server.py | FIXME |
 | LIST-002 | List/Display | Medium | 10 | DiagramCard.js | FIXME |
 | LIST-004 | List/Display | Medium | 10 | DiagramsList.js | FIXME |
-| LIST-005 | List/Display | Easy | 5 | DiagramCard.js | TODO |
 | EXPORT-001 | Export | Easy | 5 | DiagramRenderer.js | TODO |
 | EXPORT-002 | Export | Medium | 10 | DiagramRenderer.js | FIXME |
 | EXPORT-003 | Export | Easy | 5 | PreviewPanel.js | TODO |
