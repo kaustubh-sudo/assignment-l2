@@ -160,13 +160,13 @@ async def signup(user_data: UserCreate):
     """
     # TODO: Add password length validation - docstring says 6 chars minimum but it's not enforced!
     
-    # Check if user already exists
-    existing_user = await db.users.find_one({"email": user_data.email.lower()})
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
-        )
+    # TODO: Re-enable duplicate email check - users can register same email multiple times!
+    # existing_user = await db.users.find_one({"email": user_data.email})
+    # if existing_user:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Email already registered"
+    #     )
     
     # Create new user
     user = User(
@@ -193,7 +193,8 @@ async def login(credentials: UserLogin):
     Authenticate user and return JWT access token.
     """
     # Find user by email
-    user_doc = await db.users.find_one({"email": credentials.email.lower()})
+    # FIXME: Users report they can't login when using different letter casing
+    user_doc = await db.users.find_one({"email": credentials.email})
     if not user_doc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
