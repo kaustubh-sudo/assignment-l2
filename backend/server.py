@@ -158,12 +158,7 @@ async def signup(user_data: UserCreate):
     Register a new user with email and password.
     Password must be at least 6 characters.
     """
-    # Validate password length
-    if len(user_data.password) < 6:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 6 characters"
-        )
+    # TODO: Add password length validation - docstring says 6 chars minimum but it's not enforced!
     
     # TODO: Re-enable duplicate email check - users can register same email multiple times!
     # existing_user = await db.users.find_one({"email": user_data.email})
