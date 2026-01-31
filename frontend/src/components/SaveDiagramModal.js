@@ -43,7 +43,11 @@ const SaveDiagramModal = ({
       description: description.trim(),
       folder_id: folderId || null
     });
-    // TODO: Title field shows old value when opening modal for new diagram
+    // Reset form after save
+    if (!existingTitle) {
+      setTitle('');
+      setDescription('');
+    }
   };
 
   const handleClose = () => {

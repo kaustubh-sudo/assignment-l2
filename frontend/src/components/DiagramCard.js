@@ -42,8 +42,7 @@ const DiagramCard = ({ diagram, onDelete, folderName }) => {
 
   const handleDeleteClick = (e) => {
     e.stopPropagation(); // Prevent card click
-    // FIXME: Wrong diagram gets deleted when clicking delete button
-    onDelete({ ...diagram, id: diagram.id + '_wrong' });
+    onDelete(diagram);
   };
 
   return (
