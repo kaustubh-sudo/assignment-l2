@@ -33,6 +33,7 @@ BUGS: Dict[str, Dict] = {
         "original": '''    # Find user by email
     user_doc = await db.users.find_one({"email": credentials.email.lower()})''',
         "buggy": '''    # Find user by email
+    # FIXME: Users report they can't login when using different letter casing
     user_doc = await db.users.find_one({"email": credentials.email})''',
         # Flexible check: is .lower() used on credentials.email in login?
         "fix_check": lambda content: bool(re.search(r'credentials\.email\.lower\(\)', content)),
@@ -53,7 +54,7 @@ BUGS: Dict[str, Dict] = {
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
         )''',
-        "buggy": '''    # Check if user already exists - DISABLED FOR TESTING
+        "buggy": '''    # TODO: Re-enable duplicate email check - users can register same email multiple times!
     # existing_user = await db.users.find_one({"email": user_data.email})
     # if existing_user:
     #     raise HTTPException(
@@ -78,7 +79,7 @@ BUGS: Dict[str, Dict] = {
     setUser(null);
   };''',
         "buggy": '''  const logout = () => {
-    // Token removal disabled
+    // FIXME: Users report staying logged in after logout - token persists somewhere
     setToken(null);
     setUser(null);
   };''',
@@ -114,7 +115,7 @@ async def signup(user_data: UserCreate):
     Register a new user with email and password.
     Password must be at least 6 characters.
     """
-    # Password validation disabled for testing
+    # TODO: Add password length validation - docstring says 6 chars minimum but it's not enforced!
     
     # Check if user already exists''',
         # Flexible check: is there password length validation?
