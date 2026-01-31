@@ -4,9 +4,9 @@
 You have been given access to a **Diagram Maker** web application that allows users to create, save, and manage diagrams. The application has several bugs that need to be identified and fixed.
 
 **Time Limit:** 1 hour  
-**Total Bugs:** 21  
-**Total Points:** 175  
-**Categories:** Authentication (4), Save/Load (5), List/Display (4), Export (3), Search (3), Folders (2)
+**Total Bugs:** 20  
+**Total Points:** 170  
+**Categories:** Authentication (4), Save/Load (5), List/Display (3), Export (3), Search (3), Folders (2)
 
 > 💡 **Tip:** Look for `TODO`, `FIXME`, and hint comments in the code - they point to the bugs!
 
