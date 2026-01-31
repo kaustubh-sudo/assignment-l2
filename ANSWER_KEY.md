@@ -197,14 +197,6 @@ return `${sanitizedTitle}.${format}`;
 
 ## Search Bugs
 
-### SEARCH-001: Case-Sensitive Search
-**File:** `/app/frontend/src/pages/DiagramsList.js`
-```javascript
-// Add toLowerCase()
-const query = debouncedSearchQuery.toLowerCase().trim();
-diagram.title.toLowerCase().includes(query)
-```
-
 ### SEARCH-002: Ignores Folder Filter
 **File:** `/app/frontend/src/pages/DiagramsList.js`
 ```javascript
