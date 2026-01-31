@@ -316,7 +316,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### FOLDER-003: Create Folder with Empty Name Succeeds (5 pts) --> not working
+### FOLDER-003: Create Folder with Empty Name Succeeds (5 pts)
 **Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
@@ -326,6 +326,8 @@ You have been given access to a **Diagram Maker** web application that allows us
 4. ❌ Folder is created without a name
 
 **Expected:** Should show "Folder name is required" error
+
+**Hint:** Check `CreateFolderModal.js` for a `TODO` comment
 
 ---
 
