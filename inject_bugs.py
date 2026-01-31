@@ -584,7 +584,7 @@ async def get_user_folders(current_user: TokenData = Depends(get_current_user)):
     """
     Get all folders for the authenticated user.
     """
-    # BUG: Missing user_id filter - shows all users' folders
+    # FIXME: Users can see other users' folders! Privacy issue
     folders = await db.folders.find(
         {},
         {"_id": 0}
@@ -613,7 +613,7 @@ async def get_user_folders(current_user: TokenData = Depends(get_current_user)):
         description,
         diagram_type: diagramType,
         diagram_code: generatedCode,
-        // BUG: folder_id not included in save
+        // TODO: Selected folder is ignored when saving - diagram always goes to "No Folder"
       };''',
         # Flexible check: is folder_id in diagramData?
         "fix_check": lambda content: bool(re.search(r'diagramData\s*=\s*\{[^}]*folder_id\s*:', content, re.DOTALL)),
@@ -646,7 +646,7 @@ async def get_user_folders(current_user: TokenData = Depends(get_current_user)):
         "buggy": '''  const handleSubmit = (e) => {
     e.preventDefault();
     
-    // BUG: No validation - allows empty folder names
+    // TODO: Users can create folders with empty names - need validation
     
     setError('');
     onCreate(name.trim());
