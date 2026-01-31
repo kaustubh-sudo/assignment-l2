@@ -247,16 +247,6 @@ const diagramData = {
 };
 ```
 
-### FOLDER-003: Empty Folder Name Accepted
-**File:** `/app/frontend/src/components/CreateFolderModal.js`
-```javascript
-// Add validation
-if (!name.trim()) {
-  setError('Folder name is required');
-  return;
-}
-```
-
 ---
 
 ## Quick Commands
