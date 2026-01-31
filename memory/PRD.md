@@ -165,6 +165,12 @@ Transform this Kroki diagram app into a developer assessment tool by injecting b
 | Search | 4 | 30 |
 | Folders | 3 | 25 |
 
+### Hint Comments in Buggy Code
+Each injected bug includes a hint comment (`TODO`, `FIXME`) that points candidates toward the issue without revealing the solution:
+- `FIXME:` - Describes the user-facing symptom
+- `TODO:` - Describes what needs to be implemented
+- Comments do NOT include bug IDs to prevent direct lookup
+
 ### Human-Tolerant Evaluation
 The evaluation uses regex-based logical checks, not strict string matching:
 - Accepts syntactic variations (different comments, quotes, spacing)
