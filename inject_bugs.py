@@ -191,7 +191,7 @@ async def create_diagram(
     Save a new diagram for the authenticated user.
     Requires valid JWT token in Authorization header.
     """
-    # Duplicate check disabled - allows multiple diagrams with same title
+    # FIXME: Users report duplicate diagrams when saving with same title - should update instead
     
     # Validate folder_id if provided''',
         # Flexible check: is there a check for existing diagram before insert?
