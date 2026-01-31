@@ -51,7 +51,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### AUTH-003: Logout Token Persistence (5 pts) --> not working
+### AUTH-003: Logout Token Persistence (5 pts)
 **Difficulty:** Easy | **Time:** ~1 min
 
 **How to Reproduce:**
@@ -62,6 +62,8 @@ You have been given access to a **Diagram Maker** web application that allows us
 5. Press Back button → Still logged in!
 
 **Expected:** Logout should clear the token from localStorage
+
+**Hint:** Check `AuthContext.js` for a `FIXME` comment
 
 ---
 
