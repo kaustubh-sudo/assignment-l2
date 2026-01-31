@@ -262,26 +262,6 @@ async def create_diagram(
     // BUG: Form not reset after save
   };''',
     },
-    "SAVE-006": {
-        "file": "/app/backend/server.py",
-        "description": "Save without title succeeds - should require title",
-        "category": "Save/Load",
-        "difficulty": "Easy",
-        "points": 5,
-        "time_estimate": "1.5 min",
-        "original": '''class DiagramCreate(BaseModel):
-    title: str = Field(..., min_length=1, max_length=200)
-    description: str = Field(default="", max_length=1000)
-    diagram_type: str
-    diagram_code: str
-    folder_id: str | None = None''',
-        "buggy": '''class DiagramCreate(BaseModel):
-    title: str = Field(default="", max_length=200)  # BUG: No min_length validation
-    description: str = Field(default="", max_length=1000)
-    diagram_type: str
-    diagram_code: str
-    folder_id: str | None = None''',
-    },
     
     # ============== LIST/DISPLAY BUGS ==============
     "LIST-001": {
@@ -311,18 +291,6 @@ async def create_diagram(
     e.stopPropagation(); // Prevent card click
     onDelete({ ...diagram, id: diagram.id + '_wrong' });  // BUG: Corrupted ID
   };''',
-    },
-    "LIST-003": {
-        "file": "/app/backend/server.py",
-        "description": "Diagram list sorted oldest first - should show newest first",
-        "category": "List/Display",
-        "difficulty": "Easy",
-        "points": 5,
-        "time_estimate": "1.5 min",
-        "original": '''    # Sort by updated_at descending (newest first)
-    sort_direction = -1''',
-        "buggy": '''    # Sort by updated_at (BUG: ascending shows oldest first)
-    sort_direction = 1''',
     },
     "LIST-004": {
         "file": "/app/frontend/src/pages/DiagramsList.js",
