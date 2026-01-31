@@ -6,32 +6,32 @@
 
 ## Summary
 
-| Bug ID | Category | Difficulty | Points | File |
-|--------|----------|-----------|--------|------|
-| AUTH-001 | Authentication | Easy | 5 | server.py |
-| AUTH-002 | Authentication | Easy | 5 | server.py |
-| AUTH-003 | Authentication | Easy | 5 | AuthContext.js |
-| AUTH-004 | Authentication | Easy | 5 | server.py |
-| SAVE-001 | Save/Load | Hard | 15 | server.py |
-| SAVE-002 | Save/Load | Medium | 10 | DiagramRenderer.js |
-| SAVE-003 | Save/Load | Medium | 10 | DiagramRenderer.js |
-| SAVE-004 | Save/Load | Medium | 10 | DiagramRenderer.js |
-| SAVE-005 | Save/Load | Easy | 5 | SaveDiagramModal.js |
-| LIST-001 | List/Display | Hard | 15 | server.py |
-| LIST-002 | List/Display | Medium | 10 | DiagramCard.js |
-| LIST-004 | List/Display | Medium | 10 | DiagramsList.js |
-| LIST-005 | List/Display | Easy | 5 | DiagramCard.js |
-| EXPORT-001 | Export | Easy | 5 | DiagramRenderer.js |
-| EXPORT-002 | Export | Medium | 10 | DiagramRenderer.js |
-| EXPORT-003 | Export | Easy | 5 | PreviewPanel.js |
-| SEARCH-001 | Search | Easy | 5 | DiagramsList.js |
-| SEARCH-002 | Search | Medium | 10 | DiagramsList.js |
-| SEARCH-003 | Search | Medium | 10 | DiagramsList.js |
-| SEARCH-004 | Search | Easy | 5 | DiagramsList.js |
-| FOLDER-001 | Folders | Medium | 10 | server.py |
-| FOLDER-002 | Folders | Medium | 10 | DiagramRenderer.js |
-| FOLDER-003 | Folders | Easy | 5 | CreateFolderModal.js |
-| **Total** | | | **185** | |
+| Bug ID | Category | Difficulty | Points | File | Hint Marker |
+|--------|----------|-----------|--------|------|-------------|
+| AUTH-001 | Authentication | Easy | 5 | server.py | FIXME |
+| AUTH-002 | Authentication | Easy | 5 | server.py | TODO |
+| AUTH-003 | Authentication | Easy | 5 | AuthContext.js | FIXME |
+| AUTH-004 | Authentication | Easy | 5 | server.py | TODO |
+| SAVE-001 | Save/Load | Hard | 15 | server.py | FIXME |
+| SAVE-002 | Save/Load | Medium | 10 | DiagramRenderer.js | TODO |
+| SAVE-003 | Save/Load | Medium | 10 | DiagramRenderer.js | FIXME |
+| SAVE-004 | Save/Load | Medium | 10 | DiagramRenderer.js | FIXME |
+| SAVE-005 | Save/Load | Easy | 5 | SaveDiagramModal.js | TODO |
+| LIST-001 | List/Display | Hard | 15 | server.py | FIXME |
+| LIST-002 | List/Display | Medium | 10 | DiagramCard.js | FIXME |
+| LIST-004 | List/Display | Medium | 10 | DiagramsList.js | FIXME |
+| LIST-005 | List/Display | Easy | 5 | DiagramCard.js | TODO |
+| EXPORT-001 | Export | Easy | 5 | DiagramRenderer.js | TODO |
+| EXPORT-002 | Export | Medium | 10 | DiagramRenderer.js | FIXME |
+| EXPORT-003 | Export | Easy | 5 | PreviewPanel.js | TODO |
+| SEARCH-001 | Search | Easy | 5 | DiagramsList.js | FIXME |
+| SEARCH-002 | Search | Medium | 10 | DiagramsList.js | FIXME |
+| SEARCH-003 | Search | Medium | 10 | DiagramsList.js | FIXME |
+| SEARCH-004 | Search | Easy | 5 | DiagramsList.js | TODO |
+| FOLDER-001 | Folders | Medium | 10 | server.py | FIXME |
+| FOLDER-002 | Folders | Medium | 10 | DiagramRenderer.js | TODO |
+| FOLDER-003 | Folders | Easy | 5 | CreateFolderModal.js | TODO |
+| **Total** | | | **185** | | |
 
 ---
 
@@ -40,7 +40,8 @@
 ### AUTH-001: Email Case-Sensitive Login
 **File:** `/app/backend/server.py`
 ```python
-# Buggy
+# Buggy (look for FIXME comment about letter casing)
+# FIXME: Users report they can't login when using different letter casing
 user_doc = await db.users.find_one({"email": credentials.email})
 
 # Fixed
@@ -50,7 +51,9 @@ user_doc = await db.users.find_one({"email": credentials.email.lower()})
 ### AUTH-002: Duplicate Email Registration
 **File:** `/app/backend/server.py`
 ```python
-# Buggy: check is commented out
+# Buggy (look for TODO comment - check is commented out)
+# TODO: Re-enable duplicate email check - users can register same email multiple times!
+
 # Fixed: uncomment and add .lower()
 existing_user = await db.users.find_one({"email": user_data.email.lower()})
 if existing_user:
@@ -60,9 +63,9 @@ if existing_user:
 ### AUTH-003: Logout Doesn't Clear Token
 **File:** `/app/frontend/src/context/AuthContext.js`
 ```javascript
-// Buggy
+// Buggy (look for FIXME comment about token persistence)
 const logout = () => {
-  // Token removal disabled
+  // FIXME: Users report staying logged in after logout - token persists somewhere
   setToken(null);
   setUser(null);
 };
