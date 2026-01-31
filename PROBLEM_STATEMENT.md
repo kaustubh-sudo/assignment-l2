@@ -289,7 +289,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### FOLDER-002: Folder Selection Not Saved (10 pts) (make the hint more simpler)
+### FOLDER-002: Folder Selection Not Saved (10 pts)
 **Difficulty:** Medium | **Time:** ~2 min
 
 **How to Reproduce:**
@@ -304,21 +304,6 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### FOLDER-003: Create Folder with Empty Name Succeeds (5 pts) --> (unable to replicate maybe because of ui side validation)
-**Difficulty:** Easy | **Time:** ~1 min
-
-**How to Reproduce:**
-1. Click "New Folder"
-2. Leave name blank
-3. Click Create
-4. ❌ Folder is created without a name
-
-**Expected:** Should show "Folder name is required" error
-
-**Hint:** Check `CreateFolderModal.js` for a `TODO` comment
-
----
-
 ## Evaluation Criteria
 
 | Category | Bugs | Points |
@@ -327,9 +312,9 @@ You have been given access to a **Diagram Maker** web application that allows us
 | Save/Load | 5 | 50 |
 | List/Display | 4 | 40 |
 | Export | 3 | 20 |
-| Search | 4 | 30 |
-| Folders | 3 | 25 |
-| **Total** | **23** | **185** |
+| Search | 3 | 25 |
+| Folders | 2 | 20 |
+| **Total** | **21** | **175** |
 
 ---
 
