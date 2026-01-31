@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Report - Test Candidate</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; padding: 2rem; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #0f172a; margin-bottom: 0.5rem; }
+        .subtitle { color: #64748b; margin-bottom: 2rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .score-card { text-align: center; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+        .score { font-size: 4rem; font-weight: bold; }
+        .score-label { font-size: 1.25rem; opacity: 0.9; }
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.3); border-radius: 4px; margin-top: 1rem; overflow: hidden; }
+        .progress-fill { height: 100%; background: white; border-radius: 4px; transition: width 0.5s; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; }
+        .stat { padding: 1rem; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #3b82f6; }
+        .stat-label { color: #64748b; font-size: 0.875rem; }
+        .bug-item { display: flex; align-items: center; padding: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .bug-item:last-child { border-bottom: none; }
+        .bug-status { width: 12px; height: 12px; border-radius: 50%; margin-right: 1rem; flex-shrink: 0; }
+        .bug-info { flex: 1; }
+        .bug-id { font-weight: 600; color: #0f172a; }
+        .bug-desc { color: #64748b; font-size: 0.875rem; }
+        .bug-meta { display: flex; gap: 1rem; font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem; }
+        .badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; }
+        .badge-fixed { background: #dcfce7; color: #166534; }
+        .badge-broken { background: #fee2e2; color: #991b1b; }
+        .badge-difficulty { background: #f1f5f9; color: #475569; margin-left: 0.5rem; }
+        .category-header { font-weight: 600; color: #475569; margin: 1rem 0 0.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        .category-header:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+        .note { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin-top: 1rem; font-size: 0.875rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Assessment Report</h1>
+        <p class="subtitle">Candidate: Test Candidate | Generated: 2026-01-31 03:05:57</p>
+        
+        <div class="card score-card">
+            <div class="score">10.8%</div>
+            <div class="score-label">20 / 185 Points</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 10.8%"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Bugs Fixed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">20</div>
+                    <div class="stat-label">Bugs Remaining</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">23</div>
+                    <div class="stat-label">Total Bugs</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 1rem; color: #0f172a;">Bug Details</h2>
+            <p class="note">✨ Evaluation uses flexible logic-based checking. Your fix doesn't need to match exact patterns - as long as the bug is logically fixed, you get the points!</p>
+            <div class="bug-list">
+<div class="category-header">Authentication (10/20 pts)</div>
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">AUTH-001 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Email case-sensitive login - Login should be case-insensitive</div>
+                        <div class="bug-meta">
+                            <span>Points: 5/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">AUTH-002 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Duplicate email registration allowed - Should check for existing email</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">AUTH-003 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Logout doesn't clear token from localStorage</div>
+                        <div class="bug-meta">
+                            <span>Points: 5/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">AUTH-004 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Password minimum length not enforced - Should require 6+ characters</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+<div class="category-header">Save/Load (0/50 pts)</div>
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-001 <span class="badge badge-difficulty">Hard</span></div>
+                        <div class="bug-desc">Save creates duplicate entries - Should update existing diagram with same title</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/15</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-002 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Load diagram doesn't populate textarea - diagram code not loaded properly</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-003 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Save button stays disabled after save completes</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-004 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Last saved timestamp doesn't update after saving</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SAVE-005 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Title field doesn't clear after save - should reset form</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+<div class="category-header">List/Display (0/40 pts)</div>
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">LIST-001 <span class="badge badge-difficulty">Hard</span></div>
+                        <div class="bug-desc">My Diagrams shows everyone's diagrams - Missing user_id filter</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/15</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">LIST-002 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Delete removes wrong diagram - passing wrong diagram to handler</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">LIST-004 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Diagram count doesn't update after delete</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">LIST-005 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Created date shows raw ISO format instead of readable date</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+<div class="category-header">Export (0/20 pts)</div>
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">EXPORT-001 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Export filename always 'diagram.png' - should use diagram title</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">EXPORT-002 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Export button loading spinner never clears</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">EXPORT-003 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Export button not disabled during export - allows duplicate downloads</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+<div class="category-header">Search (10/30 pts)</div>
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SEARCH-001 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Search is case-sensitive - should be case-insensitive</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SEARCH-002 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Search ignores folder filter - shows results from all folders</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #22c55e;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SEARCH-003 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Clear search button doesn't work - search state not cleared</div>
+                        <div class="bug-meta">
+                            <span>Points: 10/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-fixed">FIXED</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">SEARCH-004 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Search input doesn't debounce - causes lag on every keystroke</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+<div class="category-header">Folders (0/25 pts)</div>
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">FOLDER-001 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Folder dropdown shows all users' folders - Missing user_id filter</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">FOLDER-002 <span class="badge badge-difficulty">Medium</span></div>
+                        <div class="bug-desc">Folder selection not saved with diagram - folder_id not included in save</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/10</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+                <div class="bug-item">
+                    <div class="bug-status" style="background: #ef4444;"></div>
+                    <div class="bug-info">
+                        <div class="bug-id">FOLDER-003 <span class="badge badge-difficulty">Easy</span></div>
+                        <div class="bug-desc">Create folder with empty name succeeds - missing validation</div>
+                        <div class="bug-meta">
+                            <span>Points: 0/5</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-broken">BROKEN</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
