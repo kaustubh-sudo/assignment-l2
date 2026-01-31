@@ -110,7 +110,7 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
-### SAVE-003: Save Button Stays Disabled (10 pts) --> not working
+### SAVE-003: Save Button Stays Disabled (10 pts)
 **Difficulty:** Medium | **Time:** ~1.5 min
 
 **How to Reproduce:**
@@ -120,6 +120,8 @@ You have been given access to a **Diagram Maker** web application that allows us
 4. ❌ Save button remains grayed out after completion
 
 **Expected:** Save button should re-enable after save completes
+
+**Hint:** Check `DiagramRenderer.js` for a `FIXME` comment about button state
 
 ---
 
