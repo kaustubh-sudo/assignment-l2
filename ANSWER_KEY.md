@@ -30,7 +30,10 @@
 | SEARCH-002 | Search | Medium | 10 | DiagramsList.js |
 | SEARCH-003 | Search | Medium | 10 | DiagramsList.js |
 | SEARCH-004 | Search | Easy | 5 | DiagramsList.js |
-| **Total** | | | **170** | |
+| FOLDER-001 | Folders | Medium | 10 | server.py |
+| FOLDER-002 | Folders | Medium | 10 | DiagramRenderer.js |
+| FOLDER-003 | Folders | Easy | 5 | CreateFolderModal.js |
+| **Total** | | | **195** | |
 
 ---
 
@@ -241,6 +244,43 @@ const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
 ---
 
+## Folder Bugs
+
+### FOLDER-001: Shows All Users' Folders
+**File:** `/app/backend/server.py`
+```python
+# Add user_id filter
+folders = await db.folders.find(
+    {"user_id": current_user.user_id},
+    {"_id": 0}
+)
+```
+
+### FOLDER-002: Folder Selection Not Saved
+**File:** `/app/frontend/src/pages/DiagramRenderer.js`
+```javascript
+// Include folder_id in save data
+const diagramData = {
+  title,
+  description,
+  diagram_type: diagramType,
+  diagram_code: generatedCode,
+  folder_id: folder_id  // Add this line
+};
+```
+
+### FOLDER-003: Empty Folder Name Accepted
+**File:** `/app/frontend/src/components/CreateFolderModal.js`
+```javascript
+// Add validation
+if (!name.trim()) {
+  setError('Folder name is required');
+  return;
+}
+```
+
+---
+
 ## Quick Commands
 
 ```bash
@@ -251,7 +291,7 @@ python manager.py status
 python inject_bugs.py
 
 # Inject by category
-python inject_bugs.py --category "Search"
+python inject_bugs.py --category "Folders"
 
 # Fix all bugs
 python fix_bugs.py
@@ -266,8 +306,8 @@ python evaluate.py --candidate "Name" --html
 
 | Score | Grade | Assessment |
 |-------|-------|-----------|
-| 140-170 | A | Excellent |
-| 110-139 | B | Good |
-| 75-109 | C | Average |
-| 40-74 | D | Below Average |
-| 0-39 | F | Needs Improvement |
+| 160-195 | A | Excellent |
+| 125-159 | B | Good |
+| 85-124 | C | Average |
+| 45-84 | D | Below Average |
+| 0-44 | F | Needs Improvement |

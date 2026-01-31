@@ -4,9 +4,9 @@
 You have been given access to a **Diagram Maker** web application that allows users to create, save, and manage diagrams. The application has several bugs that need to be identified and fixed.
 
 **Time Limit:** 1 hour  
-**Total Bugs:** 22  
-**Total Points:** 170  
-**Categories:** Authentication (4), Save/Load (6), List/Display (5), Export (3), Search (4)
+**Total Bugs:** 25  
+**Total Points:** 195  
+**Categories:** Authentication (4), Save/Load (6), List/Display (5), Export (3), Search (4), Folders (3)
 
 ---
 
@@ -303,6 +303,46 @@ You have been given access to a **Diagram Maker** web application that allows us
 
 ---
 
+## Folder Bugs (3 bugs, 25 points)
+
+### FOLDER-001: Folder Dropdown Shows All Users' Folders (10 pts)
+**Difficulty:** Medium | **Time:** ~2 min
+
+**How to Reproduce:**
+1. Account A creates folder "Work"
+2. Logout, create Account B
+3. Open folder dropdown → ❌ Sees "Work" from Account A
+
+**Expected:** Each user should only see their own folders
+
+---
+
+### FOLDER-002: Folder Selection Not Saved (10 pts)
+**Difficulty:** Medium | **Time:** ~2 min
+
+**How to Reproduce:**
+1. Select folder from dropdown when saving
+2. Save diagram → Success message
+3. Reload page or check My Diagrams
+4. ❌ Diagram not in the selected folder
+
+**Expected:** Folder assignment should persist
+
+---
+
+### FOLDER-003: Create Folder with Empty Name Succeeds (5 pts)
+**Difficulty:** Easy | **Time:** ~1 min
+
+**How to Reproduce:**
+1. Click "New Folder"
+2. Leave name blank
+3. Click Create
+4. ❌ Folder is created without a name
+
+**Expected:** Should show "Folder name is required" error
+
+---
+
 ## Evaluation Criteria
 
 | Category | Bugs | Points |
@@ -312,7 +352,8 @@ You have been given access to a **Diagram Maker** web application that allows us
 | List/Display | 5 | 45 |
 | Export | 3 | 20 |
 | Search | 4 | 30 |
-| **Total** | **22** | **170** |
+| Folders | 3 | 25 |
+| **Total** | **25** | **195** |
 
 ---
 
