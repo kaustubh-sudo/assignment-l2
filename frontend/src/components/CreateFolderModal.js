@@ -9,7 +9,15 @@ const CreateFolderModal = ({ isOpen, onClose, onCreate, isLoading }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // TODO: Users can create folders with empty names - need validation
+    if (!name.trim()) {
+      setError('Folder name is required');
+      return;
+    }
+    
+    if (name.length > 100) {
+      setError('Folder name must be less than 100 characters');
+      return;
+    }
     
     setError('');
     onCreate(name.trim());
@@ -84,7 +92,7 @@ const CreateFolderModal = ({ isOpen, onClose, onCreate, isLoading }) => {
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !name.trim()}
               className="flex-1 bg-blue-600 hover:bg-blue-700"
               data-testid="create-folder-submit"
             >
