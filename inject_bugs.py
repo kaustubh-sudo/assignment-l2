@@ -480,7 +480,8 @@ async def create_diagram(
         diagram.title.toLowerCase().includes(query) ||
         (diagram.description && diagram.description.toLowerCase().includes(query))
       );''',
-        "buggy": '''      const query = debouncedSearchQuery.trim();  // BUG: case-sensitive
+        "buggy": '''      // FIXME: Search for "Test" doesn't find "test" - case matching issue
+      const query = debouncedSearchQuery.trim();
       result = result.filter(diagram => 
         diagram.title.includes(query) ||
         (diagram.description && diagram.description.includes(query))
@@ -506,7 +507,7 @@ async def create_diagram(
     
     // Filter by search query
     if (debouncedSearchQuery.trim()) {''',
-        "buggy": '''    // BUG: Only apply folder filter when not searching
+        "buggy": '''    // FIXME: Searching while in a folder shows results from ALL folders
     if (!debouncedSearchQuery.trim()) {
       if (selectedFolderId === 'none') {
         result = result.filter(d => !d.folder_id);
@@ -533,9 +534,9 @@ async def create_diagram(
   const handleClearSearch = () => {
     setSearchQuery('');
   };''',
-        "buggy": '''  // Clear search - BUG: doesn't actually clear
+        "buggy": '''  // FIXME: Clear search button (X) does nothing when clicked
   const handleClearSearch = () => {
-    console.log('Clear search clicked');  // Missing setSearchQuery('')
+    console.log('Clear search clicked');
   };''',
         # Flexible check: does handleClearSearch call setSearchQuery('') within its body?
         "fix_check": lambda content: bool(re.search(r'handleClearSearch\s*=\s*\([^)]*\)\s*=>\s*\{[^}]*setSearchQuery\s*\(\s*[\'"][\'"]', content, re.DOTALL)),
@@ -552,9 +553,9 @@ async def create_diagram(
         "original": '''  // Search state
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);''',
-        "buggy": '''  // Search state - BUG: not using debounce
+        "buggy": '''  // TODO: Search feels laggy - filtering runs on every keystroke
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = searchQuery;  // Should use useDebounce''',
+  const debouncedSearchQuery = searchQuery;''',
         # Flexible check: is useDebounce used?
         "fix_check": lambda content: bool(re.search(r'debouncedSearchQuery\s*=\s*useDebounce\s*\(', content)),
         "bug_check": lambda content: bool(re.search(r'debouncedSearchQuery\s*=\s*searchQuery\s*;', content)),
