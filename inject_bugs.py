@@ -216,7 +216,7 @@ async def create_diagram(
             const data = await response.json();
             setDiagramType(data.diagram_type);
             setGeneratedCode(data.diagram_code);
-            // BUG: Not setting userInput from description
+            // TODO: The textarea is empty when loading a saved diagram - description not populated
             setSavedDiagram({''',
         # Flexible check: is setUserInput called with description when loading?
         "fix_check": lambda content: bool(re.search(r'setUserInput\s*\(\s*data\.description', content)),
@@ -240,7 +240,7 @@ async def create_diagram(
     } catch (err) {
       toast.error(err.message);
     }
-    // BUG: Missing finally block - isSaving never reset to false''',
+    // FIXME: Save button stays disabled forever after first save - state not cleaned up''',
         # Flexible check: is there a finally block with setIsSaving(false)?
         "fix_check": lambda content: bool(re.search(r'finally\s*\{[^}]*setIsSaving\s*\(\s*false\s*\)', content, re.DOTALL)),
         "bug_check": lambda content: bool(re.search(r'catch\s*\([^)]*\)\s*\{[^}]*\}\s*\n\s*//|catch\s*\([^)]*\)\s*\{[^}]*\}\s*$', content, re.MULTILINE)) and not bool(re.search(r'finally\s*\{[^}]*setIsSaving\s*\(\s*false\s*\)', content, re.DOTALL)),
@@ -265,7 +265,7 @@ async def create_diagram(
         title: data.title,
         description: data.description,
         folder_id: data.folder_id,
-        updated_at: savedDiagram?.updated_at  // BUG: Using old timestamp instead of new one
+        updated_at: savedDiagram?.updated_at  // FIXME: "Last saved" time never changes after re-saving
       });''',
         # Flexible check: is updated_at set from data.updated_at?
         "fix_check": lambda content: bool(re.search(r'updated_at:\s*data\.updated_at', content)),
