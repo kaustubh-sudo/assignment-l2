@@ -1,0 +1,327 @@
+{
+  "candidate": "Test Candidate",
+  "timestamp": "2026-01-31T03:06:37.175601",
+  "summary": {
+    "total_bugs": 23,
+    "fixed_bugs": 0,
+    "total_points": 0,
+    "max_points": 185,
+    "percentage": 0.0
+  },
+  "categories": {
+    "Authentication": {
+      "fixed": 0,
+      "total": 4,
+      "points": 0,
+      "max_points": 20
+    },
+    "Save/Load": {
+      "fixed": 0,
+      "total": 5,
+      "points": 0,
+      "max_points": 50
+    },
+    "List/Display": {
+      "fixed": 0,
+      "total": 4,
+      "points": 0,
+      "max_points": 40
+    },
+    "Export": {
+      "fixed": 0,
+      "total": 3,
+      "points": 0,
+      "max_points": 20
+    },
+    "Search": {
+      "fixed": 0,
+      "total": 4,
+      "points": 0,
+      "max_points": 30
+    },
+    "Folders": {
+      "fixed": 0,
+      "total": 3,
+      "points": 0,
+      "max_points": 25
+    }
+  },
+  "details": [
+    {
+      "bug_id": "AUTH-001",
+      "category": "Authentication",
+      "description": "Email case-sensitive login - Login should be case-insensitive",
+      "difficulty": "Easy",
+      "hint": "Look for the login endpoint and check if email is normalized to lowercase",
+      "file": "/app/backend/server.py",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    },
+    {
+      "bug_id": "AUTH-002",
+      "category": "Authentication",
+      "description": "Duplicate email registration allowed - Should check for existing email",
+      "difficulty": "Easy",
+      "hint": "Look for signup endpoint - is there a check for existing user before creating?",
+      "file": "/app/backend/server.py",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    },
+    {
+      "bug_id": "AUTH-003",
+      "category": "Authentication",
+      "description": "Logout doesn't clear token from localStorage",
+      "difficulty": "Easy",
+      "hint": "Check the logout function - does it remove the token from localStorage?",
+      "file": "/app/frontend/src/context/AuthContext.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    },
+    {
+      "bug_id": "AUTH-004",
+      "category": "Authentication",
+      "description": "Password minimum length not enforced - Should require 6+ characters",
+      "difficulty": "Easy",
+      "hint": "Check signup endpoint - is password length validated?",
+      "file": "/app/backend/server.py",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    },
+    {
+      "bug_id": "SAVE-001",
+      "category": "Save/Load",
+      "description": "Save creates duplicate entries - Should update existing diagram with same title",
+      "difficulty": "Hard",
+      "hint": "In POST /diagrams, check if a diagram with same title exists before creating new one",
+      "file": "/app/backend/server.py",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 15
+    },
+    {
+      "bug_id": "SAVE-002",
+      "category": "Save/Load",
+      "description": "Load diagram doesn't populate textarea - diagram code not loaded properly",
+      "difficulty": "Medium",
+      "hint": "When loading a diagram, is setUserInput called with the description?",
+      "file": "/app/frontend/src/pages/DiagramRenderer.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 10
+    },
+    {
+      "bug_id": "SAVE-003",
+      "category": "Save/Load",
+      "description": "Save button stays disabled after save completes",
+      "difficulty": "Medium",
+      "hint": "Check if setIsSaving(false) is called in a finally block",
+      "file": "/app/frontend/src/pages/DiagramRenderer.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 10
+    },
+    {
+      "bug_id": "SAVE-004",
+      "category": "Save/Load",
+      "description": "Last saved timestamp doesn't update after saving",
+      "difficulty": "Medium",
+      "hint": "Check if updated_at is set from API response data, not from old state",
+      "file": "/app/frontend/src/pages/DiagramRenderer.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 10
+    },
+    {
+      "bug_id": "SAVE-005",
+      "category": "Save/Load",
+      "description": "Title field doesn't clear after save - should reset form",
+      "difficulty": "Easy",
+      "hint": "After onSave is called, should the form fields be reset?",
+      "file": "/app/frontend/src/components/SaveDiagramModal.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    },
+    {
+      "bug_id": "LIST-001",
+      "category": "List/Display",
+      "description": "My Diagrams shows everyone's diagrams - Missing user_id filter",
+      "difficulty": "Hard",
+      "hint": "In GET /diagrams, is the query filtering by user_id?",
+      "file": "/app/backend/server.py",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 15
+    },
+    {
+      "bug_id": "LIST-002",
+      "category": "List/Display",
+      "description": "Delete removes wrong diagram - passing wrong diagram to handler",
+      "difficulty": "Medium",
+      "hint": "Check handleDeleteClick - is the correct diagram being passed?",
+      "file": "/app/frontend/src/components/DiagramCard.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 10
+    },
+    {
+      "bug_id": "LIST-004",
+      "category": "List/Display",
+      "description": "Diagram count doesn't update after delete",
+      "difficulty": "Medium",
+      "hint": "After delete API call, is the local diagrams state being updated?",
+      "file": "/app/frontend/src/pages/DiagramsList.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 10
+    },
+    {
+      "bug_id": "LIST-005",
+      "category": "List/Display",
+      "description": "Created date shows raw ISO format instead of readable date",
+      "difficulty": "Easy",
+      "hint": "Is the date being formatted before display?",
+      "file": "/app/frontend/src/components/DiagramCard.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    },
+    {
+      "bug_id": "EXPORT-001",
+      "category": "Export",
+      "description": "Export filename always 'diagram.png' - should use diagram title",
+      "difficulty": "Easy",
+      "hint": "Check getExportFilename - is the diagram title being used?",
+      "file": "/app/frontend/src/pages/DiagramRenderer.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    },
+    {
+      "bug_id": "EXPORT-002",
+      "category": "Export",
+      "description": "Export button loading spinner never clears",
+      "difficulty": "Medium",
+      "hint": "Is setIsExporting(false) called in a finally block?",
+      "file": "/app/frontend/src/pages/DiagramRenderer.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 10
+    },
+    {
+      "bug_id": "EXPORT-003",
+      "category": "Export",
+      "description": "Export button not disabled during export - allows duplicate downloads",
+      "difficulty": "Easy",
+      "hint": "Is the export button disabled when isExporting is true?",
+      "file": "/app/frontend/src/components/PreviewPanel.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    },
+    {
+      "bug_id": "SEARCH-001",
+      "category": "Search",
+      "description": "Search is case-sensitive - should be case-insensitive",
+      "difficulty": "Easy",
+      "hint": "Is toLowerCase() used when comparing search query with titles?",
+      "file": "/app/frontend/src/pages/DiagramsList.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    },
+    {
+      "bug_id": "SEARCH-002",
+      "category": "Search",
+      "description": "Search ignores folder filter - shows results from all folders",
+      "difficulty": "Medium",
+      "hint": "Is folder filtering applied regardless of search query?",
+      "file": "/app/frontend/src/pages/DiagramsList.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 10
+    },
+    {
+      "bug_id": "SEARCH-003",
+      "category": "Search",
+      "description": "Clear search button doesn't work - search state not cleared",
+      "difficulty": "Medium",
+      "hint": "Does handleClearSearch actually call setSearchQuery('')?",
+      "file": "/app/frontend/src/pages/DiagramsList.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 10
+    },
+    {
+      "bug_id": "SEARCH-004",
+      "category": "Search",
+      "description": "Search input doesn't debounce - causes lag on every keystroke",
+      "difficulty": "Easy",
+      "hint": "Is useDebounce being used for the search query?",
+      "file": "/app/frontend/src/pages/DiagramsList.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    },
+    {
+      "bug_id": "FOLDER-001",
+      "category": "Folders",
+      "description": "Folder dropdown shows all users' folders - Missing user_id filter",
+      "difficulty": "Medium",
+      "hint": "In GET /folders, is the query filtering by user_id?",
+      "file": "/app/backend/server.py",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 10
+    },
+    {
+      "bug_id": "FOLDER-002",
+      "category": "Folders",
+      "description": "Folder selection not saved with diagram - folder_id not included in save",
+      "difficulty": "Medium",
+      "hint": "When saving diagram, is folder_id included in the request body?",
+      "file": "/app/frontend/src/pages/DiagramRenderer.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 10
+    },
+    {
+      "bug_id": "FOLDER-003",
+      "category": "Folders",
+      "description": "Create folder with empty name succeeds - missing validation",
+      "difficulty": "Easy",
+      "hint": "Is there validation to prevent empty folder names?",
+      "file": "/app/frontend/src/components/CreateFolderModal.js",
+      "status": "INJECTED",
+      "fixed": false,
+      "points": 0,
+      "max_points": 5
+    }
+  ]
+}
