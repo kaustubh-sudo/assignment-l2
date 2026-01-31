@@ -607,61 +607,6 @@ async def get_user_folders(current_user: TokenData = Depends(get_current_user)):
         "fix_check": lambda content: bool(re.search(r'diagramData\s*=\s*\{[^}]*folder_id\s*:', content, re.DOTALL)),
         "bug_check": lambda content: bool(re.search(r'diagramData\s*=\s*\{[^}]*diagram_code', content, re.DOTALL)) and not bool(re.search(r'diagramData\s*=\s*\{[^}]*folder_id\s*:', content, re.DOTALL)),
     },
-    "FOLDER-003": {
-        "file": "/app/frontend/src/components/CreateFolderModal.js",
-        "description": "Create folder with empty name succeeds - missing validation",
-        "category": "Folders",
-        "difficulty": "Easy",
-        "points": 5,
-        "time_estimate": "1 min",
-        "hint": "Is there validation to prevent empty folder names?",
-        "original": '''  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (!name.trim()) {
-      setError('Folder name is required');
-      return;
-    }
-    
-    if (name.length > 100) {
-      setError('Folder name must be less than 100 characters');
-      return;
-    }
-    
-    setError('');
-    onCreate(name.trim());
-  };''',
-        "buggy": '''  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // TODO: Users can create folders with empty names - need validation
-    
-    setError('');
-    onCreate(name.trim());
-  };''',
-        # Flexible check: is there validation for empty name?
-        "fix_check": lambda content: bool(re.search(r'!name\.trim\(\)|name\.trim\(\)\s*===\s*[\'"][\'"]|name\s*===\s*[\'"][\'"]', content)),
-        "bug_check": lambda content: bool(re.search(r'onCreate\s*\(', content)) and not bool(re.search(r'if\s*\(\s*!name\.trim\(\)|if\s*\(\s*name\.trim\(\)\s*===', content)),
-    },
-    "FOLDER-003-FE": {
-        "file": "/app/frontend/src/components/CreateFolderModal.js",
-        "description": "Frontend button disabled state - companion to FOLDER-003",
-        "category": "Folders",
-        "difficulty": "Easy",
-        "points": 0,
-        "time_estimate": "0 min",
-        "hint": "Frontend button disable for empty name",
-        "original": '''            <Button
-              type="submit"
-              disabled={isLoading || !name.trim()}
-              className="flex-1 bg-blue-600 hover:bg-blue-700"''',
-        "buggy": '''            <Button
-              type="submit"
-              disabled={isLoading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700"''',
-        "fix_check": lambda content: bool(re.search(r'disabled=\{isLoading\s*\|\|\s*!name\.trim\(\)\}', content)),
-        "bug_check": lambda content: bool(re.search(r'disabled=\{isLoading\}[^|]', content)),
-    },
 }
 
 
